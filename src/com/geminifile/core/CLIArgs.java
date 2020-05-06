@@ -1,6 +1,7 @@
 package com.geminifile.core;
 
 import java.util.regex.*;
+import java.util.ArrayList;
 
 public class CLIArgs {
 
@@ -21,7 +22,32 @@ public class CLIArgs {
     }
 
     public static void commandProcessor(String[] args) {
-        
+
+        // Initialize the variable containing the arguments
+        ArrayList<String> arguments = new ArrayList<String>();
+
+        Pattern regSing = Pattern.compile("^(-)[a-zA-Z]{1,100}$"); // Regex for single hyphens
+        Pattern regDoub = Pattern.compile("^(--)[a-zA-Z]{1,100}$"); // Regex for double hyphens
+
+        // This for loop is for getting all the arguments from the program.
+        for (String str: args) {
+            if (regSing.matcher(str).matches()) {
+                // If it follows the single hyphen regex
+                String newArg = str.substring(1);
+                for (Character ch: newArg.toCharArray()) {
+                    arguments.add(ch.toString());
+                }
+
+            } else if (regDoub.matcher(str).matches()) {
+                // If it follows the double hyphen regex
+                String newArg = str.substring(2); // Grabs only the word
+                arguments.add(newArg);
+            }
+        }
+
+        for (int i = 0; i < arguments.size(); i++) {
+            System.out.println(arguments.get(i));
+        }
     }
 
 
