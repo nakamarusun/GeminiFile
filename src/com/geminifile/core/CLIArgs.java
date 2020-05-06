@@ -1,5 +1,7 @@
 package com.geminifile.core;
 
+import java.util.regex.*;
+
 public class CLIArgs {
 
     // TODO: complete --help and use regex (or .contains) for CLI command recognition. Make into a function
@@ -16,6 +18,10 @@ public class CLIArgs {
                 "geminifile stop: stops service\n" +
                 "geminifile status: status of the server, folder locations to sync\n" +
                 "");
+    }
+
+    public static void commandProcessor(String[] args) {
+        
     }
 
 
