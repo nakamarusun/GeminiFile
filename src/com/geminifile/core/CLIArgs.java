@@ -9,7 +9,7 @@ public class CLIArgs {
     // TODO: complete --help and use regex (or .contains) for CLI command recognition. Make into a function
 
     public static void viewHelp() {
-        System.out.println("usage: geminifile [--help] \n\n" +
+        System.out.println("usage: geminifile [--help] [-v version]\n\n" +
                 "Common geminifile commands:\n\n" +
                 "geminifile start: Starts server based on configuration file (Starts localhost on port default 39494)\n" +
                 "geminifile conf: view configuration file in CLI\n" +

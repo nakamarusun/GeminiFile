@@ -4,6 +4,8 @@ package com.geminifile.core;
 By Jason Christian @ https://www.github.com/nakamarusun
 */
 
+import com.geminifile.core.localhostconn.LocalServerCommunicator;
+
 import java.util.Map;
 
 public class Driver {
@@ -14,14 +16,14 @@ public class Driver {
             Map<String, String> argMap = CLIArgs.argumentProcessor(args);
             // Processes only the first argument, to see what the program is dealing with
             switch (argMap.keySet().iterator().next()) {
-                case "help":
+                case "--help":
                     CLIArgs.viewHelp();
                     break;
-                case "v":
+                case "-v":
                     CLIArgs.showVersion();
                     break;
                 case "start":
-                    // Start argument
+                    LocalServerCommunicator.startLocalServer();
                     break;
                 case "conf":
                     // conf argument
@@ -42,7 +44,6 @@ public class Driver {
                     System.out.println("Unknown command, please refer to 'geminifile --help'");
                     break;
             }
-
         } else {
             CLIArgs.viewHelp();
         }
