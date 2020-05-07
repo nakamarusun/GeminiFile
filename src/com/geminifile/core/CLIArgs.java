@@ -1,8 +1,8 @@
 package com.geminifile.core;
 
+import java.util.LinkedHashMap;
 import java.util.regex.*;
 import java.util.Map;
-import java.util.HashMap;
 
 public class CLIArgs {
 
@@ -22,16 +22,20 @@ public class CLIArgs {
                 "");
     }
 
-    public static void argumentProcessor(String[] args) {
+    public static Map<String, String> argumentProcessor(String[] args) {
 
         // Maps the arguments with their respective arguments.
-        Map<String, String> argumentMap = new HashMap<String, String>();
+        Map<String, String> argumentMap = new LinkedHashMap<String, String>();
 
         Pattern regSing = Pattern.compile("^(-)[a-zA-Z]{1,100}$"); // Regex for single hyphens
         Pattern regDoub = Pattern.compile("^(--)[a-zA-Z]{1,100}$"); // Regex for double hyphens
 
+        // THE PROGRAM ALWAYS PICKS UP THE FIRST ARGUMENT
+        argumentMap.put(args[0], "");
+
         // This for loop is for getting all the arguments from the program.
-        for (int i = 0; i < args.length; i++) {
+        // Starts from 1 because the first argument has already been picked up
+        for (int i = 1; i < args.length; i++) {
 
             // Checks whether there is an argument after
             String argAfter = "";
@@ -39,7 +43,7 @@ public class CLIArgs {
                 if (!args[i + 1].startsWith("-")) {
                     argAfter = args[i + 1]; // Assigns into variable
                 }
-            } catch (IndexOutOfBoundsException e) { } // Just to catch out of boudns
+            } catch (IndexOutOfBoundsException e) { } // Just to catch out of bounds
 
             if (regSing.matcher(args[i]).matches()) {
                 // If it follows the single hyphen regex
@@ -55,7 +59,7 @@ public class CLIArgs {
             }
         }
 
-        System.out.println(argumentMap.toString());
+        return argumentMap;
     }
 
 
