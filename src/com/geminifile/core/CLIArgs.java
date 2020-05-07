@@ -1,7 +1,8 @@
 package com.geminifile.core;
 
 import java.util.regex.*;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 public class CLIArgs {
 
@@ -21,33 +22,40 @@ public class CLIArgs {
                 "");
     }
 
-    public static void commandProcessor(String[] args) {
+    public static void argumentProcessor(String[] args) {
 
-        // Initialize the variable containing the arguments
-        ArrayList<String> arguments = new ArrayList<String>();
+        // Maps the arguments with their respective arguments.
+        Map<String, String> argumentMap = new HashMap<String, String>();
 
         Pattern regSing = Pattern.compile("^(-)[a-zA-Z]{1,100}$"); // Regex for single hyphens
         Pattern regDoub = Pattern.compile("^(--)[a-zA-Z]{1,100}$"); // Regex for double hyphens
 
         // This for loop is for getting all the arguments from the program.
-        for (String str: args) {
-            if (regSing.matcher(str).matches()) {
+        for (int i = 0; i < args.length; i++) {
+
+            // Checks whether there is an argument after
+            String argAfter = "";
+            try {
+                if (!args[i + 1].startsWith("-")) {
+                    argAfter = args[i + 1]; // Assigns into variable
+                }
+            } catch (IndexOutOfBoundsException e) { } // Just to catch out of boudns
+
+            if (regSing.matcher(args[i]).matches()) {
                 // If it follows the single hyphen regex
-                String newArg = str.substring(1);
+                String newArg = args[i].substring(1);
                 for (Character ch: newArg.toCharArray()) {
-                    arguments.add(ch.toString());
+                    argumentMap.put(ch.toString(), argAfter);
                 }
 
-            } else if (regDoub.matcher(str).matches()) {
+            } else if (regDoub.matcher(args[i]).matches()) {
                 // If it follows the double hyphen regex
-                String newArg = str.substring(2); // Grabs only the word
-                arguments.add(newArg);
+                String newArg = args[i].substring(2); // Grabs only the word
+                argumentMap.put(newArg, argAfter);
             }
         }
 
-        for (int i = 0; i < arguments.size(); i++) {
-            System.out.println(arguments.get(i));
-        }
+        System.out.println(argumentMap.toString());
     }
 
 
