@@ -13,7 +13,35 @@ public class Driver {
             // Processes the CLI arguments into a map of arguments and sub-arguments
             Map<String, String> argMap = CLIArgs.argumentProcessor(args);
             // Processes only the first argument, to see what the program is dealing with
-            System.out.println(argMap.toString());
+            switch (argMap.keySet().iterator().next()) {
+                case "help":
+                    CLIArgs.viewHelp();
+                    break;
+                case "v":
+                    CLIArgs.showVersion();
+                    break;
+                case "start":
+                    // Start argument
+                    break;
+                case "conf":
+                    // conf argument
+                    break;
+                case "log":
+                    // log
+                    break;
+                case "sync":
+                    // sync
+                    break;
+                case "stop":
+                    // stop
+                    break;
+                case "status":
+                    // status
+                    break;
+                default:
+                    System.out.println("Unknown command, please refer to 'geminifile --help'");
+                    break;
+            }
 
         } else {
             CLIArgs.viewHelp();

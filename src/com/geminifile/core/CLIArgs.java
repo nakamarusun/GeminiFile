@@ -62,6 +62,21 @@ public class CLIArgs {
         return argumentMap;
     }
 
-
+    public static void showVersion() {
+        System.out.println("" +
+                "######################\n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "       #      #       \n" +
+                "######################\n" +
+                "GeminiFile v0.1 by Jason Christian\n" +
+                "" +
+                "");
+    }
 
 }
