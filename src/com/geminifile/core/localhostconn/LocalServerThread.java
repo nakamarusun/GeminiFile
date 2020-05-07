@@ -6,7 +6,12 @@ import java.io.InputStreamReader;
 import java.net.*;
 import static com.geminifile.core.CONSTANTS.LOCALPORT;
 
-// UNENCRYPTED LOCALHOST SERVER COMMAND RECEIVER
+/*
+This class is used to set up a localhost server.
+When the geminifile service starts, it will run in the background with little control of how it runs.
+This module is used to query information and send commands towards that service.
+By setting up a local host server, it can receive and send messages and commands.
+ */
 
 public class LocalServerThread implements Runnable {
 
@@ -25,7 +30,7 @@ public class LocalServerThread implements Runnable {
             in = new BufferedReader(new InputStreamReader(sock.getInputStream())); // Starts a new string parser from byte data
 
             while(true) {
-                System.out.println(in.readLine()); // Everytime the client flushes, the message gets printed
+                System.out.println(in.readLine()); // Every time the client flushes, the message gets printed
             }
 
         } catch (IOException e) {
