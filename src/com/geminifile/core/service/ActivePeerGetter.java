@@ -1,5 +1,7 @@
 package com.geminifile.core.service;
 
+import java.net.InetAddress;
+import java.util.Set;
 import java.util.Vector;
 
 import static com.geminifile.core.CONSTANTS.*;
@@ -9,7 +11,11 @@ in the network.
  */
 
 public class ActivePeerGetter implements Runnable {
-    private static Vector<String> activeIpAddresses;
+    private static Vector<InetAddress> activeIpAddresses;
+
+    public ActivePeerGetter() {
+        activeIpAddresses = new Vector<>();
+    }
 
     @Override
     public void run() {
@@ -18,16 +24,18 @@ public class ActivePeerGetter implements Runnable {
         ThreadGroup pinger = new ThreadGroup("Pinger");
 
         for (int i = 0; i < IPPINGERTHREADS; i++) {
-            new Thread(pinger, new PingerThread(i));
+            new Thread(pinger, new PingerThread(i)).start();
         }
-
 
 
         // Wait until thread group is dead
 
 
-
         // End the thread by interrupting the main one.
         Service.getMainThreadRef().interrupt();
+    }
+
+    public static void addActiveIp(InetAddress ip) {
+        activeIpAddresses.add(ip);
     }
 }

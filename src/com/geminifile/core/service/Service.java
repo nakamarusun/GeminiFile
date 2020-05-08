@@ -16,16 +16,25 @@ public class Service {
 
         try {
             id = InetAddress.getLocalHost();
-            if (id.getHostAddress().equals("127.0.0.1")) {
+            String ip = id.getHostAddress();
+            if (ip.equals("127.0.0.1")) {
                 System.out.println("System is not connected to any network !");
                 System.exit(-1);
             }
+            // SETS THE IP BEGINNING FOR PINGER THREAD
+            PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
         } catch(UnknownHostException e) {
             System.out.println("System cannot resolve a valid address !");
             System.exit(-1);
         }
 
+        // Beginning of server listener
+
+        // End of server listener
+
         Thread pinger = new Thread(new ActivePeerGetter());
+
+        pinger.start();
 
         try {
             Thread.currentThread().join();

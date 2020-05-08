@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class CLIArgs {
 
-    // TODO: complete --help and use regex (or .contains) for CLI command recognition. Make into a function
 
     public static void viewHelp() {
         System.out.println("usage: geminifile [--help] [-v version]\n\n" +
