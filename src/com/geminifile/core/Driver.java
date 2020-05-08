@@ -45,9 +45,7 @@ public class Driver {
                     break;
             }
         } else {
-            CLIArgs.viewHelp();
+            // TODO: Starts the application GUI
         }
-
-
     }
 } //

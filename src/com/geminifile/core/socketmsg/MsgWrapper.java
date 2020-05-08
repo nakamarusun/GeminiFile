@@ -39,8 +39,5 @@ public class MsgWrapper implements Serializable {
         return "{" + type.name() + ": " + content + "}";
     }
 
-//    public boolean sendTo() {
-//
-//    }
 
 }

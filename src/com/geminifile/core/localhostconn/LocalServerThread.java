@@ -1,12 +1,13 @@
 package com.geminifile.core.localhostconn;
 
+import com.geminifile.core.socketmsg.MsgWrapper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import static com.geminifile.core.CONSTANTS.LOCALPORT;
-import com.geminifile.core.socketmsg.*;
 
 /*
 This class is used to set up a localhost server.
@@ -19,7 +20,6 @@ public class LocalServerThread implements Runnable {
 
     private ServerSocket ssock;
     private Socket sock;
-    private BufferedReader in;
 
     @Override
     public void run() {
@@ -37,7 +37,8 @@ public class LocalServerThread implements Runnable {
             while(true) {
                 try {
                     MsgWrapper msg = (MsgWrapper) os.readObject();
-                    System.out.println(msg.toString());
+                    LocalServerCommunicator.putMessage(msg);
+                    // TODO: PAUSE THREAD AND SEND A REPLY
                 } catch(ClassNotFoundException e) {
                     e.printStackTrace();
                 }
