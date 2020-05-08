@@ -5,6 +5,7 @@ By Jason Christian @ https://www.github.com/nakamarusun
 */
 
 import com.geminifile.core.localhostconn.LocalServerCommunicator;
+import com.geminifile.core.service.Service;
 
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class Driver {
                     CLIArgs.showVersion();
                     break;
                 case "start":
-                    LocalServerCommunicator.startLocalServer();
+                    Service.start();
                     break;
                 case "conf":
                     // conf argument
