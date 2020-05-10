@@ -3,6 +3,7 @@ package com.geminifile.core.service;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.concurrent.CancellationException;
 
 import static com.geminifile.core.CONSTANTS.*;
 
@@ -59,7 +60,7 @@ public class PingerThread implements Runnable {
                 Socket tryOpen = new Socket();
                 tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
                 // do the msg query here
-                ActivePeerGetter.addActiveIp(ip);   // add to vector
+                ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector
                 tryOpen.close();
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
             } catch (IOException e) {

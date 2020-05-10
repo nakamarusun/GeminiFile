@@ -6,12 +6,7 @@ import static com.geminifile.core.CONSTANTS.*;
 
 public class Service {
 
-    private static Thread mainThread;
-
     public static void start() {
-        // Assigns the main thread to variable for easy access.
-        mainThread = Thread.currentThread();
-
 
         // Checks the status of network. Is the device connected to any network ?
         InetAddress id;
@@ -20,7 +15,7 @@ public class Service {
             String ip = id.getHostAddress();
             if (ip.equals("127.0.0.1")) {
                 System.out.println("System is not connected to any network !");
-                System.exit(-1);
+                System.exit(0);
             }
             // SETS THE IP BEGINNING FOR PINGER THREAD
             PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
@@ -29,16 +24,11 @@ public class Service {
             System.exit(-1);
         }
 
-        // Start pinger to ping all the ranges of the local ip address
-        Thread pinger = new Thread(new ActivePeerGetter(Thread.currentThread()));
-        pinger.start();
 
-        // Waits until the pinger completes its' job
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            // when the pinger is done pinging, do something
-        }
+        // Start pinger to ping all the ranges of the local ip address
+        Thread pinger = new Thread(new ActivePeerGetter());
+        pinger.setDaemon(true);
+        pinger.start();
 
 
     }
