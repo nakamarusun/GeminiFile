@@ -1,9 +1,7 @@
 package com.geminifile.core.service;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 
 import static com.geminifile.core.CONSTANTS.*;
@@ -30,6 +28,7 @@ public class PingerThread implements Runnable {
     @Override
     public void run() {
         // This sections test for all the ip address connections.
+        // Checks for active ip addresses, and inserts it into an arrayList
         int repetition = (range / IPPINGERTHREADS) + 1;
         for (int i = 0; i < repetition; i++) {
             int ipToPing = factor + (i * repetition);
@@ -42,13 +41,11 @@ public class PingerThread implements Runnable {
                 if (ip.isReachable(PINGTIMEOUT)) {
                     activeIps.add(ip);
                 }
-            } catch (UnknownHostException e) {
+            } catch (IOException e) {
                 // TODO: LOG FOR ERRORS AND CONTINUE
                 e.printStackTrace();
-            } catch (IOException e) {
-                // TODO: LOG FOR ERRORS
-                e.printStackTrace();
             }
+
         }
 
         if (activeIps.size() == 0) {
@@ -59,13 +56,15 @@ public class PingerThread implements Runnable {
         for (InetAddress ip : activeIps) {
             // TODO: Change this by implementing message query stuff.
             try {
-                Socket tryOpen = new Socket(ip, COMMPORT);
-                ActivePeerGetter.addActiveIp(ip);
+                Socket tryOpen = new Socket();
+                tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
+                // do the msg query here
+                ActivePeerGetter.addActiveIp(ip);   // add to vector
                 tryOpen.close();
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
             } catch (IOException e) {
                 // TODO: LOG ERROR
-                System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh");
+                System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
             }
         }
 

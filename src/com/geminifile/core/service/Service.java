@@ -11,9 +11,10 @@ public class Service {
     public static void start() {
         // Assigns the main thread to variable for easy access.
         mainThread = Thread.currentThread();
+
+
         // Checks the status of network. Is the device connected to any network ?
         InetAddress id;
-
         try {
             id = InetAddress.getLocalHost();
             String ip = id.getHostAddress();
@@ -28,14 +29,11 @@ public class Service {
             System.exit(-1);
         }
 
-        // Beginning of server listener
-
-        // End of server listener
-
-        Thread pinger = new Thread(new ActivePeerGetter());
-
+        // Start pinger to ping all the ranges of the local ip address
+        Thread pinger = new Thread(new ActivePeerGetter(Thread.currentThread()));
         pinger.start();
 
+        // Waits until the pinger completes its' job
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
@@ -43,10 +41,6 @@ public class Service {
         }
 
 
-    }
-
-    public static Thread getMainThreadRef() {
-        return mainThread;
     }
 
 }

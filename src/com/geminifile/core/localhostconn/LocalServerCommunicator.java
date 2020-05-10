@@ -12,6 +12,7 @@ import java.util.concurrent.SynchronousQueue;
 /*
 This class functions as a gateway that receives and send commands from the command line or
 application. The received command then could be sent into other parts of the program to run.
+This local host can only serve one connection at a time.
  */
 
 public class LocalServerCommunicator {
