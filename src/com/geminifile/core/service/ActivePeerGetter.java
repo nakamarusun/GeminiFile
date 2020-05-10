@@ -43,6 +43,7 @@ public class ActivePeerGetter implements Runnable {
                 break;
             }
         }
+        pinger.destroy();
 
         // End the thread by interrupting the main one.
         threadToInterrupt.interrupt();
