@@ -9,6 +9,7 @@ public class Service {
     public static void start() {
 
         // Checks the status of network. Is the device connected to any network ?
+        // TODO: Move getting current local ip address to ActivePeerGetter
         InetAddress id;
         try {
             id = InetAddress.getLocalHost();
