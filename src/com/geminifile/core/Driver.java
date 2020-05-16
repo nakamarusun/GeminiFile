@@ -24,6 +24,7 @@ public class Driver {
                     CLIArgs.showVersion();
                     break;
                 case "start":
+                    LocalServerCommunicator.startLocalServer();
                     Service.start();
                     break;
                 case "conf":
@@ -49,4 +50,4 @@ public class Driver {
             // TODO: Starts the application GUI
         }
     }
-} //
+}

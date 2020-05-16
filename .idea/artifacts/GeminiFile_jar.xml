@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="GeminiFile:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/GeminiFile_jar</output-path>
+    <root id="archive" name="GeminiFile.jar">
+      <element id="module-output" name="GeminiFile" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/commons-net-3.6.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
