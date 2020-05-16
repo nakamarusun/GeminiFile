@@ -8,5 +8,6 @@ public enum MsgType {
     ASK, // Asking for information
     INFO, // Give an information (1 means accepted, )
     COMMAND, // Command (Will not reply)
-    PING // Returns pong
+    PING, // Returns pong
+    NOREPLY // Does not have to reply to the message.
 }

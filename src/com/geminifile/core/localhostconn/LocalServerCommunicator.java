@@ -1,7 +1,7 @@
 package com.geminifile.core.localhostconn;
 
 import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.MsgWrapper;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,6 +22,7 @@ public class LocalServerCommunicator implements Runnable {
 
     private static Thread localServerThread;
     private static SynchronousQueue<MsgWrapper> inboundMsg;
+    private static SynchronousQueue<MsgWrapper> outboundMsg;
 
 
     public static void startLocalServer() {
@@ -74,6 +75,10 @@ public class LocalServerCommunicator implements Runnable {
         }
     }
 
+    public static MsgWrapper getReply() throws InterruptedException {
+        return outboundMsg.take();
+    }
+
     @Override
     public void run() {
         /*
@@ -83,7 +88,6 @@ public class LocalServerCommunicator implements Runnable {
         By setting up a local host server, it can receive and send messages and commands.
          */
         try {
-            // TODO: MAKE SERVER REQUIRE AUTHENTICATION BEFORE CONNECTING
 
             System.out.println("Opening port in " + LOCALPORT);
             ServerSocket ssock = new ServerSocket(LOCALPORT);
