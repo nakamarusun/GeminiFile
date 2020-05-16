@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 public class MsgWrapper implements Serializable {
 
-    private String content;
+    private String content; // Contains a description of a message
     private MsgType type;
 
     public MsgWrapper(String content, MsgType type) {

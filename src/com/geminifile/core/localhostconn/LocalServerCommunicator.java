@@ -1,5 +1,6 @@
 package com.geminifile.core.localhostconn;
 
+import com.geminifile.core.socketmsg.MsgProcessor;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
@@ -8,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.Scanner;
-import java.util.concurrent.SynchronousQueue;
 
 import static com.geminifile.core.CONSTANTS.LOCALPORT;
 
@@ -21,21 +21,12 @@ This local host can only serve one connection at a time.
 public class LocalServerCommunicator implements Runnable {
 
     private static Thread localServerThread;
-    private static SynchronousQueue<MsgWrapper> inboundMsg;
-    private static SynchronousQueue<MsgWrapper> outboundMsg;
-
 
     public static void startLocalServer() {
-
-        inboundMsg = new SynchronousQueue<MsgWrapper>(true);
 
         localServerThread = new Thread(new LocalServerCommunicator());
         localServerThread.setDaemon(true); // Server is only daemon, when all the main processes is done, this process is optional.
         localServerThread.start();
-
-    }
-
-    private static void processMsg(MsgWrapper msg) {
 
     }
 
@@ -67,18 +58,6 @@ public class LocalServerCommunicator implements Runnable {
         }
     }
 
-    public static void putMessage(MsgWrapper msg) {
-        try {
-            inboundMsg.put(msg);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static MsgWrapper getReply() throws InterruptedException {
-        return outboundMsg.take();
-    }
-
     @Override
     public void run() {
         /*
@@ -95,13 +74,19 @@ public class LocalServerCommunicator implements Runnable {
             Socket sock = ssock.accept(); // Accepts connection
             System.out.println("Connected !");
 
-            ObjectInputStream os = new ObjectInputStream(sock.getInputStream());
+            ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
+            ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
 
             while(true) {
+                // Main loop for receiving local message.
                 try {
-                    MsgWrapper msg = (MsgWrapper) os.readObject();
-                    LocalServerCommunicator.putMessage(msg);
-                    // TODO: PAUSE THREAD AND SEND A REPLY
+                    MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
+                    if (msg.getType() != MsgType.NOREPLY) {
+                        MsgWrapper msgReply = (new MsgProcessor(msg)).process(); // Processes the input message
+                        if (msgReply.getType() != MsgType.NOACTION) {
+                            localObjectOut.writeObject(msgReply); // Send it to the client.
+                        }
+                    }
                 } catch(ClassNotFoundException e) {
                     e.printStackTrace();
                 }
