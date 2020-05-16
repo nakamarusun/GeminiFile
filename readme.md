@@ -9,4 +9,4 @@
 - Linux
 - Android
 
-GeminiFile is coded in java 14, for my second semester programming language final project.
+GeminiFile is coded in java 8, for my second semester programming language final project.
