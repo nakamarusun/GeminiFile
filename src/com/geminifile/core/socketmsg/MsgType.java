@@ -7,7 +7,7 @@ public enum MsgType {
     CONNACCEPT, // The reply to CONNQUERY, with status message (MOTD or something)
     ASK, // Asking for information
     INFO, // Give an information (1 means accepted, )
-    COMMAND, // Command (Will not reply)
+    COMMAND, // Command (returns 1 or 0 depending on done)
     PING, // Returns pong
     NOREPLY, // Does not have to reply to the message.
     NOACTION // Don't reply to the message.

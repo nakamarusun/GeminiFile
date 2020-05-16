@@ -25,12 +25,12 @@ public class LocalServerCommunicator implements Runnable {
     public static void startLocalServer() {
 
         localServerThread = new Thread(new LocalServerCommunicator());
-        localServerThread.setDaemon(true); // Server is only daemon, when all the main processes is done, this process is optional.
+//        localServerThread.setDaemon(true); // Server is only daemon, when all the main processes is done, this process is optional.
         localServerThread.start();
 
     }
 
-    private static void debugLocalThreadClient() {
+    public static void debugLocalThreadClient() {
         // tester for client
         try {
             Thread.sleep(1000);
@@ -66,34 +66,51 @@ public class LocalServerCommunicator implements Runnable {
         This module is used to query information and send commands towards that service.
         By setting up a local host server, it can receive and send messages and commands.
          */
+        System.out.println("Opening in localhost:" + LOCALPORT);
+        ServerSocket ssock = null;
         try {
-
-            System.out.println("Opening port in " + LOCALPORT);
-            ServerSocket ssock = new ServerSocket(LOCALPORT);
-
-            Socket sock = ssock.accept(); // Accepts connection
-            System.out.println("Connected !");
-
-            ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
-            ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
-
-            while(true) {
-                // Main loop for receiving local message.
-                try {
-                    MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
-                    if (msg.getType() != MsgType.NOREPLY) {
-                        MsgWrapper msgReply = (new MsgProcessor(msg)).process(); // Processes the input message
-                        if (msgReply.getType() != MsgType.NOACTION) {
-                            localObjectOut.writeObject(msgReply); // Send it to the client.
-                        }
-                    }
-                } catch(ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
+            ssock = new ServerSocket(LOCALPORT);
         } catch (IOException e) {
+            System.out.println("Failed to open server socket");
             e.printStackTrace();
+            System.exit(5); // Failed to open local server socket
+        }
+
+        while (true) {
+            // Main loop for accepting new clients
+            try {
+                Socket sock = ssock.accept(); // Accepts connection
+                System.out.println("Connected !");
+
+                ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
+                ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
+
+                while (true) {
+                    // Main loop for receiving local message.
+                    try {
+                        System.out.println("Waiting for message..");
+                        MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
+                        System.out.println("[LOCAL] " + msg.toString());
+
+                        MsgWrapper msgReply = (new MsgProcessor(msg)).process(); // Processes the input message
+
+                        // If message type is expecting a reply, then wait for reply from the client.
+                        if (MsgProcessor.isExpectingReply(msg)) {
+                            localObjectOut.writeObject(msgReply); // Reply message to the client.
+                        }
+
+                    } catch (ClassNotFoundException e) {
+                        System.out.println("Class deserialization error");
+                        e.printStackTrace();
+                    }
+                }
+
+            } catch (SocketException ec) {
+                System.out.println("Client Disconnected.");
+            } catch (IOException e) {
+                System.out.println("Socket error.");
+                e.printStackTrace();
+            }
         }
     }
 }
