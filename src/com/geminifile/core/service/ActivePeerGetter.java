@@ -17,14 +17,17 @@ public class ActivePeerGetter implements Runnable {
     // Vector is used here because of its' safety feature for multithreading workloads.
     private static Set<InetAddress> activeIpAddresses;
     private static Vector<InetAddress> tempIpAddresses;
-    private static final Lock updateListLock;
+    private static final Lock updateListLock; // Lock to avoid from accessing list when updating
 
-    public ActivePeerGetter() {
-        tempIpAddresses = new Vector<>();
-    }
+    private static boolean isIpUpdated;
+    private static final Lock isIpUpdatedLock;
+
 
     static {
         updateListLock = new ReentrantLock();
+        isIpUpdatedLock = new ReentrantLock();
+        tempIpAddresses = new Vector<>();
+        isIpUpdated = false;
     }
 
     @Override
@@ -57,6 +60,11 @@ public class ActivePeerGetter implements Runnable {
             ScheduledExecutorService pinger = Executors.newScheduledThreadPool(IPPINGERTHREADS);// Creates new pinger scheduler
             List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
+
+            // If haven't been updated yet, then lock the process.
+            if (!isIpUpdated) {
+                isIpUpdatedLock.lock();
+            }
 
             // Starts executing the pings
             // How do i interrupt this process ?
@@ -100,6 +108,13 @@ public class ActivePeerGetter implements Runnable {
             } catch (Exception ignored) { }
             updateListLock.unlock();
 
+            // Updating process is done.
+            if (!isIpUpdated) {
+                isIpUpdatedLock.unlock();
+            }
+
+            // Signs that ip table has been updated
+            isIpUpdated = true;
 
             // these run after all the pingerThreads and its' sub processes has completed
             pinger.shutdown();
@@ -111,6 +126,7 @@ public class ActivePeerGetter implements Runnable {
 
     }
 
+    // Get all active ips
     public static Set<InetAddress> getActiveIps() {
         // Check if blocked
         updateListLock.lock();
@@ -118,7 +134,11 @@ public class ActivePeerGetter implements Runnable {
         return activeIpAddresses;
     }
 
+    // Get all updated active ips. When method is invoked again, but ip table has not been updated, then wait.
     public static Set<InetAddress> getUpdatedActiveIps() {
+        isIpUpdatedLock.lock();
+        isIpUpdatedLock.unlock();
+        isIpUpdated = false;
         return activeIpAddresses;
     }
 
