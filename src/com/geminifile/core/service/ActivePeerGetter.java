@@ -1,6 +1,7 @@
 package com.geminifile.core.service;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -31,6 +32,24 @@ public class ActivePeerGetter implements Runnable {
         long nextSync = 0;
         while (true) {
 
+            // Get current local IP Address. If got 127.0.0.1, then for now quite the program.
+            // Checks the status of network. Is the device connected to any network ?
+            // TODO: do something if 127.0.0.1 is got instead.
+            InetAddress id;
+            try {
+                id = InetAddress.getLocalHost();
+                String ip = id.getHostAddress();
+                if (ip.equals("127.0.0.1")) {
+                    System.out.println("System is not connected to any network !");
+                    System.exit(0);
+                }
+                // SETS THE IP BEGINNING FOR PINGER THREAD
+                PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
+            } catch(UnknownHostException e) {
+                System.out.println("System cannot resolve a valid address !");
+                System.exit(-1);
+            }
+
             ScheduledExecutorService pinger = Executors.newScheduledThreadPool(IPPINGERTHREADS);// Creates new pinger scheduler
             List<ScheduledFuture<?>> threads = new ArrayList<>();
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
@@ -55,9 +74,8 @@ public class ActivePeerGetter implements Runnable {
             try {
                 activeIpAddresses.clear(); // Tries to clear the activeIpAddresses
             } catch (Exception ignored) { }
-            for (int i = 0; i < tempIpAddresses.size(); i++) {
-                activeIpAddresses.add(tempIpAddresses.get(i)); // adds address from temporary to active
-            }
+            // adds address from temporary to active
+            activeIpAddresses.addAll(tempIpAddresses);
             try {
                 tempIpAddresses.clear(); // Tries to clear tempIpAddresses
             } catch (Exception ignored) { }
@@ -78,6 +96,10 @@ public class ActivePeerGetter implements Runnable {
         // Check if blocked
         updateListLock.lock();
         updateListLock.unlock();
+        return activeIpAddresses;
+    }
+
+    public static Set<InetAddress> getUpdatedActiveIps() {
         return activeIpAddresses;
     }
 

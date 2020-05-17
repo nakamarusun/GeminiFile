@@ -1,4 +1,4 @@
-package com.geminifile.core.localnetworkconn;
+package com.geminifile.core.service.localnetworkconn;
 
 import java.io.IOException;
 import java.net.ServerSocket;

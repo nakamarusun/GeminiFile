@@ -1,4 +1,4 @@
-package com.geminifile.core.localhostconn;
+package com.geminifile.core.service.localhostconn;
 
 import com.geminifile.core.socketmsg.MsgProcessor;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
