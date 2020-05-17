@@ -12,3 +12,5 @@ import the keystore and truststore into the application
 - https://stackoverflow.com/questions/6786945/how-to-do-ssl-socket-programming/6787029
 
 when trying to connect to other peers, send a certificate.
+
+https://www.javaworld.com/article/2075291/build-secure-network-applications-with-ssl-and-the-jsse-api.html

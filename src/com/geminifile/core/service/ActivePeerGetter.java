@@ -17,17 +17,21 @@ public class ActivePeerGetter implements Runnable {
     // Vector is used here because of its' safety feature for multithreading workloads.
     private static Set<InetAddress> activeIpAddresses;
     private static Vector<InetAddress> tempIpAddresses;
-    private static Lock updateListLock;
+    private static final Lock updateListLock;
 
     public ActivePeerGetter() {
         tempIpAddresses = new Vector<>();
+    }
+
+    static {
+        updateListLock = new ReentrantLock();
     }
 
     @Override
     public void run() {
         // TODO: Add method to override the process by invoking a command from the command line.
 
-        updateListLock = new ReentrantLock();
+
         // This section pings and collects active ip addresses
         long nextSync = 0;
         while (true) {
@@ -51,20 +55,35 @@ public class ActivePeerGetter implements Runnable {
             }
 
             ScheduledExecutorService pinger = Executors.newScheduledThreadPool(IPPINGERTHREADS);// Creates new pinger scheduler
-            List<ScheduledFuture<?>> threads = new ArrayList<>();
+            List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
 
             // Starts executing the pings
+            // How do i interrupt this process ?
             for (int i = 0; i < IPPINGERTHREADS; i++) {
-                threads.add(pinger.schedule(new PingerThread(i), nextSync, TimeUnit.MILLISECONDS));
+                scheduledFutures.add(pinger.schedule(new PingerThread(i), nextSync, TimeUnit.MILLISECONDS));
             }
 
 
             // This method checks whether all of the pingerThreads has completed.
-            for (ScheduledFuture<?> trd : threads) {
+            // This boolean functions as a override for the "refresh now" function.
+            boolean restartProcess = false;
+            for (ScheduledFuture<?> trd : scheduledFutures) {
                 try {
                     trd.get();
-                } catch (InterruptedException | ExecutionException ignored) { }
+                } catch (InterruptedException interrupted) {
+                    // The waiting process is interrupted to restart the pinger service.
+                    restartProcess = true;
+                    break;
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // If "refresh ips" is invoked then restart process.
+            if (restartProcess) {
+                nextSync = 0;
+                continue;
             }
 
 

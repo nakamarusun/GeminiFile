@@ -8,6 +8,8 @@ import static com.geminifile.core.CONSTANTS.*;
 
 public class Service {
 
+    private static Thread pinger;
+
     public static void start() {
 
         // Starts local server msg command processor
@@ -15,11 +17,14 @@ public class Service {
 
 
         // Start pinger to ping all the ranges of the local ip address
-        Thread pinger = new Thread(new ActivePeerGetter());
+        pinger = new Thread(new ActivePeerGetter());
         pinger.setDaemon(true);
         pinger.start();
 
+    }
 
+    public static void restartPinger() {
+        pinger.interrupt();
     }
 
 }
