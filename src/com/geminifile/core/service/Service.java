@@ -1,5 +1,7 @@
 package com.geminifile.core.service;
 
+import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import static com.geminifile.core.CONSTANTS.*;
@@ -7,6 +9,9 @@ import static com.geminifile.core.CONSTANTS.*;
 public class Service {
 
     public static void start() {
+
+        // Starts local server msg command processor
+        LocalServerCommunicator.startLocalServer();
 
         // Checks the status of network. Is the device connected to any network ?
         // TODO: Move getting current local ip address to ActivePeerGetter

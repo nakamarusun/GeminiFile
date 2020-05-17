@@ -1,0 +1,14 @@
+- if havent been initialized yet, create a keystore and truststore file programatically.
+
+https://www.javaworld.com/article/2075291/build-secure-network-applications-with-ssl-and-the-jsse-api.html
+http://www.bouncycastle.org/java.html
+https://docs.oracle.com/cd/E19879-01/820-4335/ablqz/index.html
+https://stackoverflow.com/questions/925377/generate-certificates-public-and-private-keys-with-java
+
+- create a certificate, then put it into the keystore.
+
+import the keystore and truststore into the application
+
+- https://stackoverflow.com/questions/6786945/how-to-do-ssl-socket-programming/6787029
+
+when trying to connect to other peers, send a certificate.

@@ -4,8 +4,8 @@ package com.geminifile.core;
 By Jason Christian @ https://www.github.com/nakamarusun
 */
 
-import com.geminifile.core.localhostconn.LocalClientCommunicator;
-import com.geminifile.core.localhostconn.LocalServerCommunicator;
+import com.geminifile.core.service.localhostconn.LocalClientCommunicator;
+import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
@@ -27,7 +27,6 @@ public class Driver {
                     CLIArgs.showVersion();
                     break;
                 case "start":
-                    LocalServerCommunicator.startLocalServer();
                     Service.start();
                     break;
                 case "conf":

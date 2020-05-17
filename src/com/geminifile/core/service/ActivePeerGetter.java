@@ -24,6 +24,7 @@ public class ActivePeerGetter implements Runnable {
 
     @Override
     public void run() {
+        // TODO: Add method to override the process by invoking a command from the command line.
 
         updateListLock = new ReentrantLock();
         // This section pings and collects active ip addresses
@@ -55,7 +56,7 @@ public class ActivePeerGetter implements Runnable {
                 activeIpAddresses.clear(); // Tries to clear the activeIpAddresses
             } catch (Exception ignored) { }
             for (int i = 0; i < tempIpAddresses.size(); i++) {
-                activeIpAddresses.add(tempIpAddresses.get(0));
+                activeIpAddresses.add(tempIpAddresses.get(i)); // adds address from temporary to active
             }
             try {
                 tempIpAddresses.clear(); // Tries to clear tempIpAddresses
@@ -73,7 +74,7 @@ public class ActivePeerGetter implements Runnable {
 
     }
 
-    public static Set<InetAddress> getUpdatedActiveIp() {
+    public static Set<InetAddress> getActiveIps() {
         // Check if blocked
         updateListLock.lock();
         updateListLock.unlock();
