@@ -22,6 +22,8 @@ public class ActivePeerGetter implements Runnable {
     private static boolean isIpUpdated;
     private static final Lock isIpUpdatedLock;
 
+    private static InetAddress currentAddress;
+
 
     static {
         updateListLock = new ReentrantLock();
@@ -32,8 +34,6 @@ public class ActivePeerGetter implements Runnable {
 
     @Override
     public void run() {
-        // TODO: Add method to override the process by invoking a command from the command line.
-
 
         // This section pings and collects active ip addresses
         long nextSync = 0;
@@ -41,15 +41,22 @@ public class ActivePeerGetter implements Runnable {
 
             // Get current local IP Address. If got 127.0.0.1, then for now quite the program.
             // Checks the status of network. Is the device connected to any network ?
-            // TODO: do something if 127.0.0.1 is got instead.
             InetAddress id;
             try {
                 id = InetAddress.getLocalHost();
                 String ip = id.getHostAddress();
                 if (ip.equals("127.0.0.1")) {
+                    // If current device is not connected to any network, then run a thread to detect if the device is then connected to any network
                     System.out.println("System is not connected to any network !");
-                    System.exit(0);
+                    // If current thread is interrupted by the ipChecker thread, then restart the service.
+                    try {
+                        Thread.currentThread().join();
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
                 }
+                // Sets the current ip address
+                currentAddress = id;
                 // SETS THE IP BEGINNING FOR PINGER THREAD
                 PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
             } catch(UnknownHostException e) {
@@ -62,55 +69,59 @@ public class ActivePeerGetter implements Runnable {
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
 
             // If haven't been updated yet, then lock the process.
-            if (!isIpUpdated) {
-                isIpUpdatedLock.lock();
-            }
-
-            // Starts executing the pings
-            // How do i interrupt this process ?
-            for (int i = 0; i < IPPINGERTHREADS; i++) {
-                scheduledFutures.add(pinger.schedule(new PingerThread(i), nextSync, TimeUnit.MILLISECONDS));
-            }
-
-
-            // This method checks whether all of the pingerThreads has completed.
-            // This boolean functions as a override for the "refresh now" function.
-            boolean restartProcess = false;
-            for (ScheduledFuture<?> trd : scheduledFutures) {
-                try {
-                    trd.get();
-                } catch (InterruptedException interrupted) {
-                    // The waiting process is interrupted to restart the pinger service.
-                    restartProcess = true;
-                    break;
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
+            try {
+                if (!isIpUpdated) {
+                    isIpUpdatedLock.lock();
                 }
-            }
 
-            // If "refresh ips" is invoked then restart process.
-            if (restartProcess) {
-                nextSync = 0;
-                continue;
-            }
+                // Starts executing the pings
+                // How do i interrupt this process ?
+                for (int i = 0; i < IPPINGERTHREADS; i++) {
+                    scheduledFutures.add(pinger.schedule(new PingerThread(i), nextSync, TimeUnit.MILLISECONDS));
+                }
 
 
-            // More process after pings is done
-            // This section covers the renewing of the address database
-            updateListLock.lock(); // Blocks the process, so cannot access
-            try {
-                activeIpAddresses.clear(); // Tries to clear the activeIpAddresses
-            } catch (Exception ignored) { }
-            // adds address from temporary to active
-            activeIpAddresses.addAll(tempIpAddresses);
-            try {
-                tempIpAddresses.clear(); // Tries to clear tempIpAddresses
-            } catch (Exception ignored) { }
-            updateListLock.unlock();
+                // This method checks whether all of the pingerThreads has completed.
+                // This boolean functions as a override for the "refresh now" function.
+                boolean restartProcess = false;
+                for (ScheduledFuture<?> trd : scheduledFutures) {
+                    try {
+                        trd.get();
+                    } catch (InterruptedException interrupted) {
+                        // The waiting process is interrupted to restart the pinger service.
+                        restartProcess = true;
+                        break;
+                    } catch (ExecutionException e) {
+                        System.out.println("Error in executing one of the pinger threads.");
+                    }
+                }
 
-            // Updating process is done.
-            if (!isIpUpdated) {
-                isIpUpdatedLock.unlock();
+                // If "refresh ips" is invoked then restart process.
+                if (restartProcess) {
+                    pinger.shutdownNow(); // shutdown all of the thread processes.
+                    nextSync = 0;
+                    continue;
+                }
+
+
+                // More process after pings is done
+                // This section covers the renewing of the address database
+                updateListLock.lock(); // Blocks the process, so cannot access
+                try {
+                    activeIpAddresses.clear(); // Tries to clear the activeIpAddresses
+                    // adds address from temporary to active
+                    activeIpAddresses.addAll(tempIpAddresses);
+                    // removes the current ip address from the other ip addresses.
+                    activeIpAddresses.remove(currentAddress);
+                    tempIpAddresses.clear(); // Tries to clear tempIpAddresses
+                } finally {
+                    updateListLock.unlock();
+                }
+            } finally {
+                // Updating process is done.
+                if (!isIpUpdated) {
+                    isIpUpdatedLock.unlock();
+                }
             }
 
             // Signs that ip table has been updated
@@ -145,4 +156,9 @@ public class ActivePeerGetter implements Runnable {
     static void addActiveTempIp(InetAddress ip) {
         tempIpAddresses.add(ip);
     }
+
+    public static InetAddress getCurrentAddress() {
+        return currentAddress;
+    }
+
 }
