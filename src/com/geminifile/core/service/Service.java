@@ -15,13 +15,18 @@ import static com.geminifile.core.CONSTANTS.*;
 public class Service {
 
     private static InetAddress currentIp;
+    private static Thread networkingThread;
 
     public static void start() {
 
+        System.out.println("Service is starting...");
         // Starts local server message command processor
         LocalServerCommunicator.startLocalServer();
 
         while (true) {
+            System.out.println("Networking service is starting...");
+            // Assigns current thread as service thread.
+            networkingThread = Thread.currentThread();
 
             // Assigns the current ip address to the service variable
             try {
@@ -48,11 +53,11 @@ public class Service {
             /* ScheduledExecutionService for checking whether self ip address is the same
             to warrant a restart. */
             ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor();
-            ipChecker.scheduleAtFixedRate(new IpChangeChecker(Thread.currentThread()), 5000, 5000, TimeUnit.MILLISECONDS);
+            ipChecker.scheduleAtFixedRate(new IpChangeChecker(networkingThread), 5000, 5000, TimeUnit.MILLISECONDS);
 
             // Waits to detect any network ip changes, and restarts all of the service.
             try {
-                Thread.currentThread().join();
+                networkingThread.join();
             } catch (InterruptedException e) {
                 // Shutdowns the ip checker
                 ipChecker.shutdownNow();
@@ -65,6 +70,10 @@ public class Service {
 
     public static InetAddress getCurrentIp() {
         return currentIp;
+    }
+
+    public static void restartNetworkingService() {
+        networkingThread.interrupt();
     }
 
 }

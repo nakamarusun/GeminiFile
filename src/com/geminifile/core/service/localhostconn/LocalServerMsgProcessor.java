@@ -1,17 +1,19 @@
-package com.geminifile.core.socketmsg;
+package com.geminifile.core.service.localhostconn;
 
 /*
 This class takes an MsgWrapper object, and processes it depending on the content, then
 returns a corresponding reply MsgWrapper object.
  */
 
+import com.geminifile.core.service.Service;
+import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 
-public class MsgProcessor {
+public class LocalServerMsgProcessor {
 
     MsgWrapper msg;
 
-    public MsgProcessor(MsgWrapper msg) {
+    public LocalServerMsgProcessor(MsgWrapper msg) {
         this.msg = msg;
     }
 
@@ -34,6 +36,11 @@ public class MsgProcessor {
             case INFO:
                 System.out.println(msg.toString());
                 return noAction;
+            case COMMAND:
+                if (msg.getContent().equals("refresh")) {
+                    Service.restartNetworkingService();
+                }
+                return (new MsgWrapper("DONE", MsgType.INFO));
             default:
                 return noAction;
         }

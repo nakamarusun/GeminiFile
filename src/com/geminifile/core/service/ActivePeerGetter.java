@@ -1,7 +1,6 @@
 package com.geminifile.core.service;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
@@ -26,7 +25,7 @@ public class ActivePeerGetter implements Runnable {
 
     private static boolean willStopService;
 
-    private static Thread currentThread;
+    private static Thread peerGetterThread;
 
     static {
         activeIpAddresses = new HashSet<>();
@@ -41,8 +40,9 @@ public class ActivePeerGetter implements Runnable {
     @Override
     public void run() {
 
+        System.out.println("Pinger service is starting...");
         // Sets reference to the thread running this process so can be interrupted.
-        currentThread = Thread.currentThread();
+        peerGetterThread = Thread.currentThread();
 
         // This section pings and collects active ip addresses
         long nextSync = 0;
@@ -71,6 +71,7 @@ public class ActivePeerGetter implements Runnable {
                     try {
                         trd.get();
                     } catch (InterruptedException interrupted) {
+                        System.out.println("Peer getter thread interrupted");
                         // The waiting process is interrupted to stop the pinger service
                         if (willStopService) {
                             break;
@@ -84,6 +85,8 @@ public class ActivePeerGetter implements Runnable {
                 }
 
                 if (willStopService) {
+                    System.out.println("Peer getter thread stopping...");
+                    willStopService = false;
                     // Stops service
                     pinger.shutdownNow();
                     break;
@@ -91,6 +94,7 @@ public class ActivePeerGetter implements Runnable {
 
                 // If "refresh ips" is invoked then restart process.
                 if (restartProcess) {
+                    System.out.println("Peer getter thread restarting...");
                     pinger.shutdownNow(); // shutdown all of the thread processes.
                     nextSync = 0;
                     continue;
@@ -102,6 +106,7 @@ public class ActivePeerGetter implements Runnable {
                 try {
                     activeIpAddresses.clear(); // Tries to clear the activeIpAddresses
                     // adds address from temporary to active
+                    // and make sure to remove any duplicates.
                     activeIpAddresses.addAll(tempIpAddresses);
                     // removes the current ip address from the other ip addresses.
                     activeIpAddresses.remove(Service.getCurrentIp());
@@ -124,7 +129,7 @@ public class ActivePeerGetter implements Runnable {
             System.out.println("Process done after: " + ((new Date()).getTime() - startTime - nextSync));
             long startAfter = (PINGEVERYXSECOND * 1000) - ((new Date()).getTime() - startTime - nextSync);
             System.out.println("Process will restart after: " + startAfter);
-            nextSync = startAfter > 0 ? startAfter : 0; // Renew the nextSync scheduler timer
+            nextSync = startAfter > 0 ? startAfter : 0; // Renew the nextSync scheduler timer and clamp it so it never reaches below 0.
         }
 
     }
@@ -151,11 +156,11 @@ public class ActivePeerGetter implements Runnable {
 
     public static void stopService() {
         willStopService = true;
-        currentThread.interrupt();
+        peerGetterThread.interrupt();
     }
 
     public static void restartService() {
-        currentThread.interrupt();
+        peerGetterThread.interrupt();
     }
 
 }

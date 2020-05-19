@@ -1,6 +1,5 @@
 package com.geminifile.core.service.localhostconn;
 
-import com.geminifile.core.socketmsg.MsgProcessor;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
@@ -66,12 +65,12 @@ public class LocalServerCommunicator implements Runnable {
         This module is used to query information and send commands towards that service.
         By setting up a local host server, it can receive and send messages and commands.
          */
-        System.out.println("Opening in localhost:" + LOCALPORT);
+        System.out.println("[LSERVER] Opening in localhost:" + LOCALPORT);
         ServerSocket ssock = null;
         try {
             ssock = new ServerSocket(LOCALPORT);
         } catch (IOException e) {
-            System.out.println("Failed to open server socket");
+            System.out.println("[LSERVER] Failed to open server socket");
             e.printStackTrace();
             System.exit(5); // Failed to open local server socket
         }
@@ -80,35 +79,36 @@ public class LocalServerCommunicator implements Runnable {
             // Main loop for accepting new clients
             try {
                 Socket sock = ssock.accept(); // Accepts connection
-                System.out.println("Connected !");
+                System.out.println("[LSERVER] Connected !");
 
                 ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
                 ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
                 while (true) {
                     // Main loop for receiving local message.
+                    // TODO: add loop for back and forth with client
                     try {
                         System.out.println("Waiting for message..");
                         MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
-                        System.out.println("[LOCAL] " + msg.toString());
+                        System.out.println("[LCLIENT] " + msg.toString());
 
-                        MsgWrapper msgReply = (new MsgProcessor(msg)).process(); // Processes the input message
+                        MsgWrapper msgReply = (new LocalServerMsgProcessor(msg)).process(); // Processes the input message
 
                         // If message type is expecting a reply, then wait for reply from the client.
-                        if (MsgProcessor.isExpectingReply(msg)) {
+                        if (LocalServerMsgProcessor.isExpectingReply(msg)) {
                             localObjectOut.writeObject(msgReply); // Reply message to the client.
                         }
 
                     } catch (ClassNotFoundException e) {
-                        System.out.println("Class deserialization error");
+                        System.out.println("[LSERVER] Class deserialization error");
                         e.printStackTrace();
                     }
                 }
 
             } catch (SocketException ec) {
-                System.out.println("Client Disconnected.");
+                System.out.println("[LSERVER] Client Disconnected.");
             } catch (IOException e) {
-                System.out.println("Socket error.");
+                System.out.println("[LSERVER] Socket error.");
                 e.printStackTrace();
             }
         }

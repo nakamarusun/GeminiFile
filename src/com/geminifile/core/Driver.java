@@ -44,6 +44,9 @@ public class Driver {
                 case "status":
                     LocalClientCommunicator.sendLocalMessage(new MsgWrapper("status", MsgType.ASK));
                     break;
+                case "refresh":
+                    LocalClientCommunicator.sendLocalMessage(new MsgWrapper("refresh", MsgType.COMMAND));
+                    break;
                 default:
                     System.out.println("Unknown command, please refer to 'geminifile --help'");
                     break;

@@ -1,6 +1,5 @@
 package com.geminifile.core.service.localhostconn;
 
-import com.geminifile.core.socketmsg.MsgProcessor;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
@@ -15,7 +14,7 @@ public class LocalClientCommunicator {
     private static MsgWrapper msg;
 
     public static void startLocalClient() {
-        System.out.println("Connecting to localhost:" + LOCALPORT);
+        System.out.println("[LCLIENT] Connecting to localhost:" + LOCALPORT);
         try {
             // Begin connection
             Socket sock = new Socket("127.0.0.1", LOCALPORT);
@@ -26,12 +25,13 @@ public class LocalClientCommunicator {
             localObjectOut.writeObject(msg); // note to self: i think this starts up a NEW THREAD. so, you have to wait for it to be done before closing the socket.
 
             // if message type is expecting a reply then, wait for localhost server to reply.
-            if (MsgProcessor.isExpectingReply(msg)) {
+            // TODO: add back and forth for messaging with server.
+            if (LocalServerMsgProcessor.isExpectingReply(msg)) {
                 try {
                     MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
-                    System.out.println("[SERVER] " + msg.toString());
+                    System.out.println("[LSERVER] " + msg.toString());
                 } catch (ClassNotFoundException e) {
-                    System.out.println("Class error not found");
+                    System.out.println("[LCLIENT] Class error not found");
                     e.printStackTrace();
                 }
             }
@@ -45,7 +45,7 @@ public class LocalClientCommunicator {
 
 
         } catch (IOException e) {
-            System.out.println("No geminifile service is running at localhost:" + LOCALPORT);
+            System.out.println("[LCLIENT] No geminifile service is running at localhost:" + LOCALPORT);
             e.printStackTrace();
         }
     }
