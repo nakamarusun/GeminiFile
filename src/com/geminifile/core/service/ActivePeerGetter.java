@@ -15,55 +15,38 @@ in the network.
 
 public class ActivePeerGetter implements Runnable {
     // Vector is used here because of its' safety feature for multithreading workloads.
-    private static Set<InetAddress> activeIpAddresses;
-    private static Vector<InetAddress> tempIpAddresses;
+    private static final Set<InetAddress> activeIpAddresses;
+    private static final Vector<InetAddress> tempIpAddresses;
     private static final Lock updateListLock; // Lock to avoid from accessing list when updating
 
     private static boolean isIpUpdated;
     private static final Lock isIpUpdatedLock;
 
-    private static InetAddress currentAddress;
+//    private static InetAddress currentAddress;
 
+    private static boolean willStopService;
+
+    private static Thread currentThread;
 
     static {
+        activeIpAddresses = new HashSet<>();
         updateListLock = new ReentrantLock();
         isIpUpdatedLock = new ReentrantLock();
         tempIpAddresses = new Vector<>();
+        willStopService = false;
         isIpUpdated = false;
     }
+
 
     @Override
     public void run() {
 
+        // Sets reference to the thread running this process so can be interrupted.
+        currentThread = Thread.currentThread();
+
         // This section pings and collects active ip addresses
         long nextSync = 0;
         while (true) {
-
-            // Get current local IP Address. If got 127.0.0.1, then for now quite the program.
-            // Checks the status of network. Is the device connected to any network ?
-            InetAddress id;
-            try {
-                id = InetAddress.getLocalHost();
-                String ip = id.getHostAddress();
-                if (ip.equals("127.0.0.1")) {
-                    // If current device is not connected to any network, then run a thread to detect if the device is then connected to any network
-                    System.out.println("System is not connected to any network !");
-                    // If current thread is interrupted by the ipChecker thread, then restart the service.
-                    try {
-                        Thread.currentThread().join();
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
-                }
-                // Sets the current ip address
-                currentAddress = id;
-                // SETS THE IP BEGINNING FOR PINGER THREAD
-                PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
-            } catch(UnknownHostException e) {
-                System.out.println("System cannot resolve a valid address !");
-                System.exit(-1);
-            }
-
             ScheduledExecutorService pinger = Executors.newScheduledThreadPool(IPPINGERTHREADS);// Creates new pinger scheduler
             List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
@@ -88,12 +71,22 @@ public class ActivePeerGetter implements Runnable {
                     try {
                         trd.get();
                     } catch (InterruptedException interrupted) {
+                        // The waiting process is interrupted to stop the pinger service
+                        if (willStopService) {
+                            break;
+                        }
                         // The waiting process is interrupted to restart the pinger service.
                         restartProcess = true;
                         break;
                     } catch (ExecutionException e) {
                         System.out.println("Error in executing one of the pinger threads.");
                     }
+                }
+
+                if (willStopService) {
+                    // Stops service
+                    pinger.shutdownNow();
+                    break;
                 }
 
                 // If "refresh ips" is invoked then restart process.
@@ -103,7 +96,6 @@ public class ActivePeerGetter implements Runnable {
                     continue;
                 }
 
-
                 // More process after pings is done
                 // This section covers the renewing of the address database
                 updateListLock.lock(); // Blocks the process, so cannot access
@@ -112,7 +104,7 @@ public class ActivePeerGetter implements Runnable {
                     // adds address from temporary to active
                     activeIpAddresses.addAll(tempIpAddresses);
                     // removes the current ip address from the other ip addresses.
-                    activeIpAddresses.remove(currentAddress);
+                    activeIpAddresses.remove(Service.getCurrentIp());
                     tempIpAddresses.clear(); // Tries to clear tempIpAddresses
                 } finally {
                     updateListLock.unlock();
@@ -157,8 +149,13 @@ public class ActivePeerGetter implements Runnable {
         tempIpAddresses.add(ip);
     }
 
-    public static InetAddress getCurrentAddress() {
-        return currentAddress;
+    public static void stopService() {
+        willStopService = true;
+        currentThread.interrupt();
+    }
+
+    public static void restartService() {
+        currentThread.interrupt();
     }
 
 }

@@ -9,11 +9,14 @@ incoming connections from another peer,
 meanwhile PeerServerSender manages new connections to another device.
  */
 
+import com.geminifile.core.service.ActivePeerGetter;
 import com.geminifile.core.service.Node;
+import com.geminifile.core.service.Service;
 
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,21 +29,12 @@ public class PeerCommunicatorManager {
         peerTableLock = new ReentrantLock();
     }
 
-    public void start() {
+    public static void start() {
         // When a network ip is reset, or connection is reset, restart all of the thread.
         while (true) {
             // Run thread for PeerClientAcceptor
             // Run thread for PeerServerSender
 
-            /* ScheduledExecutionService for checking whether self ip address is the same
-            to warrant a restart.
-             */
-            ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor();
-
-            // If interrupted, stop thread and restart service.
-            try {
-                Thread.currentThread().join();
-            } catch (InterruptedException ignored) { }
         }
     }
 

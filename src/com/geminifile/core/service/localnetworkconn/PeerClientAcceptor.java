@@ -18,7 +18,7 @@ public class PeerClientAcceptor implements Runnable {
     public void run() {
         try {
             // TODO: add a handler for changing the current ip address.
-            ServerSocket ssock = new ServerSocket(COMMPORT, 50, ActivePeerGetter.getCurrentAddress());
+            ServerSocket ssock = new ServerSocket(COMMPORT, 50, InetAddress.getLocalHost());
             /* This works ONLY as connection acceptors.
             accepted connections operations are then put into a new separate thread.
             when another peer connects to this device, put the IP address to peerTable,
