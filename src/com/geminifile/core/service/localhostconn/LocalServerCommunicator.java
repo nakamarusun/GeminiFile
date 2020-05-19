@@ -84,9 +84,9 @@ public class LocalServerCommunicator implements Runnable {
                 ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
                 ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
+
                 while (true) {
                     // Main loop for receiving local message.
-                    // TODO: add loop for back and forth with client
                     try {
                         System.out.println("Waiting for message..");
                         MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
@@ -95,7 +95,7 @@ public class LocalServerCommunicator implements Runnable {
                         MsgWrapper msgReply = (new LocalServerMsgProcessor(msg)).process(); // Processes the input message
 
                         // If message type is expecting a reply, then wait for reply from the client.
-                        if (LocalServerMsgProcessor.isExpectingReply(msg)) {
+                        if (ExpectingReply.isExpectingReply(msg)) {
                             localObjectOut.writeObject(msgReply); // Reply message to the client.
                         }
 

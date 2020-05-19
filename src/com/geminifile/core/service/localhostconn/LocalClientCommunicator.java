@@ -22,14 +22,20 @@ public class LocalClientCommunicator {
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream()); // note to self: ObjectOutputStream MUST come first, then ObjectInputStream.
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
+            // Send the object out to the server.
             localObjectOut.writeObject(msg); // note to self: i think this starts up a NEW THREAD. so, you have to wait for it to be done before closing the socket.
 
             // if message type is expecting a reply then, wait for localhost server to reply.
-            // TODO: add back and forth for messaging with server.
-            if (LocalServerMsgProcessor.isExpectingReply(msg)) {
+            while (ExpectingReply.isExpectingReply(msg)) {
                 try {
-                    MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
+                    msg = (MsgWrapper) localObjectIn.readObject();
                     System.out.println("[LSERVER] " + msg.toString());
+                    // Process message from the server
+                    MsgWrapper msgReply = (new LocalClientMsgProcessor(msg)).process(); // Processes the input message
+                    if (ExpectingReply.isExpectingReply(msg)) {
+                        localObjectOut.writeObject(msgReply);
+                    }
+                    msg = msgReply;
                 } catch (ClassNotFoundException e) {
                     System.out.println("[LCLIENT] Class error not found");
                     e.printStackTrace();

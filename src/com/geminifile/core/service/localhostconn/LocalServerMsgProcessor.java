@@ -5,18 +5,19 @@ This class takes an MsgWrapper object, and processes it depending on the content
 returns a corresponding reply MsgWrapper object.
  */
 
+import com.geminifile.core.service.LocalMsgProcessor;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 
-public class LocalServerMsgProcessor {
+public class LocalServerMsgProcessor extends LocalMsgProcessor implements ExpectingReply {
 
-    MsgWrapper msg;
 
     public LocalServerMsgProcessor(MsgWrapper msg) {
-        this.msg = msg;
+        super(msg);
     }
 
+    @Override
     public MsgWrapper process() {
         // Processes the message in the constructor, and returns a MsgWrapper reply object.
         // The program can also return a NOREPLY MsgWrapper object to signify not to reply anything.
@@ -40,17 +41,10 @@ public class LocalServerMsgProcessor {
                 if (msg.getContent().equals("refresh")) {
                     Service.restartNetworkingService();
                 }
-                return (new MsgWrapper("DONE", MsgType.INFO));
+                return (new MsgWrapper("Done", MsgType.ASK));
             default:
                 return noAction;
         }
-    }
-
-    public static boolean isExpectingReply(MsgWrapper msg) {
-        return msg.getType() == MsgType.CONNQUERY
-                || msg.getType() == MsgType.ASK
-                || msg.getType() == MsgType.COMMAND
-                || msg.getType() == MsgType.PING; // Returns true if the MstType is listed here
     }
 
 }

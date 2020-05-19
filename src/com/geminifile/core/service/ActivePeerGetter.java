@@ -88,6 +88,7 @@ public class ActivePeerGetter implements Runnable {
                     System.out.println("Peer getter thread stopping...");
                     willStopService = false;
                     // Stops service
+                    // TODO: This does not stop the service.
                     pinger.shutdownNow();
                     break;
                 }
