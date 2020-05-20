@@ -33,6 +33,11 @@ public class PingerThread implements Runnable {
         // Checks for active ip addresses, and inserts it into an arrayList
         int repetition = (range / IPPINGERTHREADS) + 1;
         for (int i = 0; i < repetition; i++) {
+            // Check whether thread is interrupted, and stops it if it has to.
+            if (Thread.currentThread().isInterrupted()) {
+                System.out.println("Pinger thread interrupted at " + factor );
+                return;
+            }
             int ipToPing = factor + (i * repetition);
             if (ipToPing > range) { break; } // If ip to check is more than 255, then there is no point.
 
@@ -56,6 +61,10 @@ public class PingerThread implements Runnable {
 
         // Check for open port @ COMMPORT
         for (InetAddress ip : activeIps) {
+            if (Thread.currentThread().isInterrupted()) {
+                System.out.println("Pinger thread interrupted at " + factor );
+                return;
+            }
             // TODO: Change this by implementing message query stuff.
             try {
                 Socket tryOpen = new Socket();

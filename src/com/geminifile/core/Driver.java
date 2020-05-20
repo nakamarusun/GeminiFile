@@ -5,7 +5,6 @@ By Jason Christian @ https://www.github.com/nakamarusun
 */
 
 import com.geminifile.core.service.localhostconn.LocalClientCommunicator;
-import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
@@ -34,9 +33,6 @@ public class Driver {
                     break;
                 case "log":
                     // log
-                    break;
-                case "sync":
-                    // sync
                     break;
                 case "stop":
                     // stop
