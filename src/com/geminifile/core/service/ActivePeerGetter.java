@@ -47,6 +47,8 @@ public class ActivePeerGetter implements Runnable {
         // This section pings and collects active ip addresses
         long nextSync = 0;
         while (true) {
+            tempIpAddresses.clear(); // Tries to clear tempIpAddresses
+
             ScheduledExecutorService pinger = Executors.newScheduledThreadPool(IPPINGERTHREADS);// Creates new pinger scheduler
             List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
             long startTime = (new Date()).getTime(); // This stores the starting time of the pinger.
@@ -111,7 +113,6 @@ public class ActivePeerGetter implements Runnable {
                     activeIpAddresses.addAll(tempIpAddresses);
                     // removes the current ip address from the other ip addresses.
                     activeIpAddresses.remove(Service.getCurrentIp());
-                    tempIpAddresses.clear(); // Tries to clear tempIpAddresses
                 } finally {
                     updateListLock.unlock();
                 }

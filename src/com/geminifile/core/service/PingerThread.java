@@ -61,15 +61,15 @@ public class PingerThread implements Runnable {
 
         // Check for open port @ COMMPORT
         for (InetAddress ip : activeIps) {
-            if (Thread.currentThread().isInterrupted()) {
-                System.out.println("Pinger thread interrupted at " + factor );
-                return;
-            }
             // TODO: Change this by implementing message query stuff.
             try {
                 Socket tryOpen = new Socket();
                 tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
                 // do the msg query here
+                if (Thread.currentThread().isInterrupted()) {
+                    System.out.println("Pinger thread interrupted at " + factor );
+                    return;
+                }
                 ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector
                 tryOpen.close();
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
