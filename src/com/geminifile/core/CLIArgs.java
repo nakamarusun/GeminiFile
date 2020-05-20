@@ -15,9 +15,11 @@ public class CLIArgs {
                 "   [-l <all local port>], [-s <sync port>]\n" +
                 "geminifile log: view update log and stuff\n" +
                 "geminifile sync: force sync of files\n" +
-                "   [-d <folder to sync>] [-f force sync]\n" +
+                "   [-d <folder> syncs folder with ',' delimiter] [-f force sync]\n" +
                 "geminifile stop: stops service\n" +
                 "geminifile status: status of the server, folder locations to sync\n" +
+                "geminifile refresh: refreshes the specified services\n" +
+                "   [-n networking service]" +
                 "");
     }
 
@@ -29,8 +31,7 @@ public class CLIArgs {
         Pattern regSing = Pattern.compile("^(-)[a-zA-Z]{1,100}$"); // Regex for single hyphens
         Pattern regDoub = Pattern.compile("^(--)[a-zA-Z]{1,100}$"); // Regex for double hyphens
 
-        // THE PROGRAM ALWAYS PICKS UP THE FIRST ARGUMENT
-        argumentMap.put(args[0], "");
+        // THE PROGRAM ALWAYS IGNORES THE FIRST ARGUMENT
 
         // This for loop is for getting all the arguments from the program.
         // Starts from 1 because the first argument has already been picked up
@@ -63,7 +64,8 @@ public class CLIArgs {
 
     public static void showVersion() {
         System.out.println("" +
-                "######################\n" +
+                "###                ###\n" +
+                "   ################   \n" +
                 "       #      #       \n" +
                 "       #      #       \n" +
                 "       #      #       \n" +
@@ -72,7 +74,8 @@ public class CLIArgs {
                 "       #      #       \n" +
                 "       #      #       \n" +
                 "       #      #       \n" +
-                "######################\n" +
+                "   ################   \n" +
+                "###                ###\n" +
                 "GeminiFile v0.1 by Jason Christian\n" +
                 "" +
                 "");

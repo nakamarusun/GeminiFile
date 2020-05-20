@@ -38,7 +38,7 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
                 System.out.println(msg.toString());
                 return noAction;
             case COMMAND:
-                if (msg.getContent().equals("refresh")) {
+                if (msg.getContent().equals("RefNet")) {
                     Service.restartNetworkingService();
                 }
                 return (new MsgWrapper("Done", MsgType.ASK));

@@ -11,14 +11,14 @@ import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.util.Map;
 
-public class Driver {
+public class CLIDriver {
     public static void main(String[] args) {
 
         if (args.length != 0) {
             // Processes the CLI arguments into a map of arguments and sub-arguments
             Map<String, String> argMap = CLIArgs.argumentProcessor(args);
             // Processes only the first argument, to see what the program is dealing with
-            switch (argMap.keySet().iterator().next()) {
+            switch (args[0]) {
                 case "--help":
                     CLIArgs.viewHelp();
                     break;
@@ -34,21 +34,24 @@ public class Driver {
                 case "log":
                     // log
                     break;
+                case "sync":
+                    //sync
+                    break;
                 case "stop":
                     // stop
                     break;
                 case "status":
-                    LocalClientCommunicator.sendLocalMessage(new MsgWrapper("status", MsgType.ASK));
+                    ArgumentProcessor.status(argMap);
                     break;
                 case "refresh":
-                    LocalClientCommunicator.sendLocalMessage(new MsgWrapper("refresh", MsgType.COMMAND));
+                    ArgumentProcessor.refresh(argMap);
                     break;
                 default:
                     System.out.println("Unknown command, please refer to 'geminifile --help'");
                     break;
             }
         } else {
-            // TODO: Starts the application GUI
+            CLIArgs.viewHelp();
         }
     }
 }
