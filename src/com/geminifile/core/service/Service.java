@@ -6,6 +6,8 @@ import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +18,7 @@ public class Service {
 
     private static InetAddress currentIp;
     private static Thread networkingThread;
+    private static Node myNode;
 
     public static void start() {
 
@@ -41,6 +44,25 @@ public class Service {
                 e.printStackTrace();
                 System.exit(-1);
             }
+
+            // Generate unique SHA-256 based on identity
+            MessageDigest messageDigest = null;
+            try {
+                messageDigest = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                System.exit(5);
+            }
+            messageDigest.update((currentIp.getHostName() + System.getProperty("os.name")).getBytes());
+            String uniqueId = new String(messageDigest.digest());
+
+            // Assigns myNode
+            myNode = new Node(currentIp,
+                    COMMPORT,
+                    uniqueId,
+                    currentIp.getHostName(),
+                    System.getProperty("os.name")
+            );
 
             // If the current ip address is not localhost (connected to a network) then runs all of the networking service.
             // If not, then await for connection to be made.
@@ -79,6 +101,10 @@ public class Service {
 
     public static void restartNetworkingService() {
         networkingThread.interrupt();
+    }
+
+    public static Node getMyNode() {
+        return myNode;
     }
 
 }

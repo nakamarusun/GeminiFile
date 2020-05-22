@@ -5,7 +5,7 @@ import com.geminifile.core.socketmsg.MsgType;
 
 public class MsgIdentification extends MsgWrapper {
 
-    Node selfNode;
+    private Node selfNode;
 
     public MsgIdentification(String content, MsgType type, Node selfNode) {
         super(content, type);

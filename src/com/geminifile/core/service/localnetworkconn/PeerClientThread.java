@@ -1,6 +1,6 @@
 package com.geminifile.core.service.localnetworkconn;
 
-import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
+import com.geminifile.core.socketmsg.msgwrapper.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,7 +24,8 @@ public class PeerClientThread implements Runnable {
 
             try {
                 // Accept query from the peer.
-                MsgWrapper inQuery = (MsgWrapper)localObjectIn.readObject();
+                MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject();
+
 
             } catch (ClassNotFoundException e) {
                 System.out.println("Class deserialization error");
