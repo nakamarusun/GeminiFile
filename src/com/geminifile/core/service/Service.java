@@ -37,6 +37,7 @@ public class Service {
             } catch (UnknownHostException e) {
                 System.out.println("System cannot resolve a valid IP address !");
                 e.printStackTrace();
+                System.exit(-1);
             }
 
             // If the current ip address is not localhost (connected to a network) then runs all of the networking service.

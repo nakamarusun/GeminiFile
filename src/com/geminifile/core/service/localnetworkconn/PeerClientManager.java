@@ -10,14 +10,13 @@ import java.util.Vector;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
-public class PeerClientAcceptor implements Runnable {
+public class PeerClientManager implements Runnable {
 
     private Vector<Socket> activeSocketPeers;
 
     @Override
     public void run() {
         try {
-            // TODO: add a handler for changing the current ip address.
             ServerSocket ssock = new ServerSocket(COMMPORT, 50, InetAddress.getLocalHost());
             /* This works ONLY as connection acceptors.
             accepted connections operations are then put into a new separate thread.

@@ -49,7 +49,6 @@ public class PingerThread implements Runnable {
                     activeIps.add(ip);
                 }
             } catch (IOException e) {
-                // TODO: LOG FOR ERRORS AND CONTINUE
                 e.printStackTrace();
             }
 
@@ -74,7 +73,6 @@ public class PingerThread implements Runnable {
                 tryOpen.close();
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
             } catch (IOException e) {
-                // TODO: LOG ERROR
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
             }
         }
