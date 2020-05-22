@@ -8,6 +8,7 @@ import com.geminifile.core.service.ActivePeerGetter;
 import com.geminifile.core.service.Service;
 
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class IpChangeChecker implements Runnable {
@@ -22,10 +23,10 @@ public class IpChangeChecker implements Runnable {
     public void run() {
         try {
             // If ip registered in Service is not the same as the current detected ip
-            if (!Service.getCurrentIp().getHostAddress().equals(InetAddress.getLocalHost().getHostAddress())) {
+            if (!Service.getCurrentIp().getHostAddress().equals(Service.getNonLoopbackIp4Address().getHostAddress())) {
                 // Interrupt main service thread and restart.
                 threadToInterrupt.interrupt();
             }
-        } catch (UnknownHostException ignored) { }
+        } catch (SocketException ignored) { }
     }
 }

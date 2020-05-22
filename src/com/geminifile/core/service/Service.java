@@ -4,11 +4,10 @@ import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +16,7 @@ import static com.geminifile.core.CONSTANTS.*;
 
 public class Service {
 
-    private static InetAddress currentIp;
+    private static InetAddress currentIp; // Ip getting must be the first non-loopback address.
     private static Thread networkingThread;
     private static Node myNode;
 
@@ -36,11 +35,13 @@ public class Service {
             // Checking thread.
             // Assigns the current ip address to the service variable
             try {
-                currentIp = InetAddress.getLocalHost();
+                // Get the first non-loopback address
+                currentIp = Service.getNonLoopbackIp4Address();
                 String ip = currentIp.getHostAddress();
                 // Sets a beginning for all of the pinger threads.
                 PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
-            } catch (UnknownHostException e) {
+                System.out.println("ip is: " + currentIp.getHostAddress());
+            } catch (SocketException e) {
                 System.out.println("System cannot resolve a valid IP address !");
                 e.printStackTrace();
                 System.exit(-1);
@@ -68,7 +69,6 @@ public class Service {
             // If the current ip address is not localhost (connected to a network) then runs all of the networking service.
             // If not, then await for connection to be made.
             if (!currentIp.getHostAddress().startsWith("127")) {
-                System.out.println(currentIp.getHostAddress());
                 // Start pinger to ping all the ranges of the local ip address
                 Thread pinger = new Thread(new ActivePeerGetter());
                 pinger.setDaemon(true);
@@ -110,6 +110,23 @@ public class Service {
 
     public static Node getMyNode() {
         return myNode;
+    }
+
+    public static InetAddress getNonLoopbackIp4Address() throws SocketException {
+        // Gets the first non loopback ipv4 address, and returns it. If there is none, then return the loopbackAddress.
+        Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
+        while (en.hasMoreElements()) {
+            NetworkInterface i = en.nextElement();
+            for (Enumeration<InetAddress> en2 = i.getInetAddresses(); en2.hasMoreElements();) {
+                InetAddress address = en2.nextElement();
+                if (!address.isLoopbackAddress()) {
+                    if (address instanceof Inet4Address) {
+                        return address;
+                    }
+                }
+            }
+        }
+        return InetAddress.getLoopbackAddress();
     }
 
 }

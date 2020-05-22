@@ -1,5 +1,7 @@
 package com.geminifile.core.service.localnetworkconn;
 
+import com.geminifile.core.service.Service;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -24,7 +26,7 @@ public class PeerClientManager implements Runnable {
     @Override
     public void run() {
         try {
-            ssock = new ServerSocket(COMMPORT, 50, InetAddress.getLocalHost());
+            ssock = new ServerSocket(COMMPORT, 50, Service.getNonLoopbackIp4Address());
             /* This works ONLY as connection acceptors.
             accepted connections operations are then put into a new separate thread.
             when another peer connects to this device, put the IP address to peerTable,
