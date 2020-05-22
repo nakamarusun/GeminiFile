@@ -30,6 +30,7 @@ public class PeerCommunicatorManager {
     }
 
     public static void start() {
+        peerTable.clear();
         // When a network ip is reset, or connection is reset, restart all of the thread.
         while (true) {
             // Run thread for PeerClientAcceptor

@@ -24,6 +24,13 @@ public class ActivePeerGetter implements Runnable {
 
     private static Thread peerGetterThread;
 
+    public ActivePeerGetter() {
+        activeIpAddresses.clear();
+        tempIpAddresses.clear();
+        activeIpBQ.clear();
+        willStopService = false;
+    }
+
 
     @Override
     public void run() {
