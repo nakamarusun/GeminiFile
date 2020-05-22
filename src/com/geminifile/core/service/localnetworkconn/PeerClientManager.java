@@ -40,7 +40,7 @@ public class PeerClientManager implements Runnable {
 
         } catch (IOException e) {
             if (stopSsock) {
-                // Do stuff when stopped
+                // Do stuff when service is stopped
             } else {
                 System.out.println("Socket error");
                 e.printStackTrace();

@@ -8,12 +8,14 @@ public class Node {
     private int port;
     private String id;
     private String name;
+    private String os;
 
-    public Node(InetAddress ip, int port, String id, String name) {
+    public Node(InetAddress ip, int port, String id, String name, String os) {
         this.ip = ip;
         this.port = port;
         this.id = id;
         this.name = name;
+        this.os = os;
     }
 
     public InetAddress getIp() {
@@ -47,4 +49,13 @@ public class Node {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
 }
