@@ -1,6 +1,12 @@
 package com.geminifile.core.service;
 
+import com.geminifile.core.socketmsg.MsgType;
+import com.geminifile.core.socketmsg.msgwrapper.MsgIdentification;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
+
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
@@ -60,11 +66,29 @@ public class PingerThread implements Runnable {
 
         // Check for open port @ COMMPORT
         for (InetAddress ip : activeIps) {
-            // TODO: Change this by implementing message query stuff.
             try {
                 Socket tryOpen = new Socket();
                 tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
-                // do the msg query here
+
+                // Do the msg query here
+                ObjectOutputStream localObjectOut = new ObjectOutputStream(tryOpen.getOutputStream());
+                ObjectInputStream localObjectIn = new ObjectInputStream(tryOpen.getInputStream());
+
+                // Send connection query to the device
+                localObjectOut.writeObject(new MsgIdentification("ping", MsgType.CONNQUERY, Service.getMyNode()));
+                // See if the reply is good
+                try {
+                    MsgWrapper reply = (MsgWrapper)localObjectIn.readObject();
+                    // if the reply is not expected then throw an IOException error
+                    if ( !(reply.getType() == MsgType.CONNACCEPT && reply.getContent().equals("pinggood")) ) {
+                        throw new IOException("Reply not expected from peer");
+                    }
+                } catch (ClassNotFoundException e) {
+                    System.out.println("Class deserialization error");
+                    e.printStackTrace();
+                }
+                // Msg query ends
+
                 if (Thread.currentThread().isInterrupted()) {
 //                    System.out.println("Pinger thread interrupted at " + factor );
                     return;
@@ -73,6 +97,7 @@ public class PingerThread implements Runnable {
                 tryOpen.close();
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
             } catch (IOException e) {
+                // If connection is error
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
             }
         }

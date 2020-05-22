@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-// This thread can also accept ping queries.
+// This thread can also handle ping queries.
 
 public class PeerClientThread implements Runnable {
 
@@ -29,6 +29,11 @@ public class PeerClientThread implements Runnable {
             try {
                 // Accept query from the peer. Whether this is a query or not.
                 MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject();
+                // Handle ping and exit. If not, then continue as usual
+                if (inQuery.getContent().equals("ping")) {
+                    localObjectOut.writeObject(new MsgIdentification("pinggood", MsgType.CONNACCEPT, Service.getMyNode()));
+                    return;
+                }
                 // Send self id as CONNQUERY accept
                 localObjectOut.writeObject(new MsgIdentification("reply", MsgType.CONNQUERY, Service.getMyNode()));
                 // Accept an OK request

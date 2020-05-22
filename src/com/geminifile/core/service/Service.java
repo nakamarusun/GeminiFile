@@ -4,6 +4,7 @@ import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
@@ -66,13 +67,17 @@ public class Service {
 
             // If the current ip address is not localhost (connected to a network) then runs all of the networking service.
             // If not, then await for connection to be made.
-            if (!currentIp.getHostAddress().equals("127.0.0.1")) {
+            if (!currentIp.getHostAddress().startsWith("127")) {
+                System.out.println(currentIp.getHostAddress());
                 // Start pinger to ping all the ranges of the local ip address
                 Thread pinger = new Thread(new ActivePeerGetter());
                 pinger.setDaemon(true);
                 pinger.start();
 
 //                PeerCommunicatorManager.start();
+            } else {
+                System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
+                System.out.println(myNode.toString());
             }
 
 

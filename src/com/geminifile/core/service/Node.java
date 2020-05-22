@@ -58,4 +58,14 @@ public class Node {
         this.os = os;
     }
 
+    @Override
+    public String toString() {
+        return "Node{" +
+                "ip=" + ip.toString() +
+                ", port=" + port +
+                ", name='" + name + '\'' +
+                ", os='" + os + '\'' +
+                ", id='" + id + '\'' +
+                '}';
+    }
 }
