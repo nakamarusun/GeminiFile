@@ -10,6 +10,8 @@ import java.util.Vector;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
+// Peer client manager accepts all connection from other devices running geminifile instances.
+
 public class PeerClientManager implements Runnable {
 
     private Vector<Socket> activeSocketPeers;

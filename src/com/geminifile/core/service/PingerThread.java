@@ -28,14 +28,14 @@ public class PingerThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Starting pinger " + factor);
+//        System.out.println("Starting pinger " + factor);
         // This sections test for all the ip address connections.
         // Checks for active ip addresses, and inserts it into an arrayList
         int repetition = (range / IPPINGERTHREADS) + 1;
         for (int i = 0; i < repetition; i++) {
             // Check whether thread is interrupted, and stops it if it has to.
             if (Thread.currentThread().isInterrupted()) {
-                System.out.println("Pinger thread interrupted at " + factor );
+//                System.out.println("Pinger thread interrupted at " + factor );
                 return;
             }
             int ipToPing = factor + (i * repetition);
@@ -66,7 +66,7 @@ public class PingerThread implements Runnable {
                 tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
                 // do the msg query here
                 if (Thread.currentThread().isInterrupted()) {
-                    System.out.println("Pinger thread interrupted at " + factor );
+//                    System.out.println("Pinger thread interrupted at " + factor );
                     return;
                 }
                 ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector

@@ -23,11 +23,13 @@ public class Service {
         // Starts local server message command processor
         LocalServerCommunicator.startLocalServer();
 
+        // Assigns current thread as service thread.
+        networkingThread = Thread.currentThread();
+
         while (true) {
             System.out.println("Networking service is starting...");
-            // Assigns current thread as service thread.
-            networkingThread = Thread.currentThread();
 
+            // Checking thread.
             // Assigns the current ip address to the service variable
             try {
                 currentIp = InetAddress.getLocalHost();
@@ -51,12 +53,13 @@ public class Service {
 //                PeerCommunicatorManager.start();
             }
 
-            /* ScheduledExecutionService for checking whether self ip address is the same
-            to warrant a restart. */
+
+            // ScheduledExecutionService for checking whether self ip address is the same to warrant a restart.
             ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor();
             ipChecker.scheduleAtFixedRate(new IpChangeChecker(networkingThread), 5000, 5000, TimeUnit.MILLISECONDS);
 
-            // Waits to detect any network ip changes, and restarts all of the service.
+
+//            Waits to detect any network ip changes, and restarts all of the networking services.
             try {
                 networkingThread.join();
             } catch (InterruptedException e) {
@@ -66,6 +69,7 @@ public class Service {
                 ActivePeerGetter.stopService();
                 // Stops all the PeerCommunicatorManager processes.
             }
+
         }
     }
 
