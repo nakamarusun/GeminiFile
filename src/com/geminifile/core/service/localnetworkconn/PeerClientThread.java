@@ -28,11 +28,14 @@ public class PeerClientThread implements Runnable {
 
             try {
                 // Accept query from the peer. Whether this is a query or not it is decided later.
-                MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject(); // ERROR
-//                System.out.println("read ping from ip: " + sock.getInetAddress().getHostAddress());
+                MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject();
                 // Handle ping and exit. If not, then continue as usual
                 if (inQuery.getContent().equals("ping")) {
                     localObjectOut.writeObject(new MsgIdentification("pinggood", MsgType.CONNACCEPT, Service.getMyNode()));
+                    return;
+                } else if ( !inQuery.getContent().equals("query")) {
+                    // TODO: CHECK IN TRUSTED DEVICES FILE WHETHER PEER IS KNOWN. IF IT IS NOT KNOWN, PROMPT THE USER TO TRUST IT OR NOT.
+                    // if message is not ping and not query then quit the thread
                     return;
                 }
                 // Send self id as CONNQUERY accept
