@@ -53,65 +53,53 @@ public class PingerThread implements Runnable {
                 InetAddress ip = InetAddress.getByName(ipBeginning + ipToPing);
                 // Check to not match self ip
 //                if (ip.equals(Service.getCurrentIp())) { continue; } // Code to check self ip.
-                // If ip is reachable then add to list
-                if (ip.isReachable(PINGTIMEOUT)) {
-                    activeIps.add(ip);
-                } else {
-                    if (ip.getHostAddress().equals("192.168.1.9")) {
-                        System.out.println("Cannot connect to celine wtf ??????????");
+
+                // Pings the ip by checking the open port @ COMMPORT and attempting to query with it.
+                // Check for open port @ COMMPORT
+                try {
+                    Socket tryOpen = new Socket();
+                    tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PINGTIMEOUT);
+//                System.out.println("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
+                    // Do the msg query here
+                    ObjectOutputStream localObjectOut = new ObjectOutputStream(tryOpen.getOutputStream());
+                    ObjectInputStream localObjectIn = new ObjectInputStream(tryOpen.getInputStream());
+
+                    // Send a connection query to the device with intention to ping
+                    localObjectOut.writeObject(new MsgIdentification("ping", MsgType.CONNQUERY, Service.getMyNode()));
+//                System.out.println("Sent ping to ip: " + tryOpen.getInetAddress().getHostAddress());
+                    // See if the reply is good
+                    try {
+                        MsgWrapper reply = (MsgWrapper)localObjectIn.readObject();
+                        // if the reply is not expected then throw an IOException error
+                        if ( !(reply.getType() == MsgType.CONNACCEPT && reply.getContent().equals("pinggood")) ) {
+                            throw new IOException("Reply not expected from peer");
+                        }
+                    } catch (ClassNotFoundException e) {
+                        System.out.println("Class deserialization error");
+                        e.printStackTrace();
                     }
+                    // Msg query ends
+
+                    if (Thread.currentThread().isInterrupted()) {
+//                    System.out.println("Pinger thread interrupted at " + factor );
+                        return;
+                    }
+                    ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector
+                    tryOpen.close();
+                    System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
+                } catch (IOException e) {
+                    // If connection is error
+//                    System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
 
-        if (activeIps.size() == 0) {
-//            System.out.println("Stopping pinger " + factor);
-            return; // No active ips, stopping thread.
-        }
 
-        // Check for open port @ COMMPORT
-        for (InetAddress ip : activeIps) {
-            try {
-                Socket tryOpen = new Socket();
-                tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
-//                System.out.println("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
-                // Do the msg query here
-                ObjectOutputStream localObjectOut = new ObjectOutputStream(tryOpen.getOutputStream());
-                ObjectInputStream localObjectIn = new ObjectInputStream(tryOpen.getInputStream());
-
-                // Send a connection query to the device with intention to ping
-                localObjectOut.writeObject(new MsgIdentification("ping", MsgType.CONNQUERY, Service.getMyNode()));
-//                System.out.println("Sent ping to ip: " + tryOpen.getInetAddress().getHostAddress());
-                // See if the reply is good
-                try {
-                    MsgWrapper reply = (MsgWrapper)localObjectIn.readObject();
-                    // if the reply is not expected then throw an IOException error
-                    if ( !(reply.getType() == MsgType.CONNACCEPT && reply.getContent().equals("pinggood")) ) {
-                        throw new IOException("Reply not expected from peer");
-                    }
-                } catch (ClassNotFoundException e) {
-                    System.out.println("Class deserialization error");
-                    e.printStackTrace();
-                }
-                // Msg query ends
-
-                if (Thread.currentThread().isInterrupted()) {
-//                    System.out.println("Pinger thread interrupted at " + factor );
-                    return;
-                }
-                ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector
-                tryOpen.close();
-                System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
-            } catch (IOException e) {
-                // If connection is error
-                System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
-            }
-        }
 //        System.out.println("Stopping pinger " + factor);
-
     }
 
     public static void setIpBeginning(String ipBeginning) {
