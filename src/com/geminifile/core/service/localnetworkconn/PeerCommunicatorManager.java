@@ -20,12 +20,17 @@ public class PeerCommunicatorManager {
 
     private static final Vector<Node> peerTable = new Vector<>(); // When current device has connected to another device, insert into set.
 
+    private static Thread peerClient;
+    private static Thread peerServer;
+
     public static void start() {
 
         // Run thread for PeerClientAcceptor
-        Thread peerClient = new Thread(new PeerClientManager());
+        peerClient = new Thread(new PeerClientManager());
         peerClient.start();
         // Run thread for PeerServerSender
+        peerServer = new Thread(new PeerServerManager());
+        peerServer.start();
 
     }
 
