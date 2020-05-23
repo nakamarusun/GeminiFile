@@ -23,14 +23,12 @@ public class PingerThread implements Runnable {
 
     // Determines the ip number they will be pinging
     private final int factor;
-    private final ArrayList<InetAddress> activeIps;
 
     private static final int range = 255; // Range until stop
     private static String ipBeginning; // WARNING, HAS TO BE SET FIRST BY SERVICE JAVA
 
     public PingerThread(int factor) {
         this.factor = factor + 1;
-        this.activeIps = new ArrayList<>();
     }
 
     @Override
