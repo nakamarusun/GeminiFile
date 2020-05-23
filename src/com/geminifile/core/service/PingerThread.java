@@ -18,6 +18,7 @@ This thread scans for active ip addresses in the network, then checks for open p
 If it is open, then it gets added to the ActivePeerGetter.activeIpAddresses.
  */
 
+// TODO: Make this more efficient.
 public class PingerThread implements Runnable {
 
     // Determines the ip number they will be pinging
@@ -44,15 +45,21 @@ public class PingerThread implements Runnable {
 //                System.out.println("Pinger thread interrupted at " + factor );
                 return;
             }
-            int ipToPing = factor + (i * repetition);
+            int ipToPing = factor + (i * IPPINGERTHREADS);
             if (ipToPing > range) { break; } // If ip to check is more than 255, then there is no point.
 
             // Check if ip is open
             try {
                 InetAddress ip = InetAddress.getByName(ipBeginning + ipToPing);
+                // Check to not match self ip
+//                if (ip.equals(Service.getCurrentIp())) { continue; } // Code to check self ip.
                 // If ip is reachable then add to list
                 if (ip.isReachable(PINGTIMEOUT)) {
                     activeIps.add(ip);
+                } else {
+                    if (ip.getHostAddress().equals("192.168.1.9")) {
+                        System.out.println("Cannot connect to celine wtf ??????????");
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -61,6 +68,7 @@ public class PingerThread implements Runnable {
         }
 
         if (activeIps.size() == 0) {
+//            System.out.println("Stopping pinger " + factor);
             return; // No active ips, stopping thread.
         }
 
@@ -69,13 +77,14 @@ public class PingerThread implements Runnable {
             try {
                 Socket tryOpen = new Socket();
                 tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PORTCONNECTTIMEOUT);
-
+//                System.out.println("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
                 // Do the msg query here
                 ObjectOutputStream localObjectOut = new ObjectOutputStream(tryOpen.getOutputStream());
                 ObjectInputStream localObjectIn = new ObjectInputStream(tryOpen.getInputStream());
 
-                // Send connection query to the device
+                // Send a connection query to the device with intention to ping
                 localObjectOut.writeObject(new MsgIdentification("ping", MsgType.CONNQUERY, Service.getMyNode()));
+//                System.out.println("Sent ping to ip: " + tryOpen.getInetAddress().getHostAddress());
                 // See if the reply is good
                 try {
                     MsgWrapper reply = (MsgWrapper)localObjectIn.readObject();
@@ -101,6 +110,7 @@ public class PingerThread implements Runnable {
                 System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
             }
         }
+//        System.out.println("Stopping pinger " + factor);
 
     }
 

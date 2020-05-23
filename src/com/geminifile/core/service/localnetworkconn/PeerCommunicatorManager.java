@@ -9,34 +9,25 @@ incoming connections from another peer,
 meanwhile PeerServerSender manages new connections to another device.
  */
 
-import com.geminifile.core.service.ActivePeerGetter;
 import com.geminifile.core.service.Node;
-import com.geminifile.core.service.Service;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PeerCommunicatorManager {
 
-    private static Set<Node> peerTable; // When current device has connected to another device, insert into set.
-    private static final Lock peerTableLock; // Concurrency safety.
-
-    static {
-        peerTableLock = new ReentrantLock();
-    }
+    private static final Set<Node> peerTable = new HashSet<>(); // When current device has connected to another device, insert into set.
+    private static final Lock peerTableLock = new ReentrantLock(); // Concurrency safety.
 
     public static void start() {
-        peerTable.clear();
-        // When a network ip is reset, or connection is reset, restart all of the thread.
-        while (true) {
-            // Run thread for PeerClientAcceptor
-            // Run thread for PeerServerSender
 
-        }
+        // Run thread for PeerClientAcceptor
+        Thread peerClient = new Thread(new PeerClientManager());
+        peerClient.start();
+        // Run thread for PeerServerSender
+
     }
 
     public static void addPeerTable(Node node) {
@@ -55,6 +46,12 @@ public class PeerCommunicatorManager {
         } finally {
             peerTableLock.unlock();
         }
+    }
+
+    public static void stopService() {
+        PeerClientManager.stopService();
+        // Clear peerTable when starting service
+        peerTable.clear();
     }
 
 }

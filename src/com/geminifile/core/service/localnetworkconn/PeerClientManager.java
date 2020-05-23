@@ -5,6 +5,7 @@ import com.geminifile.core.service.Service;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Vector;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
@@ -13,7 +14,7 @@ import static com.geminifile.core.CONSTANTS.COMMPORT;
 
 public class PeerClientManager implements Runnable {
 
-    private static Vector<Thread> activeSocketPeers;
+    private static Vector<Thread> activeSocketPeers = new Vector<>();
     private static ServerSocket ssock;
 
     private static boolean stopSsock = false;
@@ -35,7 +36,9 @@ public class PeerClientManager implements Runnable {
 
             while (true) {
                 // Creates new thread.
-                Thread clientThread = new Thread(new PeerClientThread(ssock.accept()));
+                Socket socketRef = ssock.accept();
+//                System.out.println("Connected with ip: " + socketRef.getInetAddress().getHostAddress());
+                Thread clientThread = new Thread(new PeerClientThread(socketRef));
                 clientThread.start();
                 activeSocketPeers.add(clientThread);
             }

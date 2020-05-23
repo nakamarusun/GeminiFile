@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 // Enums with a star means that it is EXPECTING A REPLY.
 
-public enum MsgType {
+public enum MsgType implements Serializable {
     CONNQUERY, // Connection query, used for when a client decides to connect to a server ***
-    CONNACCEPT, // The reply to CONNQUERY, with status message (MOTD or something)
+    CONNACCEPT, // The reply to CONNQUERY, with status message
     ASK, // Asking for information ***
     INFO, // Give an information (1 means accepted, )
     COMMAND, // Command (returns 1 or 0 depending on done) ***

@@ -1,8 +1,9 @@
 package com.geminifile.core.service;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
-public class Node {
+public class Node implements Serializable {
 
     private InetAddress ip;
     private int port;

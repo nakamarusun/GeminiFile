@@ -3,7 +3,9 @@ package com.geminifile.core.socketmsg.msgwrapper;
 import com.geminifile.core.service.Node;
 import com.geminifile.core.socketmsg.MsgType;
 
-public class MsgIdentification extends MsgWrapper {
+import java.io.Serializable;
+
+public class MsgIdentification extends MsgWrapper implements Serializable {
 
     private Node selfNode;
 

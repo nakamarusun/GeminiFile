@@ -74,7 +74,7 @@ public class Service {
                 pinger.setDaemon(true);
                 pinger.start();
 
-//                PeerCommunicatorManager.start();
+                PeerCommunicatorManager.start();
             } else {
                 System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
                 System.out.println(myNode.toString());

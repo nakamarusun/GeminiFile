@@ -27,8 +27,9 @@ public class PeerClientThread implements Runnable {
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
             try {
-                // Accept query from the peer. Whether this is a query or not.
-                MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject();
+                // Accept query from the peer. Whether this is a query or not it is decided later.
+                MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject(); // ERROR
+//                System.out.println("read ping from ip: " + sock.getInetAddress().getHostAddress());
                 // Handle ping and exit. If not, then continue as usual
                 if (inQuery.getContent().equals("ping")) {
                     localObjectOut.writeObject(new MsgIdentification("pinggood", MsgType.CONNACCEPT, Service.getMyNode()));
