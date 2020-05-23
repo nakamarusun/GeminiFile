@@ -12,14 +12,13 @@ meanwhile PeerServerSender manages new connections to another device.
 import com.geminifile.core.service.Node;
 
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PeerCommunicatorManager {
 
-    private static final Set<Node> peerTable = new HashSet<>(); // When current device has connected to another device, insert into set.
-    private static final Lock peerTableLock = new ReentrantLock(); // Concurrency safety.
+    private static final Vector<Node> peerTable = new Vector<>(); // When current device has connected to another device, insert into set.
 
     public static void start() {
 
@@ -31,21 +30,11 @@ public class PeerCommunicatorManager {
     }
 
     public static void addPeerTable(Node node) {
-        peerTableLock.lock();
-        try {
-            peerTable.add(node);
-        } finally {
-            peerTableLock.unlock();
-        }
+        peerTable.add(node);
     }
 
     public static void removePeerTable(Node node) {
-        peerTableLock.lock();
-        try {
-            peerTable.remove(node);
-        } finally {
-            peerTableLock.unlock();
-        }
+        peerTable.remove(node);
     }
 
     public static void stopService() {
