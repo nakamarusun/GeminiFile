@@ -4,7 +4,11 @@ import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 
-import java.net.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
@@ -12,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.geminifile.core.CONSTANTS.*;
+import static com.geminifile.core.CONSTANTS.COMMPORT;
 
 public class Service {
 
@@ -48,23 +52,36 @@ public class Service {
             }
 
             // Generate unique SHA-256 based on identity
-            MessageDigest messageDigest = null;
             try {
-                messageDigest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+                byte[] hash;
+                // The input for the hash is basically the machine MAC address. If doesn't exist then, (machine name + os name)
+                byte[] macAddr = NetworkInterface.getNetworkInterfaces().nextElement().getHardwareAddress();
+                if (macAddr == null) {
+                    hash = messageDigest.digest((currentIp.getHostName() + System.getProperty("os.name")).getBytes(StandardCharsets.UTF_8)); // Update the bytes with the string converted by the UTF-8 format
+                } else {
+                    hash = messageDigest.digest(macAddr); // Update the bytes with the string converted by the UTF-8 format
+                }
+                StringBuilder hexString = new StringBuilder();
+
+                for (byte b : hash) {
+                    String hex = Integer.toHexString(0xff & b);
+                    if (hex.length() == 1) hexString.append('0');
+                    hexString.append(hex);
+                }
+                String uniqueId = hexString.toString();
+                // Assigns myNode
+                myNode = new Node(currentIp,
+                        COMMPORT,
+                        uniqueId,
+                        currentIp.getHostName(),
+                        System.getProperty("os.name")
+                );
+            } catch (NoSuchAlgorithmException | SocketException e) {
                 e.printStackTrace();
                 System.exit(5);
             }
-            messageDigest.update((currentIp.getHostName() + System.getProperty("os.name")).getBytes());
-            String uniqueId = new String(messageDigest.digest());
 
-            // Assigns myNode
-            myNode = new Node(currentIp,
-                    COMMPORT,
-                    uniqueId,
-                    currentIp.getHostName(),
-                    System.getProperty("os.name")
-            );
 
             // If the current ip address is not localhost (connected to a network) then runs all of the networking service.
             // If not, then await for connection to be made.
