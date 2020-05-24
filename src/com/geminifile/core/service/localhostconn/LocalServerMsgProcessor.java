@@ -10,6 +10,8 @@ import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 
+import java.util.Set;
+
 public class LocalServerMsgProcessor extends LocalMsgProcessor implements ExpectingReply {
 
 
@@ -29,6 +31,15 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
                 switch (msg.getContent()) {
                     case "status":
                         return (new MsgWrapper("All ok !", MsgType.INFO));
+                    case "threads":
+                        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+                        StringBuilder strBuild = new StringBuilder();
+                        strBuild.append("Current running threads on GeminiFile Service:\n");
+                        for (Thread t : threads) {
+                            strBuild.append(String.format("%-20s \t %s \t %d \t %s\n",
+                                    t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
+                        }
+                        return (new MsgWrapper(strBuild.toString(), MsgType.INFO));
                     default:
                         return noAction;
                 }

@@ -54,6 +54,8 @@ public class PeerServerThread implements Runnable {
             otherNode = replyQuery.getSelfNode();
             PeerCommunicatorManager.addPeerTable(otherNode);
 
+            System.out.println("Successfully established connection with " + sock.getInetAddress().getHostAddress());
+
             while (true) {
                 // Main communication loop
             }

@@ -15,7 +15,7 @@ import java.net.Socket;
 // TODO: REMOVE FROM PEER TABLE
 public class PeerClientThread implements Runnable {
 
-    private Socket sock;
+    private final Socket sock;
     private Node otherNode;
 
     public PeerClientThread(Socket mySocket) {
@@ -56,7 +56,7 @@ public class PeerClientThread implements Runnable {
                     sock.close();
                     return;
                 }
-
+                System.out.println("Successfully accepted connection from " + sock.getInetAddress().getHostAddress());
                 while (true) {
                     // Main message manager loop
                 }

@@ -1,5 +1,6 @@
 package com.geminifile.core.service.localhostconn;
 
+import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
@@ -57,8 +58,10 @@ public class LocalClientCommunicator {
     }
 
     public static void sendLocalMessage(MsgWrapper msg) {
-        LocalClientCommunicator.msg = msg;
-        startLocalClient();
+        if (!(msg.getType() == MsgType.NOACTION)) {
+            LocalClientCommunicator.msg = msg;
+            startLocalClient();
+        }
     }
 
 }
