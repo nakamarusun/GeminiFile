@@ -26,7 +26,7 @@ public class PeerServerManager implements Runnable {
 
                 for (InetAddress e : peerList) {
                     // Creates a new thread to process the connection.
-                    Thread serverThread = new Thread(new PeerServerThread(e));
+                    Thread serverThread = new Thread(new PeerServerThread(e), "PeerThreadS" + e.getHostAddress());
                     serverThread.start();
                     activeSocketPeers.add(serverThread);
                 }

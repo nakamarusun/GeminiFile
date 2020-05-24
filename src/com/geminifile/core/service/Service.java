@@ -14,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
@@ -87,7 +88,7 @@ public class Service {
             // If not, then await for connection to be made.
             if (!currentIp.getHostAddress().startsWith("127")) {
                 // Start pinger to ping all the ranges of the local ip address
-                Thread pinger = new Thread(new ActivePeerGetter());
+                Thread pinger = new Thread(new ActivePeerGetter(), "PingerManagerThread");
                 pinger.setDaemon(true);
                 pinger.start();
 
@@ -99,7 +100,8 @@ public class Service {
 
 
             // ScheduledExecutionService for checking whether self ip address is the same to warrant a restart.
-            ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor();
+            // Use lambda ThreadFactory to name the thread.
+            ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "NetworkChangeThread"));
             ipChecker.scheduleAtFixedRate(new IpChangeChecker(networkingThread), 5000, 5000, TimeUnit.MILLISECONDS);
 
 

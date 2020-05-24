@@ -38,7 +38,7 @@ public class PeerClientManager implements Runnable {
                 // Creates new thread.
                 Socket socketRef = ssock.accept();
 //                System.out.println("Connected with ip: " + socketRef.getInetAddress().getHostAddress());
-                Thread clientThread = new Thread(new PeerClientThread(socketRef));
+                Thread clientThread = new Thread(new PeerClientThread(socketRef), "PeerThreadC" + socketRef.getInetAddress());
                 clientThread.start();
                 activeSocketPeers.add(clientThread);
             }

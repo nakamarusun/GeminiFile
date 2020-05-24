@@ -34,6 +34,7 @@ public class PingerThread implements Runnable {
     @Override
     public void run() {
 //        System.out.println("Starting pinger " + factor);
+        Thread.currentThread().setName("PingerThread-" + factor);
         // This sections test for all the ip address connections.
         // Checks for active ip addresses, and inserts it into an arrayList
         int repetition = (range / IPPINGERTHREADS) + 1;

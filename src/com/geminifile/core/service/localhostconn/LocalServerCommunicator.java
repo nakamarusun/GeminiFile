@@ -23,7 +23,7 @@ public class LocalServerCommunicator implements Runnable {
 
     public static void startLocalServer() {
 
-        localServerThread = new Thread(new LocalServerCommunicator());
+        localServerThread = new Thread(new LocalServerCommunicator(), "LocalhostServerThread");
 //        localServerThread.setDaemon(true); // Server is only daemon, when all the main processes is done, this process is optional.
         localServerThread.start();
 

@@ -30,13 +30,14 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
             case ASK:
                 switch (msg.getContent()) {
                     case "status":
+                        // TODO: INFORMATIVE STATUS
                         return (new MsgWrapper("All ok !", MsgType.INFO));
                     case "threads":
                         Set<Thread> threads = Thread.getAllStackTraces().keySet();
                         StringBuilder strBuild = new StringBuilder();
                         strBuild.append("Current running threads on GeminiFile Service:\n");
                         for (Thread t : threads) {
-                            strBuild.append(String.format("%-20s \t %s \t %d \t %s\n",
+                            strBuild.append(String.format("%-23s \t %s \t %d \t %s\n",
                                     t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
                         }
                         return (new MsgWrapper(strBuild.toString(), MsgType.INFO));
@@ -49,6 +50,7 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
                 System.out.println(msg.toString());
                 return noAction;
             case COMMAND:
+                // TODO: DOES NOT WORK PROPERLY
                 if (msg.getContent().equals("RefNet")) {
                     Service.restartNetworkingService();
                 }
