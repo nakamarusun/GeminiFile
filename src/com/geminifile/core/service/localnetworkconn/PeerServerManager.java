@@ -29,6 +29,7 @@ public class PeerServerManager implements Runnable {
                     // Checks if the ip is in the PeerTable
                     if (PeerCommunicatorManager.isInPeerTable(e)) {
                         // if it's inside, then restart the loop.
+                        System.out.println("Already connected with " + e.getHostAddress());
                         continue;
                     }
                     // Creates a new thread to process the connection.

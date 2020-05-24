@@ -49,7 +49,7 @@ public class PeerCommunicatorManager {
     public static boolean isInPeerTable(InetAddress inetAddr) {
         // Checks whether the specified ip is inside the peerTable
         for (Map.Entry<Node, Socket> e : peerTable.entrySet()) {
-            if (e.getValue().getInetAddress() == inetAddr) {
+            if (e.getValue().getInetAddress().equals(inetAddr)) {
                 return true;
             }
         }
