@@ -114,6 +114,7 @@ public class Service {
                 // Interrupts the pinger and stops it
                 ActivePeerGetter.stopService();
                 // Stops all the PeerCommunicatorManager processes.
+                PeerCommunicatorManager.stopService();
             }
 
         }

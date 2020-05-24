@@ -11,14 +11,18 @@ meanwhile PeerServerSender manages new connections to another device.
 
 import com.geminifile.core.service.Node;
 
-import java.util.HashSet;
-import java.util.Vector;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PeerCommunicatorManager {
 
-    private static final Vector<Node> peerTable = new Vector<>(); // When current device has connected to another device, insert into set.
+    // Stores the corresponding node with their sockets.
+    private static final ConcurrentHashMap<Node, Socket> peerTable = new ConcurrentHashMap<>();
 
     private static Thread peerClient;
     private static Thread peerServer;
@@ -34,18 +38,39 @@ public class PeerCommunicatorManager {
 
     }
 
-    public static void addPeerTable(Node node) {
-        peerTable.add(node);
+    public static void addPeerTable(Node node, Socket sock) {
+        peerTable.put(node, sock);
     }
 
     public static void removePeerTable(Node node) {
         peerTable.remove(node);
     }
 
+    public static boolean isInPeerTable(InetAddress inetAddr) {
+        // Checks whether the specified ip is inside the peerTable
+        for (Map.Entry<Node, Socket> e : peerTable.entrySet()) {
+            if (e.getValue().getInetAddress() == inetAddr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void stopService() {
-        PeerClientManager.stopService();
-        // Clear peerTable when starting service
+        // Disconnects all the peerTable
+        for (Map.Entry<Node, Socket> e : peerTable.entrySet()) {
+            try {
+                e.getValue().close();
+            } catch (IOException ioException) {
+                System.out.println("Error closing socket" + e.toString());
+                ioException.printStackTrace();
+            }
+        }
+        // Clear peerTable when stopping service
         peerTable.clear();
+
+        PeerClientManager.stopService();
+        PeerServerManager.stopService();
     }
 
 }

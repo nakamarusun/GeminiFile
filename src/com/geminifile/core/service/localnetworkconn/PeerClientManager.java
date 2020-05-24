@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Vector;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
@@ -17,15 +18,16 @@ public class PeerClientManager implements Runnable {
     private static Vector<Thread> activeSocketPeers = new Vector<>();
     private static ServerSocket ssock;
 
-    private static boolean stopSsock = false;
+    private static boolean stopSock;
 
     public PeerClientManager() {
         activeSocketPeers.clear();
-        stopSsock = false;
+        stopSock = false;
     }
 
     @Override
     public void run() {
+        activeSocketPeers.clear();
         try {
             ssock = new ServerSocket(COMMPORT, 50, Service.getNonLoopbackIp4Address());
             /* This works ONLY as connection acceptors.
@@ -42,20 +44,21 @@ public class PeerClientManager implements Runnable {
                 clientThread.start();
                 activeSocketPeers.add(clientThread);
             }
-
-        } catch (IOException e) {
-            if (stopSsock) {
-                // Do stuff when service is stopped
+        } catch (SocketException e) {
+            if (stopSock) {
+                // Stops the service
             } else {
-                System.out.println("Socket error");
-                e.printStackTrace();
+                // Restart PeerClientManager.
             }
+        } catch (IOException e) {
+            System.out.println("Socket error");
+            e.printStackTrace();
         }
     }
 
     public static void stopService() {
         try {
-            stopSsock = true;
+            stopSock = true;
             ssock.close();
         } catch (IOException e) {
             e.printStackTrace();

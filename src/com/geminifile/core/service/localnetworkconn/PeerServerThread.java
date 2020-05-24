@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
@@ -52,7 +53,7 @@ public class PeerServerThread implements Runnable {
             localObjectOut.writeObject(new MsgWrapper("allok", MsgType.CONNACCEPT));
             // Puts id into peerTable
             otherNode = replyQuery.getSelfNode();
-            PeerCommunicatorManager.addPeerTable(otherNode);
+            PeerCommunicatorManager.addPeerTable(otherNode, sock);
 
             System.out.println("Successfully established connection with " + sock.getInetAddress().getHostAddress());
 
@@ -64,10 +65,19 @@ public class PeerServerThread implements Runnable {
         } catch (ClassNotFoundException e) {
             System.out.println("Class deserialization error");
             e.printStackTrace();
-        } catch (IOException e) {
+
+        } catch (SocketException e) {
             // If an io exception occurs, usually because of a connection reset, quit the thread.
-            PeerCommunicatorManager.removePeerTable(otherNode);
+            System.out.println("Disconnected from " + nodeIp.getHostAddress());
+            PeerCommunicatorManager.removePeerTable(otherNode); // TODO: may cause some problems when removing while iterating @ PeerCommunicatorManager
+
+        } catch (IOException e) {
+            System.out.println("IOException occurred");
+            e.printStackTrace();
         }
+
+        // For safety, remove when thread is done.
+        PeerCommunicatorManager.removePeerTable(otherNode);
 
     }
 
