@@ -14,7 +14,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
@@ -125,6 +124,7 @@ public class Service {
     }
 
     public static void restartNetworkingService() {
+        // Interrupts the main service thread, signifying to restart service.
         networkingThread.interrupt();
     }
 

@@ -13,16 +13,12 @@ import com.geminifile.core.service.Node;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Vector;
 
 public class PeerCommunicatorManager {
 
     // Stores the corresponding node with their sockets.
-    private static final ConcurrentHashMap<Node, Socket> peerTable = new ConcurrentHashMap<>();
+    private static final Vector<PeerCommunicationLoop> peerTable = new Vector<>();
 
     private static Thread peerClient;
     private static Thread peerServer;
@@ -38,18 +34,18 @@ public class PeerCommunicatorManager {
 
     }
 
-    public static void addPeerTable(Node node, Socket sock) {
-        peerTable.put(node, sock);
+    public static void addPeerTable(PeerCommunicationLoop comms) {
+        peerTable.add(comms);
     }
 
     public static void removePeerTable(Node node) {
-        peerTable.remove(node);
+        peerTable.removeIf(e -> e.getNode() == node);
     }
 
     public static boolean isInPeerTable(InetAddress inetAddr) {
         // Checks whether the specified ip is inside the peerTable
-        for (Map.Entry<Node, Socket> e : peerTable.entrySet()) {
-            if (e.getValue().getInetAddress().equals(inetAddr)) {
+        for (PeerCommunicationLoop e : peerTable) {
+            if (e.getSock().getInetAddress().equals(inetAddr)) {
                 return true;
             }
         }
@@ -58,9 +54,9 @@ public class PeerCommunicatorManager {
 
     public static void stopService() {
         // Disconnects all the peerTable
-        for (Map.Entry<Node, Socket> e : peerTable.entrySet()) {
+        for (PeerCommunicationLoop e : peerTable) {
             try {
-                e.getValue().close();
+                e.getSock().close();
             } catch (IOException ioException) {
                 System.out.println("Error closing socket" + e.toString());
                 ioException.printStackTrace();

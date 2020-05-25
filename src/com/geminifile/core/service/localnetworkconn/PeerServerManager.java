@@ -32,12 +32,12 @@ public class PeerServerManager implements Runnable {
                         System.out.println("Already connected with " + e.getHostAddress());
                         continue;
                     }
-                    // Creates a new thread to process the connection.
                     // TODO: DO THIS TO ALL OF THE THREAD INTERRUPTIONS BY stopService()
                     if (currentThread.isInterrupted()) {
                         throw new InterruptedException("PeerServerManager is stopping");
                     }
-                    Thread serverThread = new Thread(new PeerServerThread(e), "PeerThreadS" + e.getHostAddress());
+                    // Creates a new thread to process the connection.
+                    Thread serverThread = new Thread(new PeerServerThread(e), "PeerS(" + e.getHostAddress() + ")");
                     serverThread.start();
                     activeSocketPeers.add(serverThread);
                 }

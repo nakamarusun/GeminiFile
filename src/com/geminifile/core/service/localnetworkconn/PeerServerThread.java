@@ -53,14 +53,13 @@ public class PeerServerThread implements Runnable {
             localObjectOut.writeObject(new MsgWrapper("allok", MsgType.CONNACCEPT));
             // Puts id into peerTable
             otherNode = replyQuery.getSelfNode();
-            PeerCommunicatorManager.addPeerTable(otherNode, sock);
 
+            // At this point, the device has successfully handshake and established connection with the other device
             System.out.println("Successfully established connection with " + sock.getInetAddress().getHostAddress());
 
-            while (true) {
-                // Main communication loop
-            }
-
+            PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
+            PeerCommunicatorManager.addPeerTable(commsLoop);
+            commsLoop.startComms();
 
         } catch (ClassNotFoundException e) {
             System.out.println("Class deserialization error");
@@ -69,7 +68,7 @@ public class PeerServerThread implements Runnable {
         } catch (SocketException e) {
             // If an io exception occurs, usually because of a connection reset, quit the thread.
             System.out.println("Disconnected from " + nodeIp.getHostAddress());
-            PeerCommunicatorManager.removePeerTable(otherNode); // TODO: may cause some problems when removing while iterating @ PeerCommunicatorManager
+            PeerCommunicatorManager.removePeerTable(otherNode);
 
         } catch (IOException e) {
             System.out.println("IOException occurred");
