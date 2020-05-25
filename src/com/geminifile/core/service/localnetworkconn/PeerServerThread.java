@@ -15,7 +15,8 @@ import java.net.SocketException;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
-// TODO: DO SOME SOCKET CLOSES
+// This thread first function as a handshake with the other peer, sending the query first to the other peer.
+// After successfully verified,
 public class PeerServerThread implements Runnable {
 
     private InetAddress nodeIp;

@@ -1,4 +1,4 @@
-package com.geminifile.core.service.localhostconn;
+package com.geminifile.core.service.localhostconn.msgprocessor;
 
 /*
 This class takes an MsgWrapper object, and processes it depending on the content, then
@@ -7,6 +7,7 @@ returns a corresponding reply MsgWrapper object.
 
 import com.geminifile.core.service.LocalMsgProcessor;
 import com.geminifile.core.service.Service;
+import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 

@@ -1,7 +1,7 @@
-package com.geminifile.core.service.localhostconn;
+package com.geminifile.core.service.localhostconn.msgprocessor;
 
 import com.geminifile.core.service.LocalMsgProcessor;
-import com.geminifile.core.service.Service;
+import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
