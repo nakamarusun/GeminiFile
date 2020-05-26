@@ -20,7 +20,7 @@ public class CLIArgs {
                 "geminifile status: status of the server, folder locations to sync\n" +
                 "   [--threads views all current threads running]\n" +
                 "geminifile refresh: refreshes the specified services\n" +
-                "   [-n networking service]" +
+                "   [-n networking service], [-p pinger service]" +
                 "");
     }
 

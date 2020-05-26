@@ -41,8 +41,11 @@ public class CLIArgumentProcessor {
         MsgWrapper msg = new MsgWrapper("", MsgType.NOACTION);
 
         for (Map.Entry<String, String> e : args.entrySet()) {
-            if (e.getKey().equals("n")) {
-                msg = new MsgWrapper("RefNet", MsgType.COMMAND);
+            switch (e.getKey()) {
+                case "n":
+                    msg = new MsgWrapper("RefNet", MsgType.COMMAND);
+                case "p":
+                    msg = new MsgWrapper("Ping", MsgType.COMMAND);
             }
         }
 

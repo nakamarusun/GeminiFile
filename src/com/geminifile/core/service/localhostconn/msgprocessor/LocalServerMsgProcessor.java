@@ -5,6 +5,7 @@ This class takes an MsgWrapper object, and processes it depending on the content
 returns a corresponding reply MsgWrapper object.
  */
 
+import com.geminifile.core.service.ActivePeerGetter;
 import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.ExpectingReply;
@@ -54,8 +55,13 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                 break;
             case COMMAND:
                 // TODO: DOES NOT WORK PROPERLY
-                if (msg.getContent().equals("RefNet")) {
-                    Service.restartNetworkingService();
+                switch (msg.getContent()) {
+                    case "RefNet":
+                        Service.restartNetworkingService();
+                        break;
+                    case "Ping":
+                        ActivePeerGetter.restartService();
+                        break;
                 }
                 msgProc = new MsgWrapper("Done", MsgType.ASK);
                 break;
