@@ -4,11 +4,11 @@ import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 // Abstract super class for LocalClientMsgProcessor and LocalServerMsgProcessor
 
-public abstract class LocalMsgProcessor {
+public abstract class MsgProcessor {
 
     protected MsgWrapper msg;
 
-    public LocalMsgProcessor(MsgWrapper msg) {
+    public MsgProcessor(MsgWrapper msg) {
         this.msg = msg;
     }
 

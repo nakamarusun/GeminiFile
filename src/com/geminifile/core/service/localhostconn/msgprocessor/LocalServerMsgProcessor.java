@@ -5,7 +5,7 @@ This class takes an MsgWrapper object, and processes it depending on the content
 returns a corresponding reply MsgWrapper object.
  */
 
-import com.geminifile.core.service.LocalMsgProcessor;
+import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
@@ -13,7 +13,7 @@ import com.geminifile.core.socketmsg.msgwrapper.*;
 
 import java.util.Set;
 
-public class LocalServerMsgProcessor extends LocalMsgProcessor implements ExpectingReply {
+public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
 
     public LocalServerMsgProcessor(MsgWrapper msg) {
@@ -25,14 +25,15 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
         // Processes the message in the constructor, and returns a MsgWrapper reply object.
         // The program can also return a NOREPLY MsgWrapper object to signify not to reply anything.
 
-        MsgWrapper noAction = (new MsgWrapper("", MsgType.NOACTION));
+        MsgWrapper msgProc = new MsgWrapper("", MsgType.NOACTION);
 
         switch(msg.getType()) {
             case ASK:
                 switch (msg.getContent()) {
                     case "status":
                         // TODO: INFORMATIVE STATUS
-                        return (new MsgWrapper("All ok !", MsgType.INFO));
+                        msgProc = new MsgWrapper("All ok !", MsgType.INFO);
+                        break;
                     case "threads":
                         Set<Thread> threads = Thread.getAllStackTraces().keySet();
                         StringBuilder strBuild = new StringBuilder();
@@ -41,24 +42,26 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
                             strBuild.append(String.format("%-25s \t %s \t %-2d %s\n",
                                     t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
                         }
-                        return (new MsgWrapper(strBuild.toString(), MsgType.INFO));
-                    default:
-                        return noAction;
+                        msgProc = new MsgWrapper(strBuild.toString(), MsgType.INFO);
+                        break;
                 }
+                break;
             case PING:
-                return (new MsgWrapper("Pong", MsgType.INFO));
+                msgProc = new MsgWrapper("Pong", MsgType.INFO);
+                break;
             case INFO:
                 System.out.println(msg.toString());
-                return noAction;
+                break;
             case COMMAND:
                 // TODO: DOES NOT WORK PROPERLY
                 if (msg.getContent().equals("RefNet")) {
                     Service.restartNetworkingService();
                 }
-                return (new MsgWrapper("Done", MsgType.ASK));
-            default:
-                return noAction;
+                msgProc = new MsgWrapper("Done", MsgType.ASK);
+                break;
         }
+
+        return msgProc;
     }
 
 }

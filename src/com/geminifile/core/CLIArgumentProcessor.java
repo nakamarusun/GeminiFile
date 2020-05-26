@@ -15,10 +15,12 @@ to make things tidier.
 public class CLIArgumentProcessor {
 
     public static void status(Map<String, String> args) {
+
+        MsgWrapper msg = new MsgWrapper("", MsgType.NOACTION);
+
         if (args.size() != 0) {
             // Iterate within the arguments
             for (Map.Entry<String, String> e : args.entrySet()) {
-                MsgWrapper msg;
                 switch (e.getKey()) {
                     case "threads":
                         msg = new MsgWrapper("threads", MsgType.ASK);
@@ -26,20 +28,25 @@ public class CLIArgumentProcessor {
                     default:
                         msg = new MsgWrapper("", MsgType.NOACTION);
                 }
-                LocalClientCommunicator.sendLocalMessage(msg);
             }
         } else {
-            LocalClientCommunicator.sendLocalMessage(new MsgWrapper("status", MsgType.ASK));
+            msg = new MsgWrapper("status", MsgType.ASK);
         }
+
+        LocalClientCommunicator.sendLocalMessage(msg);
     }
 
     public static void refresh(Map<String, String> args) {
-        // TODO: FIX THIS
+
+        MsgWrapper msg = new MsgWrapper("", MsgType.NOACTION);
+
         for (Map.Entry<String, String> e : args.entrySet()) {
             if (e.getKey().equals("n")) {
-                LocalClientCommunicator.sendLocalMessage(new MsgWrapper("RefNet", MsgType.COMMAND));
+                msg = new MsgWrapper("RefNet", MsgType.COMMAND);
             }
         }
+
+        LocalClientCommunicator.sendLocalMessage(msg);
     }
 
 }
