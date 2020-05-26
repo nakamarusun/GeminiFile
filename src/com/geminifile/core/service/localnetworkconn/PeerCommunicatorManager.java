@@ -26,10 +26,10 @@ public class PeerCommunicatorManager {
     public static void start() {
 
         // Run thread for PeerClientAcceptor
-        peerClient = new Thread(new PeerClientManager(), "PeerClientManagerThread");
+        peerClient = new Thread(new PeerClientManager(), "PeerClientManager");
         peerClient.start();
         // Run thread for PeerServerSender
-        peerServer = new Thread(new PeerServerManager(), "PeerServerManagerThread");
+        peerServer = new Thread(new PeerServerManager(), "PeerServerManager");
         peerServer.start();
 
     }

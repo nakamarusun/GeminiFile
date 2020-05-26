@@ -87,7 +87,7 @@ public class Service {
             // If not, then await for connection to be made.
             if (!currentIp.getHostAddress().startsWith("127")) {
                 // Start pinger to ping all the ranges of the local ip address
-                Thread pinger = new Thread(new ActivePeerGetter(), "PingerManagerThread");
+                Thread pinger = new Thread(new ActivePeerGetter(), "PingerManager");
                 pinger.setDaemon(true);
                 pinger.start();
 
@@ -100,7 +100,7 @@ public class Service {
 
             // ScheduledExecutionService for checking whether self ip address is the same to warrant a restart.
             // Use lambda ThreadFactory to name the thread.
-            ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "NetworkChangeThread"));
+            ScheduledExecutorService ipChecker = Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "NetworkChangeDetector"));
             ipChecker.scheduleAtFixedRate(new IpChangeChecker(networkingThread), 5000, 5000, TimeUnit.MILLISECONDS);
 
 
