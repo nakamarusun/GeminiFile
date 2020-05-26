@@ -1,4 +1,4 @@
-package com.geminifile.core;
+package com.geminifile.core.service.localhostconn.msgprocessor;
 
 import com.geminifile.core.service.localhostconn.LocalClientCommunicator;
 import com.geminifile.core.socketmsg.MsgType;
@@ -12,7 +12,7 @@ The convenience to sort arguments based on their functions
 to make things tidier.
  */
 // TODO: Make this more efficient
-public class ArgumentProcessor {
+public class LocalArgumentProcessor {
 
     public static void status(Map<String, String> args) {
         if (args.size() != 0) {

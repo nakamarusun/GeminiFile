@@ -51,15 +51,15 @@ public class PeerClientManager implements Runnable {
                 // Restart PeerClientManager.
             }
         } catch (IOException e) {
-            System.out.println("Socket error");
+            System.out.println("[PEER] Socket error");
             e.printStackTrace();
         }
     }
 
     public static void stopService() {
         try {
-            stopSock = true;
-            ssock.close();
+            stopSock = true; // Signifies the interruption is because this method is invoked.
+            ssock.close(); // Close ServerSocket
         } catch (IOException e) {
             e.printStackTrace();
         }

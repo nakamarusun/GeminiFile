@@ -29,12 +29,12 @@ public class PeerServerManager implements Runnable {
                     // Checks if the ip is in the PeerTable
                     if (PeerCommunicatorManager.isInPeerTable(e)) {
                         // if it's inside, then restart the loop.
-                        System.out.println("Already connected with " + e.getHostAddress());
+                        System.out.println("[PEER] Already connected with " + e.getHostAddress());
                         continue;
                     }
                     // TODO: DO THIS TO ALL OF THE THREAD INTERRUPTIONS BY stopService()
                     if (currentThread.isInterrupted()) {
-                        throw new InterruptedException("PeerServerManager is stopping");
+                        throw new InterruptedException("[PEER] PeerServerManager is stopping");
                     }
                     // Creates a new thread to process the connection.
                     Thread serverThread = new Thread(new PeerServerThread(e), "PeerS(" + e.getHostAddress() + ")");

@@ -38,7 +38,7 @@ public class LocalServerMsgProcessor extends LocalMsgProcessor implements Expect
                         StringBuilder strBuild = new StringBuilder();
                         strBuild.append("Current running threads on GeminiFile Service:\n");
                         for (Thread t : threads) {
-                            strBuild.append(String.format("%-23s \t %s \t %-2d %s\n",
+                            strBuild.append(String.format("%-25s \t %s \t %-2d %s\n",
                                     t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
                         }
                         return (new MsgWrapper(strBuild.toString(), MsgType.INFO));

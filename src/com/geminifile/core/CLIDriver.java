@@ -4,10 +4,8 @@ package com.geminifile.core;
 By Jason Christian @ https://www.github.com/nakamarusun
 */
 
-import com.geminifile.core.service.localhostconn.LocalClientCommunicator;
 import com.geminifile.core.service.Service;
-import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
+import com.geminifile.core.service.localhostconn.msgprocessor.LocalArgumentProcessor;
 
 import java.util.Map;
 
@@ -41,10 +39,10 @@ public class CLIDriver {
                     // stop
                     break;
                 case "status":
-                    ArgumentProcessor.status(argMap);
+                    LocalArgumentProcessor.status(argMap);
                     break;
                 case "refresh":
-                    ArgumentProcessor.refresh(argMap);
+                    LocalArgumentProcessor.refresh(argMap);
                     break;
                 default:
                     System.out.println("Unknown command, please refer to 'geminifile --help'");

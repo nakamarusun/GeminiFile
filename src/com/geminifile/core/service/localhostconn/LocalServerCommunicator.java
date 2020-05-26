@@ -90,7 +90,6 @@ public class LocalServerCommunicator implements Runnable {
                 while (true) {
                     // Main loop for receiving local message.
                     try {
-                        System.out.println("Waiting for message..");
                         MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
                         System.out.println("[LCLIENT] " + msg.toString());
 

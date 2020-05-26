@@ -3,13 +3,16 @@ package com.geminifile.core.service.localnetworkconn;
 import com.geminifile.core.service.Node;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.ArrayBlockingQueue;
 
 // TODO: STOP THIS LOOP WHEN SERVICE IS STOPPED.
+// TODO: MAKE ANOTHER CLASS TO PROCESS THE MESSAGES.
 public class PeerCommunicationLoop implements Runnable {
 
     private final Socket sock;
@@ -43,11 +46,21 @@ public class PeerCommunicationLoop implements Runnable {
         while (true) {
             // Waits until there is an prompt to send.
             try {
-                MsgWrapper msg = (MsgWrapper)inStream.readObject();
+                MsgWrapper msg = (MsgWrapper) inStream.readObject();
                 // Puts it into the inMessageQueue
                 inMessageQueue.offer(msg);
+            } catch (SocketException e) {
+                // Means that server disconnects from the other machine.
+                outThread.interrupt();
+                System.out.println("[PEER] Disconnected with: " + node.getIp().getHostAddress());
+                break;
+            } catch (EOFException e) {
+                // Could mean that the server peer has disconnected from this machine.
+                outThread.interrupt();
+                System.out.println("[PEER] Disconnected from: " + node.getIp().getHostAddress());
+                break;
             } catch (ClassNotFoundException e) {
-                System.out.println("Class deserialization error.");
+                System.out.println("[PEER] Class deserialization error.");
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -64,6 +77,7 @@ public class PeerCommunicationLoop implements Runnable {
                 outStream.writeObject(msg);
             } catch (InterruptedException e) {
                 // TODO: QUIT OR RESTART WHEN INTERRUPTED.
+                return;
             } catch (IOException e) {
                 System.out.println("Error writing message to: " + node.getName() + " " + node.getIp().getHostAddress());
                 e.printStackTrace();

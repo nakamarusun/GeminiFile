@@ -57,23 +57,23 @@ public class PeerClientThread implements Runnable {
             }
 
             // At this point, the device has successfully handshake and established connection with the other device
-            System.out.println("Successfully accepted connection from " + sock.getInetAddress().getHostAddress());
+            System.out.println("[PEER] Successfully accepted connection from " + sock.getInetAddress().getHostAddress());
 
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
             commsLoop.startComms();
 
         } catch (ClassNotFoundException e) {
-            System.out.println("Class deserialization error");
+            System.out.println("[PEER] Class deserialization error");
             e.printStackTrace();
 
         } catch (SocketException e) {
             // Stops the socket.
-            System.out.println("Disconnected from " + sock.getInetAddress().getHostAddress());
+            System.out.println("[PEER] Disconnected from " + sock.getInetAddress().getHostAddress());
             PeerCommunicatorManager.removePeerTable(otherNode);
 
         } catch (IOException e) {
-            System.out.println("IOException occurred");
+            System.out.println("[PEER] IOException occurred");
             e.printStackTrace();
 
         }
