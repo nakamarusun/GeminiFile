@@ -3,7 +3,7 @@ package com.geminifile.core.service.localnetworkconn;
 // PeerServerManager gets updated ips from ActivePeerGetter and tries to connect to them here.
 // Requests will be send to PeerClientManager in the other's server geminifile instance.
 
-import com.geminifile.core.service.ActivePeerGetter;
+import com.geminifile.core.service.PingerManager;
 
 import java.net.InetAddress;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class PeerServerManager implements Runnable {
             activeSocketPeers.clear();
             try {
                 // Get updated ip list, will block to wait for updated peer from ActivePeerGetter
-                Set<InetAddress> peerList = ActivePeerGetter.getUpdatedActiveIps();
+                Set<InetAddress> peerList = PingerManager.getUpdatedActiveIps();
 
                 for (InetAddress e : peerList) {
                     // Checks if the ip is in the PeerTable

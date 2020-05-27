@@ -1,7 +1,7 @@
 package com.geminifile.core;
 
 /*
-By Jason Christian @ https://www.github.com/nakamarusun
+@author Jason Christian @ https://www.github.com/nakamarusun
 */
 
 import com.geminifile.core.service.Service;

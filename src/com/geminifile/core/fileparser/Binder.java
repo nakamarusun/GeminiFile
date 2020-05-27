@@ -12,9 +12,11 @@ public class Binder {
     private File directory; // Directory of the binder in the machine
     private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
 
+    private long directoryLastModified;
+
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
 
-    private long lastTimeModified; // Last time any of the properties are modified.
+    private long lastTimePropertiesModified; // Last time any of the properties are modified.
 
     private final List<File> recurFiles = new ArrayList<>();
 
@@ -23,14 +25,15 @@ public class Binder {
         this.name = name;
         this.id = id;
         this.directory = directory;
-        lastTimeModified = new Date().getTime();
+        lastTimePropertiesModified = new Date().getTime();
+        directoryLastModified = directory.lastModified();
     }
 
     public Binder(String name, File directory) {
         this.name = name;
         this.id = generateRandomAlphaNum(7);
         this.directory = directory;
-        lastTimeModified = new Date().getTime();
+        lastTimePropertiesModified = new Date().getTime();
     }
 
 
@@ -41,7 +44,7 @@ public class Binder {
 
     public void setName(String name) {
         this.name = name;
-        lastTimeModified = new Date().getTime();
+        lastTimePropertiesModified = new Date().getTime();
     }
 
     public String getId() {
@@ -50,7 +53,7 @@ public class Binder {
 
     public void setId(String id) {
         this.id = id;
-        lastTimeModified = new Date().getTime();
+        lastTimePropertiesModified = new Date().getTime();
     }
 
     public File getDirectory() {
@@ -59,36 +62,25 @@ public class Binder {
 
     public void setDirectory(File directory) {
         this.directory = directory;
-        lastTimeModified = new Date().getTime();
+        lastTimePropertiesModified = new Date().getTime();
     }
 
 
     // Custom methods
-    public boolean update() {
-        // Updates all of the file listing. If there is a difference from the previous iteration, return true
+    public void update() {
+        // Updates all of the file listing.
 
-        // Creates a new HashMap to compare with the previous fileListing
-        HashMap<String, Long> listingNow = new HashMap<>();
-        boolean updated = false; // Whether the current fileListing is different from the previous
-
-        for (File e : listFilesRecursively(directory)) {
-            String relPath = e.getPath().substring(directory.getPath().length());
-            listingNow.put(relPath, e.lastModified());
-        }
-        // Checks whether the fileListing is the same
-        if (!listingNow.equals(fileListing)) updated = true;
-
-        if (updated) {
-            fileListingLock.lock();
-            try {
-                fileListing.clear();
-                fileListing.putAll(listingNow);
-            } finally {
-                fileListingLock.unlock();
+        fileListingLock.lock(); // Lock for safety
+        fileListing.clear(); // Clears the list.
+        try {
+            // Loops within the new directory file listing and puts it into the hashmap.
+            for (File e : listFilesRecursively(directory)) {
+                String relPath = e.getPath().substring(directory.getPath().length());
+                fileListing.put(relPath, e.lastModified());
             }
+        } finally {
+            fileListingLock.unlock();
         }
-
-        return updated;
     }
 
     public HashMap<String, Long> getFileListing() {
@@ -119,7 +111,7 @@ public class Binder {
         }
         return str.toString();
     }
-    
+
     private List<File> listFilesRecursivelyUtil(File path) {
 
         try {

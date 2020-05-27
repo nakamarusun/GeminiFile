@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.concurrent.CancellationException;
 
 import static com.geminifile.core.CONSTANTS.*;
 
@@ -83,7 +81,7 @@ public class PingerThread implements Runnable {
 //                    System.out.println("Pinger thread interrupted at " + factor );
                         return;
                     }
-                    ActivePeerGetter.addActiveTempIp(ip);   // add to temporary vector
+                    PingerManager.addActiveTempIp(ip);   // add to temporary vector
                     tryOpen.close();
                     System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
                 } catch (IOException e) {

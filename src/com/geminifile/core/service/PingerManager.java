@@ -12,7 +12,7 @@ import static com.geminifile.core.CONSTANTS.*;
 in the network.
  */
 
-public class ActivePeerGetter implements Runnable {
+public class PingerManager implements Runnable {
     // Vector is used here because of its' safety feature for multithreading workloads.
     private static final Set<InetAddress> activeIpAddresses = new HashSet<>();
     private static final Vector<InetAddress> tempIpAddresses = new Vector<>();
@@ -24,7 +24,7 @@ public class ActivePeerGetter implements Runnable {
 
     private static Thread peerGetterThread;
 
-    public ActivePeerGetter() {
+    public PingerManager() {
         activeIpAddresses.clear();
         tempIpAddresses.clear();
         activeIpBQ.clear();

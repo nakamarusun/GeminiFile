@@ -87,16 +87,18 @@ public class Service {
             // If not, then await for connection to be made.
             if (!currentIp.getHostAddress().startsWith("127")) {
                 // Start pinger to ping all the ranges of the local ip address
-                Thread pinger = new Thread(new ActivePeerGetter(), "PingerManager");
+                Thread pinger = new Thread(new PingerManager(), "PingerManager");
                 pinger.setDaemon(true);
                 pinger.start();
 
                 PeerCommunicatorManager.start();
+
+                // Starts folder checker service
+
             } else {
                 System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
                 System.out.println(myNode.toString());
             }
-
 
             // ScheduledExecutionService for checking whether self ip address is the same to warrant a restart.
             // Use lambda ThreadFactory to name the thread.
@@ -111,11 +113,10 @@ public class Service {
                 // Shutdowns the ip checker
                 ipChecker.shutdownNow();
                 // Interrupts the pinger and stops it
-                ActivePeerGetter.stopService();
+                PingerManager.stopService();
                 // Stops all the PeerCommunicatorManager processes.
                 PeerCommunicatorManager.stopService();
             }
-
         }
     }
 

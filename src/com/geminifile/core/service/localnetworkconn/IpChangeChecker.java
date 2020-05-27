@@ -4,12 +4,9 @@ package com.geminifile.core.service.localnetworkconn;
 Ip change checker for PeerCommunicatorManager.
  */
 
-import com.geminifile.core.service.ActivePeerGetter;
 import com.geminifile.core.service.Service;
 
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 public class IpChangeChecker implements Runnable {
 
