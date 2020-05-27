@@ -10,14 +10,15 @@ public class Binder {
     private String name; // Name of the binder
     private String id; // Id of the binder, enter this id on another machine to sync this binder
     private File directory; // Directory of the binder in the machine
-    private HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
+    private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
 
-    private Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
+    private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
 
     private long lastTimeModified; // Last time any of the properties are modified.
 
-    private List<File> recurFiles = new ArrayList<>();
+    private final List<File> recurFiles = new ArrayList<>();
 
+    // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {
         this.name = name;
         this.id = id;
@@ -32,6 +33,8 @@ public class Binder {
         lastTimeModified = new Date().getTime();
     }
 
+
+    // Setters and getters
     public String getName() {
         return name;
     }
@@ -59,14 +62,33 @@ public class Binder {
         lastTimeModified = new Date().getTime();
     }
 
-    public void update() {
-        fileListingLock.lock();
-        fileListing.clear();
+
+    // Custom methods
+    public boolean update() {
+        // Updates all of the file listing. If there is a difference from the previous iteration, return true
+
+        // Creates a new HashMap to compare with the previous fileListing
+        HashMap<String, Long> listingNow = new HashMap<>();
+        boolean updated = false; // Whether the current fileListing is different from the previous
+
         for (File e : listFilesRecursively(directory)) {
             String relPath = e.getPath().substring(directory.getPath().length());
-            fileListing.put(relPath, e.lastModified());
+            listingNow.put(relPath, e.lastModified());
         }
-        fileListingLock.unlock();
+        // Checks whether the fileListing is the same
+        if (!listingNow.equals(fileListing)) updated = true;
+
+        if (updated) {
+            fileListingLock.lock();
+            try {
+                fileListing.clear();
+                fileListing.putAll(listingNow);
+            } finally {
+                fileListingLock.unlock();
+            }
+        }
+
+        return updated;
     }
 
     public HashMap<String, Long> getFileListing() {
@@ -97,11 +119,7 @@ public class Binder {
         }
         return str.toString();
     }
-
-    public void printFileListing() {
-        System.out.println(this.getFileListing().toString());
-    }
-
+    
     private List<File> listFilesRecursivelyUtil(File path) {
 
         try {
@@ -123,7 +141,7 @@ public class Binder {
 
     public List<File> listFilesRecursively(File path) {
 
-        // Clears the static variable first.
+        // Clears the private variable first.
         recurFiles.clear();
         return listFilesRecursivelyUtil(path);
     }
