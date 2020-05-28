@@ -4,6 +4,7 @@ package com.geminifile.core;
 @author Jason Christian @ https://www.github.com/nakamarusun
 */
 
+import com.geminifile.core.fileparser.BinderManager;
 import com.geminifile.core.service.Service;
 
 import java.util.Map;
@@ -42,6 +43,9 @@ public class CLIDriver {
                     break;
                 case "refresh":
                     CLIArgumentProcessor.refresh(argMap);
+                    break;
+                case "json":
+                    BinderManager.start();
                     break;
                 default:
                     System.out.println("Unknown command, please refer to 'geminifile --help'");

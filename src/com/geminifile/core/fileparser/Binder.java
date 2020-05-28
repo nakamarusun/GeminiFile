@@ -1,24 +1,30 @@
 package com.geminifile.core.fileparser;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Binder {
 
     private String name; // Name of the binder
     private String id; // Id of the binder, enter this id on another machine to sync this binder
     private File directory; // Directory of the binder in the machine
-    private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
-
     private long directoryLastModified;
+    // TODO: Add directory name
+    private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
 
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
 
     private long lastTimePropertiesModified; // Last time any of the properties are modified.
 
     private final List<File> recurFiles = new ArrayList<>();
+
+    private Thread directoryWatcher;
 
     // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {
@@ -34,6 +40,7 @@ public class Binder {
         this.id = generateRandomAlphaNum(7);
         this.directory = directory;
         lastTimePropertiesModified = new Date().getTime();
+        directoryLastModified = directory.lastModified();
     }
 
 
@@ -65,6 +72,13 @@ public class Binder {
         lastTimePropertiesModified = new Date().getTime();
     }
 
+    public long getDirectoryLastModified() {
+        return directoryLastModified;
+    }
+
+    public void setDirectoryLastModified(long directoryLastModified) {
+        this.directoryLastModified = directoryLastModified;
+    }
 
     // Custom methods
     public void update() {
@@ -88,18 +102,18 @@ public class Binder {
         return fileListing;
     }
 
-    public int randomRange(int min, int max) {
+    public static int randomRange(int min, int max) {
         Random rand = new Random();
         return (rand.nextInt(max - min + 1) + min);
     }
 
-    public String generateRandomAlphaNum(int size) {
+    public static String generateRandomAlphaNum(int size) {
         StringBuilder str = new StringBuilder();
         Random rand = new Random();
         for (int i = 0; i < size; i++) {
-            switch (rand.nextInt() % 3) {
+            switch (rand.nextInt(3)) {
                 case 0:
-                    str.append( (char)randomRange(30, 39) );
+                    str.append( (char)randomRange(48, 57) );
                     break;
                 case 1:
                     str.append( (char)randomRange(65, 90) );
@@ -138,4 +152,44 @@ public class Binder {
         return listFilesRecursivelyUtil(path);
     }
 
+    public void startWatcher() {
+        directoryWatcher = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WatchService watcher = FileSystems.getDefault().newWatchService(); // New watcher service for filesystems
+                    Path dir = Paths.get(directory.getAbsolutePath()); // The path of the directory to check
+                    dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY); // Registers the watcher to the directory, with the following args to watch for
+
+                    // Always checking for difference
+                    while (true) {
+                        WatchKey key; // key object
+                        try {
+                            key = watcher.take();
+                        } catch (InterruptedException ex) {
+                            return;
+                        }
+
+                        // At this point, the service has detected a change in the directory it is watching.
+                        System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() );
+
+//                        for (WatchEvent<?> event : key.pollEvents()) {
+//                            // Checks what events that happened.
+//                            // TODO: Wait for several seconds before syncing with the other machine
+//                            WatchEvent.Kind<?> kind = event.kind();
+//
+//                            @SuppressWarnings("unchecked")
+//                            WatchEvent<Path> ev = (WatchEvent<Path>) event; //
+//
+//                        }
+
+                    }
+
+                } catch (IOException e) {
+                    System.out.println("Error creating watcher");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }

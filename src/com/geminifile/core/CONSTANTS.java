@@ -11,4 +11,7 @@ public class CONSTANTS {
     public static final int PORTCONNECTTIMEOUT = 3000; // in ms, max time to try to connect to a port.
     public static final int PINGEVERYXSECOND = 30; // in s, time to refresh all peers.
 
+    public static final String MYBINDERSPATH = "./"; // Path to the binder's json path. Default is the same as GeminiFile executable
+    public static final String MYBINDERSFILENAME = "MyBinders.json"; // Name of the MyBinders file
+
 }
