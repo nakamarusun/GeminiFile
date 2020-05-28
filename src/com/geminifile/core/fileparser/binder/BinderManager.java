@@ -34,6 +34,7 @@ public class BinderManager {
      */
 
     public static void start() {
+        System.out.println("[FILE] Binder Manager is Starting...");
         // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
             // Creates the file
@@ -61,6 +62,7 @@ public class BinderManager {
             e.startWatcher();
         }
         // Communicates with other peers to sync files
+        saveMyBinders();
 
 
     }
@@ -142,6 +144,13 @@ public class BinderManager {
             newBinder.setDirectoryLastModified(binderJSON.getLong("lastModified"));
             binders.add(newBinder);
         }
+    }
+
+    public static Binder getBinder(String id) {
+        for (Binder e : binders) {
+            if (e.getId().equals(id)) return e;
+        }
+        return null;
     }
 
 }

@@ -1,5 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -13,7 +15,7 @@ import static java.nio.file.StandardWatchEventKinds.*;
 public class Binder {
 
     private String name; // Name of the binder
-    private String id; // Id of the binder, enter this id on another machine to sync this binder
+    private String id; // Id of the binder, enter this id on another machine to sync this binder // TODO: SECURITY ISSUE: DANGEROUS TO SEND ID TO EVERY PEER, HASH IT.
     private File directory; // Directory of the binder in the machine
     private long directoryLastModified;
     // TODO: Add directory name
@@ -44,8 +46,7 @@ public class Binder {
         directoryLastModified = directory.lastModified();
     }
 
-
-    // Setters and getters
+    //region Setters and getters
     public String getName() {
         return name;
     }
@@ -80,7 +81,7 @@ public class Binder {
     public void setDirectoryLastModified(long directoryLastModified) {
         this.directoryLastModified = directoryLastModified;
     }
-
+    //endregion
 
     // Custom methods
     public void update() {
@@ -128,6 +129,12 @@ public class Binder {
         // Clears the private variable first.
         recurFiles.clear();
         return listFilesRecursivelyUtil(path);
+    }
+
+    public String getFileListingJSON() {
+        String result = "";
+
+        return result;
     }
 
     public void startWatcher() {

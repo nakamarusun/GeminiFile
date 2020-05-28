@@ -25,6 +25,7 @@ public class PeerCommunicatorManager {
 
     public static void start() {
 
+        System.out.println("[PEER] Starting Peer Communicator Manager...");
         // Run thread for PeerClientAcceptor
         peerClient = new Thread(new PeerClientManager(), "PeerClientManager");
         peerClient.start();
@@ -58,7 +59,7 @@ public class PeerCommunicatorManager {
             try {
                 e.getSock().close();
             } catch (IOException ioException) {
-                System.out.println("Error closing socket" + e.toString());
+                System.out.println("[PEER] Error closing socket" + e.toString());
                 ioException.printStackTrace();
             }
         }

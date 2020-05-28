@@ -35,7 +35,7 @@ public class PingerManager implements Runnable {
     @Override
     public void run() {
 
-        System.out.println("Pinger service is starting...");
+        System.out.println("[PING] Pinger service is starting...");
         // Sets reference to the thread running this process so can be interrupted.
         peerGetterThread = Thread.currentThread();
 
@@ -63,7 +63,7 @@ public class PingerManager implements Runnable {
                 try {
                     trd.get();
                 } catch (InterruptedException interrupted) {
-                    System.out.println("Peer getter thread interrupted");
+                    System.out.println("[PING] Peer getter thread interrupted");
                     // The waiting process is interrupted to stop the pinger service
                     if (willStopService) {
                         break;
@@ -72,13 +72,13 @@ public class PingerManager implements Runnable {
                     restartProcess = true;
                     break;
                 } catch (ExecutionException e) {
-                    System.out.println("Error in executing one of the pinger threads.");
+                    System.out.println("[PING] Error in executing one of the pinger threads.");
                 }
             }
 
 
             if (willStopService) {
-                System.out.println("Peer getter thread stopping...");
+                System.out.println("[PING] Peer getter thread stopping...");
                 willStopService = false;
                 // Stops service
                 pinger.shutdownNow();
@@ -87,7 +87,7 @@ public class PingerManager implements Runnable {
 
             // If "refresh ips" is invoked then restart process.
             if (restartProcess) {
-                System.out.println("Peer getter thread restarting...");
+                System.out.println("[PING] Peer getter thread restarting...");
                 pinger.shutdownNow(); // shutdown all of the thread processes.
                 nextSync = 0;
                 continue;
@@ -116,9 +116,9 @@ public class PingerManager implements Runnable {
 
             // these run after all the pingerThreads and its' sub processes has completed
             pinger.shutdown();
-            System.out.println("Process done after: " + ((new Date()).getTime() - startTime - nextSync));
+            System.out.println("[PING] Process done after: " + ((new Date()).getTime() - startTime - nextSync));
             long startAfter = (PINGEVERYXSECOND * 1000) - ((new Date()).getTime() - startTime - nextSync);
-            System.out.println("Process will restart after: " + startAfter);
+            System.out.println("[PING] Process will restart after: " + startAfter);
             nextSync = startAfter > 0 ? startAfter : 0; // Renew the nextSync scheduler timer and clamp it so it never reaches below 0.
         }
 

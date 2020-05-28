@@ -1,5 +1,6 @@
 package com.geminifile.core.service;
 
+import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
@@ -95,6 +96,7 @@ public class Service {
                 PeerCommunicatorManager.start();
 
                 // Starts folder checker service
+                BinderManager.start();
 
             } else {
                 System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
