@@ -66,11 +66,17 @@ public class PeerCommunicationLoop implements Runnable {
             } catch (SocketException e) {
                 // Means that server disconnects from the other machine.
                 outThread.interrupt();
+                for (PeerMsgProcessorThread tr : msgProcessorThreads) {
+                    tr.interrupt();
+                }
                 System.out.println("[PEER] Disconnected with: " + node.getIp().getHostAddress());
                 break;
             } catch (EOFException e) {
                 // Could mean that the server peer has disconnected from this machine.
                 outThread.interrupt();
+                for (PeerMsgProcessorThread tr : msgProcessorThreads) {
+                    tr.interrupt();
+                }
                 System.out.println("[PEER] Disconnected from: " + node.getIp().getHostAddress());
                 break;
             } catch (ClassNotFoundException e) {
