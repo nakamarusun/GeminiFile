@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.geminifile.core.MathUtil.generateRandomAlphaNum;
 import static java.nio.file.StandardWatchEventKinds.*;
 
 public class Binder {
@@ -80,6 +81,7 @@ public class Binder {
         this.directoryLastModified = directoryLastModified;
     }
 
+    
     // Custom methods
     public void update() {
         // Updates all of the file listing.
@@ -100,30 +102,6 @@ public class Binder {
     public HashMap<String, Long> getFileListing() {
         this.update();
         return fileListing;
-    }
-
-    public static int randomRange(int min, int max) {
-        Random rand = new Random();
-        return (rand.nextInt(max - min + 1) + min);
-    }
-
-    public static String generateRandomAlphaNum(int size) {
-        StringBuilder str = new StringBuilder();
-        Random rand = new Random();
-        for (int i = 0; i < size; i++) {
-            switch (rand.nextInt(3)) {
-                case 0:
-                    str.append( (char)randomRange(48, 57) );
-                    break;
-                case 1:
-                    str.append( (char)randomRange(65, 90) );
-                    break;
-                case 2:
-                    str.append( (char)randomRange(97, 122) );
-                    break;
-            }
-        }
-        return str.toString();
     }
 
     private List<File> listFilesRecursivelyUtil(File path) {

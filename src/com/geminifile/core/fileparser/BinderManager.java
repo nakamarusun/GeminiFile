@@ -34,8 +34,7 @@ public class BinderManager {
      */
 
     public static void start() {
-        // Loads the binder configuration
-        // If there is no configuration, then create it.
+        // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
             // Creates the file
             try {
@@ -50,17 +49,18 @@ public class BinderManager {
             }
         }
 
+        // Loads the binder configuration
         loadMyBinders();
         System.out.println(myBinders.toString());
 
 //        addToBinders(new Binder("TestFile", new File("C:\\Users\\nakam\\Desktop\\TestSync")));
 //        addToBinders(new Binder("Jopp", new File("C:\\Users\\nakam\\Desktop\\Algorithms")));
-        saveMyBinders();
 
         // Start threads to detect change in directory.
         for (Binder e : binders) {
             e.startWatcher();
         }
+
 
     }
 
@@ -98,6 +98,8 @@ public class BinderManager {
     }
 
     public static void saveMyBinders() {
+        // First, update all of the myBinders JSONObject, and saves it.
+        updateMyBinders();
         // Writes into file
         try {
             FileWriter writer = new FileWriter(myBindersFile);
