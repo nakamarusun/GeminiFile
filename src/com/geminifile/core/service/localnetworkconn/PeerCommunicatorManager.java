@@ -10,6 +10,7 @@ meanwhile PeerServerSender manages new connections to another device.
  */
 
 import com.geminifile.core.service.Node;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -68,6 +69,13 @@ public class PeerCommunicatorManager {
 
         PeerClientManager.stopService();
         PeerServerManager.stopService();
+    }
+
+    public static void sendToAllPeers(MsgWrapper msg) {
+        // Sends the specified message to all of the  peer table.
+        for (PeerCommunicationLoop e : peerTable) {
+            e.sendMsg(msg);
+        }
     }
 
 }

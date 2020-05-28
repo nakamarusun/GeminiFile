@@ -1,6 +1,7 @@
 package com.geminifile.core.service.localnetworkconn;
 
 import com.geminifile.core.service.Node;
+import com.geminifile.core.service.localnetworkconn.comms.PeerMsgProcessorThread;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.EOFException;
@@ -9,6 +10,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 // TODO: STOP THIS LOOP WHEN SERVICE IS STOPPED.
@@ -21,7 +24,8 @@ public class PeerCommunicationLoop implements Runnable {
     private final ObjectOutputStream outStream;
 
     private final ArrayBlockingQueue<MsgWrapper> outMessageQueue;
-    private final ArrayBlockingQueue<MsgWrapper> inMessageQueue;
+
+    private final List<PeerMsgProcessorThread> msgProcessorThreads = new ArrayList<>();
 
     public PeerCommunicationLoop(Socket sock, Node node, ObjectInputStream inStream, ObjectOutputStream outStream) {
         this.sock = sock;
@@ -31,24 +35,34 @@ public class PeerCommunicationLoop implements Runnable {
 
         // Maximum message queue is 10.
         outMessageQueue = new ArrayBlockingQueue<>(10, true);
-        inMessageQueue = new ArrayBlockingQueue<>(10, true);
     }
 
     public void startComms() {
+
+        String threadBeginning = Thread.currentThread().getName();
+
         // The current thread becomes the input thread, a new thread is created for the output thread.
         Thread outThread = new Thread(this, (Thread.currentThread().getName() + "OutStream")); // Renames the threads to get a better information
+
         Thread.currentThread().setName(Thread.currentThread().getName() + "InStream");
 
         // Starts the thread
         outThread.start();
+
 
         // THIS IS THE MAIN INPUT LOOP, PROCESS INPUT
         while (true) {
             // Waits until there is an prompt to send.
             try {
                 MsgWrapper msg = (MsgWrapper) inStream.readObject();
-                // Puts it into the inMessageQueue
-                inMessageQueue.offer(msg);
+                System.out.println("[PEER] Received Message Type " + msg.getType().name());
+
+                // Processes the message in a separate thread
+                PeerMsgProcessorThread inProcessorThread = new PeerMsgProcessorThread(this, msg);
+                inProcessorThread.setName(Thread.currentThread().getName() + "MsgProcessor");
+                msgProcessorThreads.add(inProcessorThread); // And puts it into the list.
+                inProcessorThread.start();
+
             } catch (SocketException e) {
                 // Means that server disconnects from the other machine.
                 outThread.interrupt();
@@ -74,6 +88,7 @@ public class PeerCommunicationLoop implements Runnable {
         while(true) {
             try {
                 MsgWrapper msg = outMessageQueue.take();
+                System.out.println("[PEER] Sending Message Type " + msg.getType().name());
                 outStream.writeObject(msg);
             } catch (InterruptedException e) {
                 // TODO: QUIT OR RESTART WHEN INTERRUPTED.
@@ -93,4 +108,13 @@ public class PeerCommunicationLoop implements Runnable {
     public Node getNode() {
         return node;
     }
+
+    public boolean sendMsg(MsgWrapper msg) {
+        return outMessageQueue.offer(msg);
+    }
+
+    public void removeMsgProcessorThread(PeerMsgProcessorThread thread) {
+        msgProcessorThreads.remove(thread);
+    }
+
 }

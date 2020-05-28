@@ -49,7 +49,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                 }
                 break;
             case INFO:
-                System.out.println(msg.getContent());
+                System.out.println(msg.toString());
                 break;
         }
 

@@ -52,7 +52,6 @@ public class BinderManager {
 
         // Loads the binder configuration
         loadMyBinders();
-        System.out.println(myBinders.toString());
 
 //        addToBinders(new Binder("TestFile", new File("C:\\Users\\nakam\\Desktop\\TestSync")));
 //        addToBinders(new Binder("Jopp", new File("C:\\Users\\nakam\\Desktop\\Algorithms")));
@@ -65,6 +64,10 @@ public class BinderManager {
         saveMyBinders();
 
 
+    }
+
+    public static List<Binder> getAllBinders() {
+        return binders;
     }
 
     public static void addToBinders(Binder binder) {
