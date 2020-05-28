@@ -55,7 +55,6 @@ public class LocalClientCommunicator {
 
         } catch (IOException e) {
             System.out.println("[LCLIENT] No geminifile service is running at localhost:" + LOCALPORT);
-            e.printStackTrace();
         }
     }
 

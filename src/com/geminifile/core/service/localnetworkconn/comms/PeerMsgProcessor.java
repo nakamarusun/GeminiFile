@@ -37,15 +37,14 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             // Gets all the file directory with their corresponding lastModified.
                             reply.put(e, currentBinder.getFileListing()); // Puts the file listing into the reply object
                             messageContent.append(reply.toString()).append("-"); // appends to the StringBuilder
-                        } else {
-                            // Do something if doesn't have
-                            messageContent.append("NON-");
                         }
 
                     }
 
-                    msgProc = new MsgWrapper("AskBinderReply-" + messageContent.toString(), MsgType.INFO);
+                    msgProc = new MsgWrapper("AskBinderReply-" + messageContent.toString(), MsgType.NOREPLY);
                     break;
+                } else if (msg.getContent().startsWith("AskBinderReply-")) {
+                    // Do file Syncing
                 }
                 break;
             case INFO:
