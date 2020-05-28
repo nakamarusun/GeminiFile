@@ -81,7 +81,7 @@ public class Binder {
         this.directoryLastModified = directoryLastModified;
     }
 
-    
+
     // Custom methods
     public void update() {
         // Updates all of the file listing.

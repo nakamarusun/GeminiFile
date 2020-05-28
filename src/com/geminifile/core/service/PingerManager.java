@@ -105,6 +105,10 @@ public class PingerManager implements Runnable {
                 // removes the current ip address from the other ip addresses.
                 activeIpAddresses.remove(Service.getCurrentIp());
                 // Offers the completed ip set to the queue.
+                if (activeIpBQ.size() == 1) {
+                    // If there is an element in the queue, then remove it before adding the new one to ensure queue's freshness.
+                    activeIpBQ.clear();
+                }
                 activeIpBQ.offer(activeIpAddresses);
             } finally {
                 updateListLock.unlock();

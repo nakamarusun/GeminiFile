@@ -60,6 +60,7 @@ public class BinderManager {
         for (Binder e : binders) {
             e.startWatcher();
         }
+        // Communicates with other peers to sync files
 
 
     }
