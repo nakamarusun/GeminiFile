@@ -153,6 +153,7 @@ public class Binder {
     }
 
     public void startWatcher() {
+
         directoryWatcher = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -167,11 +168,12 @@ public class Binder {
                         try {
                             key = watcher.take();
                         } catch (InterruptedException ex) {
+                            // Quit the thread
                             return;
                         }
 
                         // At this point, the service has detected a change in the directory it is watching.
-                        System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() );
+                        System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() + ": " + new Date() );
 
 //                        for (WatchEvent<?> event : key.pollEvents()) {
 //                            // Checks what events that happened.
@@ -181,7 +183,13 @@ public class Binder {
 //                            @SuppressWarnings("unchecked")
 //                            WatchEvent<Path> ev = (WatchEvent<Path>) event; //
 //
-//                        }
+//                            }
+
+                        key.pollEvents();   // Removes all queue event.
+                        boolean valid = key.reset();
+                        if (!valid) {
+                            break;
+                        }
 
                     }
 
@@ -191,5 +199,8 @@ public class Binder {
                 }
             }
         });
+
+        directoryWatcher.start();
+
     }
 }
