@@ -4,7 +4,7 @@ package com.geminifile.core;
 @author Jason Christian @ https://www.github.com/nakamarusun
 */
 
-import com.geminifile.core.fileparser.BinderManager;
+import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.Service;
 
 import java.util.Map;

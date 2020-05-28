@@ -1,4 +1,4 @@
-package com.geminifile.core.fileparser;
+package com.geminifile.core.fileparser.binder;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,7 +176,7 @@ public class Binder {
                     e.printStackTrace();
                 }
             }
-        });
+        }, "BinderWatcher-" + id);
 
         directoryWatcher.start();
 

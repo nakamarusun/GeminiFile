@@ -1,4 +1,4 @@
-package com.geminifile.core.fileparser;
+package com.geminifile.core.fileparser.binder;
 
 import java.io.*;
 import java.util.ArrayList;

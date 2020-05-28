@@ -91,6 +91,7 @@ public class Service {
                 pinger.setDaemon(true);
                 pinger.start();
 
+                // Starts PeerCommunicatorManager to connect and query with other peers, and to start the communication loop.
                 PeerCommunicatorManager.start();
 
                 // Starts folder checker service
