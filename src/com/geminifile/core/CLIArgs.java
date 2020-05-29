@@ -18,7 +18,7 @@ public class CLIArgs {
                 "   [-d <folder> syncs folder with ',' delimiter] [-f force sync]\n" +
                 "geminifile stop: stops service\n" +
                 "geminifile status: status of the server, folder locations to sync\n" +
-                "   [--threads views all current threads running] [-p returns all active peers]\n" +
+                "   [--threads views all current threads running] [-p returns all active peers] [-n shows current node]\n" +
                 "geminifile refresh: refreshes the specified services\n" +
                 "   [-n networking service], [-p pinger service]\n" +
                 "geminifile shutdown: shutdowns the service.\n" +

@@ -61,12 +61,12 @@ public class Node implements Serializable {
 
     @Override
     public String toString() {
-        return "Node{" +
-                "ip=" + ip.toString() +
-                ", port=" + port +
-                ", name='" + name + '\'' +
-                ", os='" + os + '\'' +
-                ", id='" + id + '\'' +
-                '}';
+        return "Node{ " +
+                "IP: " + ip.toString() +
+                ":" + port +
+                ", Name: " + name +
+                ", OS: " + os +
+                ", ID: " + id +
+                " }";
     }
 }

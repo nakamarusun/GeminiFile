@@ -59,6 +59,13 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                                     e.getNode().getOs()));
                         }
                         msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
+                        break;
+                    case "MyNode":
+                        msgProc = new MsgWrapper(
+                                "\n" + Service.getMyNode().toString() + "\n",
+                                MsgType.INFO
+                        );
+                        break;
                 }
                 break;
             case PING:

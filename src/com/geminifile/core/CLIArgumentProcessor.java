@@ -28,6 +28,9 @@ public class CLIArgumentProcessor {
                     case "p":
                         msg = new MsgWrapper("peers", MsgType.ASK);
                         break;
+                    case "n":
+                        msg = new MsgWrapper("MyNode", MsgType.ASK);
+                        break;
                     default:
                         msg = new MsgWrapper("", MsgType.NOACTION);
                 }
