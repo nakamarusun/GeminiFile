@@ -18,6 +18,7 @@ import static com.geminifile.core.CONSTANTS.COMMPORT;
 
 // This thread first function as a handshake with the other peer, sending the query first to the other peer.
 // After successfully verified,
+// TODO: WHEN CONNECTING TO OTHERS, THAT OTHER CAN CONNECT HERE AS WELL. FIX THAT ! MAYBE USING LOCKS AND STUFF
 public class PeerServerThread implements Runnable, OnConnectOperation {
 
     private InetAddress nodeIp;
@@ -92,6 +93,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
         // Do stuff when this peer connects to other peer after query.
         // Usually preliminary stuff
         // Ask the other device if binders is in sync
+        System.out.println("[FILE] Sent AskBinderHave to " + nodeIp.getHostAddress());
         peer.sendMsg(BinderManager.getAskBinderHave());
     }
 }

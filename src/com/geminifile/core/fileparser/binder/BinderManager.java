@@ -1,9 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,6 +16,8 @@ public class BinderManager {
     private static final List<Binder> binders = new ArrayList<>();
     private static JSONObject myBinders = new JSONObject("{\nbinders: []\n}");
     private static File myBindersFile = new File(MYBINDERSPATH, MYBINDERSFILENAME);
+
+    private Vector<BinderFileDelta> binderDeltaOperations = new Vector<>(); // Stores any delta from the id specified in the object
 
     private static Lock binderLock = new ReentrantLock();
 

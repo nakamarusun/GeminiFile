@@ -18,23 +18,20 @@ public class Binder {
     private String id; // Id of the binder, enter this id on another machine to sync this binder // TODO: SECURITY ISSUE: DANGEROUS TO SEND ID TO EVERY PEER, HASH IT.
     private File directory; // Directory of the binder in the machine
     private long directoryLastModified;
-    // TODO: Add directory name
+
     private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
-
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
-
-    private long lastTimePropertiesModified; // Last time any of the properties are modified.
-
     private final List<File> recurFiles = new ArrayList<>();
 
     private Thread directoryWatcher;
+
+    private boolean updated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change // TODO: UNTESTED
 
     // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {
         this.name = name;
         this.id = id;
         this.directory = directory;
-        lastTimePropertiesModified = new Date().getTime();
         directoryLastModified = directory.lastModified();
     }
 
@@ -42,7 +39,6 @@ public class Binder {
         this.name = name;
         this.id = generateRandomAlphaNum(7);
         this.directory = directory;
-        lastTimePropertiesModified = new Date().getTime();
         directoryLastModified = directory.lastModified();
     }
 
@@ -53,7 +49,6 @@ public class Binder {
 
     public void setName(String name) {
         this.name = name;
-        lastTimePropertiesModified = new Date().getTime();
     }
 
     public String getId() {
@@ -62,7 +57,6 @@ public class Binder {
 
     public void setId(String id) {
         this.id = id;
-        lastTimePropertiesModified = new Date().getTime();
     }
 
     public File getDirectory() {
@@ -71,7 +65,6 @@ public class Binder {
 
     public void setDirectory(File directory) {
         this.directory = directory;
-        lastTimePropertiesModified = new Date().getTime();
     }
 
     public long getDirectoryLastModified() {
@@ -84,7 +77,7 @@ public class Binder {
     //endregion
 
     // Custom methods
-    public void update() {
+    private void update() {
         // Updates all of the file listing.
 
         fileListingLock.lock(); // Lock for safety
@@ -95,13 +88,16 @@ public class Binder {
                 String relPath = e.getPath().substring(directory.getPath().length());
                 fileListing.put(relPath, e.lastModified());
             }
+            updated = true;
         } finally {
             fileListingLock.unlock();
         }
     }
 
     public HashMap<String, Long> getFileListing() {
-        this.update();
+        if (!updated) {
+            this.update();
+        }
         return fileListing;
     }
 
@@ -159,6 +155,7 @@ public class Binder {
 
                         // At this point, the service has detected a change in the directory it is watching.
                         System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() + ": " + new Date() );
+                        updated = false; // Sets updated status to false.
 
 //                        for (WatchEvent<?> event : key.pollEvents()) {
 //                            // Checks what events that happened.
