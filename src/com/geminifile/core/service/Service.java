@@ -8,10 +8,7 @@ import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -76,11 +73,19 @@ public class Service {
                     hexString.append(hex);
                 }
                 String uniqueId = hexString.toString();
+
+                String name = currentIp.getHostName(); // Name of the machine
+                try {
+                    name = InetAddress.getLocalHost().getHostName(); // Tries to get the machine's name from InetAddress stuff.
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+
                 // Assigns myNode
                 myNode = new Node(currentIp,
                         COMMPORT,
                         uniqueId,
-                        currentIp.getHostName(),
+                        name,
                         System.getProperty("os.name")
                 );
             } catch (NoSuchAlgorithmException | SocketException e) {

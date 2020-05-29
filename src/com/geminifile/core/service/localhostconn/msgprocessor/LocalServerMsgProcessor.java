@@ -8,11 +8,15 @@ returns a corresponding reply MsgWrapper object.
 import com.geminifile.core.service.PingerManager;
 import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.Service;
+import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
+import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 
 import java.util.Set;
+
+import static com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager.getPeerTable;
 
 public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
@@ -45,6 +49,16 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         }
                         msgProc = new MsgWrapper(strBuild.toString(), MsgType.INFO);
                         break;
+                    case "peers":
+                        StringBuilder str = new StringBuilder("\nIP:Port               |Name            |ID          |OS\n");
+                        for (PeerCommunicationLoop e : PeerCommunicatorManager.getPeerTable()) {
+                            str.append(String.format("%-22s|%-16s|%-12s|%s\n",
+                                    e.getSock().getInetAddress().getHostAddress() + ":" + e.getSock().getPort(),
+                                    e.getNode().getName(),
+                                    e.getNode().getId().substring(0, 8) + "..",
+                                    e.getNode().getOs()));
+                        }
+                        msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
                 }
                 break;
             case PING:

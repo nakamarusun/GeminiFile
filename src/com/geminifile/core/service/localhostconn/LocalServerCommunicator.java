@@ -5,6 +5,7 @@ import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -106,7 +107,7 @@ public class LocalServerCommunicator implements Runnable {
                     }
                 }
 
-            } catch (SocketException ec) {
+            } catch (SocketException | EOFException ec) {
                 System.out.println("[LSERVER] Client Disconnected.");
             } catch (IOException e) {
                 System.out.println("[LSERVER] Socket error.");

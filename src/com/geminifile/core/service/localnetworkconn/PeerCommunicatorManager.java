@@ -40,6 +40,10 @@ public class PeerCommunicatorManager {
 
     }
 
+    public static Vector<PeerCommunicationLoop> getPeerTable() {
+        return peerTable;
+    }
+
     public static void addPeerTable(PeerCommunicationLoop comms) {
         peerTable.add(comms);
     }

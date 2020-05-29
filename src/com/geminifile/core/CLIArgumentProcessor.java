@@ -25,6 +25,9 @@ public class CLIArgumentProcessor {
                     case "threads":
                         msg = new MsgWrapper("threads", MsgType.ASK);
                         break;
+                    case "p":
+                        msg = new MsgWrapper("peers", MsgType.ASK);
+                        break;
                     default:
                         msg = new MsgWrapper("", MsgType.NOACTION);
                 }
@@ -44,8 +47,10 @@ public class CLIArgumentProcessor {
             switch (e.getKey()) {
                 case "n":
                     msg = new MsgWrapper("RefNet", MsgType.COMMAND);
+                    break;
                 case "p":
                     msg = new MsgWrapper("Ping", MsgType.COMMAND);
+                    break;
             }
         }
 

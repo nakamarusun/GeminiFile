@@ -18,9 +18,10 @@ public class CLIArgs {
                 "   [-d <folder> syncs folder with ',' delimiter] [-f force sync]\n" +
                 "geminifile stop: stops service\n" +
                 "geminifile status: status of the server, folder locations to sync\n" +
-                "   [--threads views all current threads running]\n" +
+                "   [--threads views all current threads running] [-p returns all active peers]\n" +
                 "geminifile refresh: refreshes the specified services\n" +
-                "   [-n networking service], [-p pinger service]" +
+                "   [-n networking service], [-p pinger service]\n" +
+                "geminifile shutdown: shutdowns the service.\n" +
                 "");
     }
 
@@ -44,7 +45,7 @@ public class CLIArgs {
                 if (!args[i + 1].startsWith("-")) {
                     argAfter = args[i + 1]; // Assigns into variable
                 }
-            } catch (IndexOutOfBoundsException e) { } // Just to catch out of bounds
+            } catch (IndexOutOfBoundsException ignored) { } // Just to catch out of bounds
 
             if (regSing.matcher(args[i]).matches()) {
                 // If it follows the single hyphen regex
