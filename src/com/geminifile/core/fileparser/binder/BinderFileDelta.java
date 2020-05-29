@@ -1,6 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
 import com.geminifile.core.MathUtil;
+import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,12 +12,15 @@ public class BinderFileDelta {
 
     private final String token;
 
+    private final PeerCommunicationLoop peerToSend;
+
     private final String id;
     private final Vector<String> thisPeerNeed = new Vector<>();
     private final Vector<String> otherPeerNeed = new Vector<>();
 
-    public BinderFileDelta(String id, HashMap<String, Long> thisPeerListing, HashMap<String, Long> otherPeerListing) {
+    public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, HashMap<String, Long> thisPeerListing, HashMap<String, Long> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
+        this.peerToSend = peerToSend;
         this.id = id;
         token = MathUtil.generateRandomAlphaNum(7);
 
@@ -55,7 +59,9 @@ public class BinderFileDelta {
             }
         }
         // Adds from the other copy to the need list.
-        thisPeerNeed.addAll(otherPeerListingCopy.keySet());
+        for (String e : otherPeerListingCopy.keySet()) {
+            thisPeerNeed.add(e.replace("\\", "/")); // Replaces with linux / unix character
+        }
 
     }
 

@@ -1,19 +1,26 @@
 package com.geminifile.core.service.localnetworkconn.comms;
 
 import com.geminifile.core.fileparser.binder.Binder;
+import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.MsgProcessor;
+import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Objects;
 
+// TODO: Add locks to prevent file from being accesed.
 public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
-    public PeerMsgProcessor(MsgWrapper msg) {
+    PeerCommunicationLoop communicatedPeer; // To get a reference of the peer the message is dealing with.
+
+    public PeerMsgProcessor(MsgWrapper msg, PeerCommunicationLoop peer) {
         super(msg);
+        communicatedPeer = peer;
     }
 
     @Override
@@ -53,22 +60,27 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     // Do file Syncing
                     // Processes what the current device have, and doesn't have.
                     JSONObject otherJsonFileBinder = new JSONObject(contentWithoutStart); // The json format of the received message
-                    for (String e : otherJsonFileBinder.keySet()) {
+                    for (String e : otherJsonFileBinder.keySet()) { // e is every id in the json object.
                         // Loops within the binder ids that the other machine has, and create a new list that
                         // Differentiates the files that other machine has and this.
                         HashMap<String, Long> otherFileListing = new HashMap<>();
 
                         // Iterates within the id to get all the fileListing
-                        JSONObject otherJsonFileListing = new JSONObject(otherJsonFileBinder.getString(e));
+                        JSONObject otherJsonFileListing = otherJsonFileBinder.getJSONObject(e);
                         for (String file : otherJsonFileListing.keySet()) {
                             // Puts into HashMap
                             otherFileListing.put(file, otherJsonFileListing.getLong(file));
                         }
-                        // Do comparison with the current binder's id file listing.
-
+                        // Make a new entry in the binder delta operation based on the current files with the other machine's file.
+                        try {
+                            BinderManager.addBinderDeltaOperation(new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing));
+                        } catch (NullPointerException ex) {
+                            // If failed to get the current binder from the binder manager
+                            ex.printStackTrace();
+                        }
                     }
-
                     // Replies with what files does the other device need from this device.
+                    msgProc = new MsgWrapper("", MsgType.ASK);
                 }
                 break;
             case INFO:

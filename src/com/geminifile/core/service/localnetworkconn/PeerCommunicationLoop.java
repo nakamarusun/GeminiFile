@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
 // TODO: STOP THIS LOOP WHEN SERVICE IS STOPPED.
-// TODO: MAKE ANOTHER CLASS TO PROCESS THE MESSAGES.
 public class PeerCommunicationLoop implements Runnable {
 
     private final Socket sock;
@@ -59,7 +58,7 @@ public class PeerCommunicationLoop implements Runnable {
 
                 // Processes the message in a separate thread
                 PeerMsgProcessorThread inProcessorThread = new PeerMsgProcessorThread(this, msg);
-                inProcessorThread.setName(Thread.currentThread().getName() + "MsgProcessor");
+                inProcessorThread.setName(Thread.currentThread().getName() + "-MsgProcessor-" + msg.getType().name());
                 msgProcessorThreads.add(inProcessorThread); // And puts it into the list.
                 inProcessorThread.start();
 

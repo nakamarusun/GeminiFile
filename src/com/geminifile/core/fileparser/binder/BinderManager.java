@@ -17,7 +17,7 @@ public class BinderManager {
     private static JSONObject myBinders = new JSONObject("{\nbinders: []\n}");
     private static File myBindersFile = new File(MYBINDERSPATH, MYBINDERSFILENAME);
 
-    private Vector<BinderFileDelta> binderDeltaOperations = new Vector<>(); // Stores any delta from the id specified in the object
+    private static Vector<BinderFileDelta> binderDeltaOperations = new Vector<>(); // Stores any delta from the id specified in the object
 
     private static Lock binderLock = new ReentrantLock();
 
@@ -162,5 +162,10 @@ public class BinderManager {
             content.append(e.getId()).append("-");
         }
         return new MsgWrapper(content.toString(), MsgType.ASK);
+    }
+
+    public static void addBinderDeltaOperation(BinderFileDelta delta) {
+        binderDeltaOperations.add(delta);
+        delta.printAllDelta();
     }
 }

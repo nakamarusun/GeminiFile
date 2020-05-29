@@ -2,6 +2,7 @@ package com.geminifile.core.service.localnetworkconn.comms;
 
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.socketmsg.ExpectingReply;
+import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 public class PeerMsgProcessorThread extends Thread {
@@ -17,9 +18,9 @@ public class PeerMsgProcessorThread extends Thread {
 
     @Override
     public void run() {
-        PeerMsgProcessor msgProcessor = new PeerMsgProcessor(msg);
+        PeerMsgProcessor msgProcessor = new PeerMsgProcessor(msg, peer);
         MsgWrapper reply = msgProcessor.process();
-        if (ExpectingReply.isExpectingReply(msg)) {
+        if (ExpectingReply.isExpectingReply(msg) && reply.getType() != MsgType.NOACTION) {
             peer.sendMsg(reply);
         }
         // Removes thread from the thread peer List
