@@ -55,7 +55,6 @@ public class PingerThread implements Runnable {
                 // Check for open port @ COMMPORT
                 try {
                     Socket tryOpen = new Socket();
-                    // TODO: DON'T TRY TO CONNECT IF IT's ALREADY IN PEER TABLE.
                     tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PINGTIMEOUT);
 //                System.out.println("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
                     // Do the msg query here

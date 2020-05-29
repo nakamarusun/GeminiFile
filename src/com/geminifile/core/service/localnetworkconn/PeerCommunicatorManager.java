@@ -15,6 +15,8 @@ import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Vector;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PeerCommunicatorManager {
 
@@ -23,6 +25,8 @@ public class PeerCommunicatorManager {
 
     private static Thread peerClient;
     private static Thread peerServer;
+
+    private static Lock peerConnectionLock = new ReentrantLock(); // Lock to prevent the device from accepting connections while attempting to connect to other machines.
 
     public static void start() {
 
@@ -76,6 +80,14 @@ public class PeerCommunicatorManager {
         for (PeerCommunicationLoop e : peerTable) {
             e.sendMsg(msg);
         }
+    }
+
+    public static void lockPeerConnectionLock() {
+        peerConnectionLock.lock();
+    }
+
+    public static void unlockPeerConnectionLock() {
+        peerConnectionLock.unlock();
     }
 
 }

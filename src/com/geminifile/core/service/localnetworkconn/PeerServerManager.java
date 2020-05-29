@@ -25,23 +25,27 @@ public class PeerServerManager implements Runnable {
                 // Get updated ip list, will block to wait for updated peer from ActivePeerGetter
                 Set<InetAddress> peerList = PingerManager.getUpdatedActiveIps();
 
-                for (InetAddress e : peerList) {
-                    // Checks if the ip is in the PeerTable
-                    if (PeerCommunicatorManager.isInPeerTable(e)) {
-                        // if it's inside, then restart the loop.
-                        System.out.println("[PEER] Already connected with " + e.getHostAddress());
-                        continue;
+                PeerCommunicatorManager.lockPeerConnectionLock();
+                try {
+                    for (InetAddress e : peerList) {
+                        // Checks if the ip is in the PeerTable
+                        if (PeerCommunicatorManager.isInPeerTable(e)) {
+                            // if it's inside, then restart the loop.
+                            System.out.println("[PEER] Already connected with " + e.getHostAddress());
+                            continue;
+                        }
+                        // TODO: DO THIS TO ALL OF THE THREAD INTERRUPTIONS BY stopService()
+                        if (currentThread.isInterrupted()) {
+                            throw new InterruptedException("[PEER] PeerServerManager is stopping");
+                        }
+                        // Creates a new thread to process the connection.
+                        Thread serverThread = new Thread(new PeerServerThread(e), "PeerS(" + e.getHostAddress() + ")");
+                        serverThread.start();
+                        activeSocketPeers.add(serverThread);
                     }
-                    // TODO: DO THIS TO ALL OF THE THREAD INTERRUPTIONS BY stopService()
-                    if (currentThread.isInterrupted()) {
-                        throw new InterruptedException("[PEER] PeerServerManager is stopping");
-                    }
-                    // Creates a new thread to process the connection.
-                    Thread serverThread = new Thread(new PeerServerThread(e), "PeerS(" + e.getHostAddress() + ")");
-                    serverThread.start();
-                    activeSocketPeers.add(serverThread);
+                } finally {
+                    PeerCommunicatorManager.unlockPeerConnectionLock();
                 }
-
             } catch (InterruptedException e) {
                 // The service is stopped
                 return;

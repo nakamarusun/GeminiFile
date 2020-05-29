@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Objects;
 
-// TODO: Add locks to prevent file from being accesed.
+// TODO: Add locks to prevent file from being accessed.
 public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
     PeerCommunicationLoop communicatedPeer; // To get a reference of the peer the message is dealing with.

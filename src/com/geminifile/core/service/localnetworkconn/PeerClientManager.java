@@ -39,10 +39,20 @@ public class PeerClientManager implements Runnable {
             while (true) {
                 // Creates new thread.
                 Socket socketRef = ssock.accept();
+                PeerCommunicatorManager.lockPeerConnectionLock(); // Attempts to get lock
+                try {
 //                System.out.println("Connected with ip: " + socketRef.getInetAddress().getHostAddress());
-                Thread clientThread = new Thread(new PeerClientThread(socketRef), "PeerC" + socketRef.getInetAddress());
-                clientThread.start();
-                activeSocketPeers.add(clientThread);
+                    // Check if the socket's ip is already in the peer table
+                    if (PeerCommunicatorManager.isInPeerTable(socketRef.getInetAddress())) {
+                        socketRef.close();
+                        continue; // Closes the connection and continues.
+                    }
+                    Thread clientThread = new Thread(new PeerClientThread(socketRef), "PeerC" + socketRef.getInetAddress());
+                    clientThread.start();
+                    activeSocketPeers.add(clientThread);
+                } finally {
+                    PeerCommunicatorManager.unlockPeerConnectionLock();
+                }
             }
         } catch (SocketException e) {
             if (stopSock) {

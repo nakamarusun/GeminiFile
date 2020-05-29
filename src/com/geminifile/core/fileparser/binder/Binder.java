@@ -25,7 +25,7 @@ public class Binder {
 
     private Thread directoryWatcher;
 
-    private boolean updated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change // TODO: UNTESTED
+    private boolean updated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change
 
     // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {

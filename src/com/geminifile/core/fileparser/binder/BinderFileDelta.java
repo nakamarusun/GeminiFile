@@ -45,7 +45,7 @@ public class BinderFileDelta {
                         // The file in the other device is newer than the current device
                         thisPeerNeed.add(fileJ);
                     }
-                    // TODO: remove from thisPeerListing once found.
+
                     fileIsFound = true;
                     otherPeerListingCopy.remove(ej.getKey());
                     otherPeerListing.remove(fileJ); // To make things more efficient, remove from list once it is found to be same file.
