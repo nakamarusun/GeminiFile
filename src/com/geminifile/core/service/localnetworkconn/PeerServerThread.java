@@ -1,5 +1,6 @@
 package com.geminifile.core.service.localnetworkconn;
 
+import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.Node;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
@@ -60,8 +61,12 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
 
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
-            commsLoop.startComms();
+
+            // Before starting the comms thread, do preliminary script
             newConnectionMade(commsLoop);
+
+            // Starts up the comms
+            commsLoop.startComms();
 
         } catch (ClassNotFoundException e) {
             System.out.println("[PEER] Class deserialization error");
@@ -86,5 +91,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
     public void newConnectionMade(PeerCommunicationLoop peer) {
         // Do stuff when this peer connects to other peer after query.
         // Usually preliminary stuff
+        // Ask the other device if binders is in sync
+        peer.sendMsg(BinderManager.getAskBinderHave());
     }
 }

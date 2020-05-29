@@ -22,12 +22,14 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
         switch (msg.getType()) {
             case ASK:
                 if (msg.getContent().startsWith("AskBinderHave-")) {
+                    // Will process a message with content: "AskBinderHave-id1-id2-id3-id4"
+                    // Will process it and return a statement: "AskBinderReply-{id1:[files have]}-{id3:[files have]}"
                     // Asks if this peer has binders with the corresponding id
                     String[] ids = msg.getContent().substring(msg.getContent().indexOf("-") + 1).split("-");
                     StringBuilder messageContent = new StringBuilder();
 
-                    // Iterate the ids sent, and based if this device has the corresponding id, send either a
-                    // File listing, or a NON
+                    // Iterate the ids sent, and based if this device has the corresponding id, and reply with a JSONObject
+                    // with their own File listing. Ignore if don't have
                     for (String e : ids) {
 
                         Binder currentBinder = BinderManager.getBinder(e);
@@ -41,10 +43,14 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
                     }
 
-                    msgProc = new MsgWrapper("AskBinderReply-" + messageContent.toString(), MsgType.NOREPLY);
+                    msgProc = new MsgWrapper("AskBinderReply-" + messageContent.toString(), MsgType.INFO);
                     break;
                 } else if (msg.getContent().startsWith("AskBinderReply-")) {
+                    // Will process a message with content: "AskBinderReply-{id1:[files have]}-{id3:[files have]}"
                     // Do file Syncing
+                    // Processes what the current device have, and doesn't have.
+
+                    // Replies with what files does the other device need from this device.
                 }
                 break;
             case INFO:

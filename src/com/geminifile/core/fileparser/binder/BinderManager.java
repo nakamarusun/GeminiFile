@@ -7,13 +7,15 @@ import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.geminifile.core.socketmsg.MsgType;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import org.json.*;
 
 import static com.geminifile.core.CONSTANTS.*;
 
 public class BinderManager {
 
-    private static List<Binder> binders = new ArrayList<>();
+    private static final List<Binder> binders = new ArrayList<>();
     private static JSONObject myBinders = new JSONObject("{\nbinders: []\n}");
     private static File myBindersFile = new File(MYBINDERSPATH, MYBINDERSFILENAME);
 
@@ -52,9 +54,6 @@ public class BinderManager {
 
         // Loads the binder configuration
         loadMyBinders();
-
-//        addToBinders(new Binder("TestFile", new File("C:\\Users\\nakam\\Desktop\\TestSync")));
-//        addToBinders(new Binder("Jopp", new File("C:\\Users\\nakam\\Desktop\\Algorithms")));
 
         // Start threads to detect change in directory.
         for (Binder e : binders) {
@@ -156,4 +155,12 @@ public class BinderManager {
         return null;
     }
 
+    public static MsgWrapper getAskBinderHave() {
+        // Will return a message with content: "AskBinderHave-id1-id2-id3-id4"
+        StringBuilder content = new StringBuilder("AskBinderHave-");
+        for (Binder e : binders) {
+            content.append(e.getId()).append("-");
+        }
+        return new MsgWrapper(content.toString(), MsgType.ASK);
+    }
 }
