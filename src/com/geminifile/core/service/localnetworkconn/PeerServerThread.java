@@ -17,7 +17,7 @@ import static com.geminifile.core.CONSTANTS.COMMPORT;
 
 // This thread first function as a handshake with the other peer, sending the query first to the other peer.
 // After successfully verified,
-public class PeerServerThread implements Runnable {
+public class PeerServerThread implements Runnable, OnConnectOperation {
 
     private InetAddress nodeIp;
     private Node otherNode;
@@ -61,6 +61,7 @@ public class PeerServerThread implements Runnable {
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
             commsLoop.startComms();
+            newConnectionMade(commsLoop);
 
         } catch (ClassNotFoundException e) {
             System.out.println("[PEER] Class deserialization error");
@@ -81,4 +82,9 @@ public class PeerServerThread implements Runnable {
 
     }
 
+    @Override
+    public void newConnectionMade(PeerCommunicationLoop peer) {
+        // Do stuff when this peer connects to other peer after query.
+        // Usually preliminary stuff
+    }
 }

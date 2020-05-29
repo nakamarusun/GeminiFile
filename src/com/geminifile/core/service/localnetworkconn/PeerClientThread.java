@@ -14,7 +14,7 @@ import java.net.SocketException;
 // This thread can also handle ping queries.
 // TODO: DO SOME SOCKET CLOSES
 // TODO: REMOVE FROM PEER TABLE
-public class PeerClientThread implements Runnable {
+public class PeerClientThread implements Runnable, OnConnectOperation {
 
     private final Socket sock;
     private Node otherNode;
@@ -62,6 +62,7 @@ public class PeerClientThread implements Runnable {
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
             commsLoop.startComms();
+            newConnectionMade(commsLoop);
 
         } catch (ClassNotFoundException e) {
             System.out.println("[PEER] Class deserialization error");
@@ -82,4 +83,8 @@ public class PeerClientThread implements Runnable {
         PeerCommunicatorManager.removePeerTable(otherNode);
     }
 
+    @Override
+    public void newConnectionMade(PeerCommunicationLoop peer) {
+        // Do stuff when peer accepts connection from another peer after accepting query
+    }
 }
