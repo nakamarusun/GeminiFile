@@ -26,7 +26,7 @@ public class PeerCommunicatorManager {
     private static Thread peerClient;
     private static Thread peerServer;
 
-    private static Lock peerConnectionLock = new ReentrantLock(); // Lock to prevent the device from accepting connections while attempting to connect to other machines.
+    private static final Lock peerConnectionLock = new ReentrantLock(); // Lock to prevent the device from accepting connections while attempting to connect to other machines.
 
     public static void start() {
 
@@ -42,6 +42,15 @@ public class PeerCommunicatorManager {
 
     public static Vector<PeerCommunicationLoop> getPeerTable() {
         return peerTable;
+    }
+
+    public static PeerCommunicationLoop getPeerReference(String peerNodeId) {
+
+        for (PeerCommunicationLoop e : peerTable) {
+            if (e.getNode().getId().equals(peerNodeId)) return e;
+        }
+
+        return null;
     }
 
     public static void addPeerTable(PeerCommunicationLoop comms) {

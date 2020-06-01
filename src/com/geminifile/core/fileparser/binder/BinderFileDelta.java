@@ -2,6 +2,8 @@ package com.geminifile.core.fileparser.binder;
 
 import com.geminifile.core.MathUtil;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +14,7 @@ public class BinderFileDelta {
 
     private final String token;
 
-    private final PeerCommunicationLoop peerToSend;
+    private final String peerNodeId;
 
     private final String id;
     private final Vector<String> thisPeerNeed = new Vector<>();
@@ -20,7 +22,7 @@ public class BinderFileDelta {
 
     public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, HashMap<String, Long> thisPeerListing, HashMap<String, Long> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
-        this.peerToSend = peerToSend;
+        this.peerNodeId = peerToSend.getNode().getId();
         this.id = id;
         token = MathUtil.generateRandomAlphaNum(7);
 
@@ -63,6 +65,59 @@ public class BinderFileDelta {
             thisPeerNeed.add(e.replace("\\", "/")); // Replaces with linux / unix character
         }
 
+    }
+
+    public BinderFileDelta(JSONObject binderDeltaJSON) {
+
+        token = binderDeltaJSON.getString("token"); // Sets token
+        id = binderDeltaJSON.getString("id"); // Sets id
+
+        peerNodeId = binderDeltaJSON.getString("peerNodeId");
+
+        for (int i = 0; i < binderDeltaJSON.getJSONArray("thisPeerNeed").length(); i++) {
+            thisPeerNeed.add(binderDeltaJSON.getJSONArray("thisPeerNeed").getString(i)); // Sets thisPeerNeed
+        }
+
+        for (int i = 0; i < binderDeltaJSON.getJSONArray("otherPeerNeed").length(); i++) {
+            otherPeerNeed.add(binderDeltaJSON.getJSONArray("otherPeerNeed").getString(i)); // setsOtherPeerNeed
+        }
+
+    }
+
+    public JSONObject getBinderDeltaJSON() {
+        JSONObject json = new JSONObject();
+
+        json.put("token", token); // Puts the token
+        json.put("id", id); // Puts the id
+        json.put("peerNodeId", peerNodeId);
+
+        // Puts the thisPeerNeed vector
+        JSONArray thisPeerNeedJSON = new JSONArray();
+        for (String e : thisPeerNeed) {
+            thisPeerNeedJSON.put(e);
+        }
+        json.put("thisPeerNeed", thisPeerNeed);
+
+        // Puts the otherPeerNeed vector
+        JSONArray otherPeerNeedJSON = new JSONArray();
+        for (String e : otherPeerNeed) {
+            otherPeerNeedJSON.put(e);
+        }
+        json.put("otherPeerNeed", otherPeerNeed);
+
+        return json;
+    }
+
+    public JSONObject getSwitchedBinderDeltaJSON() {
+        JSONObject json = getBinderDeltaJSON();
+
+        // Switches the thisPeerNeed and otherPeerNeed
+        JSONArray temp = json.getJSONArray("thisPeerNeed");
+
+        json.put("thisPeerNeed", json.getJSONArray("otherPeerNeed"));
+        json.put("otherPeerNeed", temp);
+
+        return json;
     }
 
     public void printAllDelta() {

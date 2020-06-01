@@ -71,16 +71,23 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             // Puts into HashMap
                             otherFileListing.put(file, otherJsonFileListing.getLong(file));
                         }
-                        // Make a new entry in the binder delta operation based on the current files with the other machine's file.
+
                         try {
-                            BinderManager.addBinderDeltaOperation(new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing));
+                            // Make a new entry in the binder delta operation based on the current files with the other machine's file.
+                            BinderFileDelta fileDelta = new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing);
+                            JSONObject switchedBinderDeltaJSON = fileDelta.getSwitchedBinderDeltaJSON(); // Switch the delta to send to the other device.
+
+                            BinderManager.addBinderDeltaOperation(fileDelta);
+                            System.out.println(fileDelta.getBinderDeltaJSON().toString());
+
+                            // Replies with what files does the other device need from this device.
+                            msgProc = new MsgWrapper("AskBinderFileList-" + switchedBinderDeltaJSON.toString(), MsgType.INFO);
+
                         } catch (NullPointerException ex) {
                             // If failed to get the current binder from the binder manager
                             ex.printStackTrace();
                         }
                     }
-                    // Replies with what files does the other device need from this device.
-                    msgProc = new MsgWrapper("", MsgType.ASK);
                 }
                 break;
             case INFO:
