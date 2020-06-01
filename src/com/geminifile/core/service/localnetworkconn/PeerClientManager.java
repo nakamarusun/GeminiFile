@@ -29,7 +29,7 @@ public class PeerClientManager implements Runnable {
     public void run() {
         activeSocketPeers.clear();
         try {
-            ssock = new ServerSocket(COMMPORT, 50, Service.getNonLoopbackIp4Address());
+            ssock = new ServerSocket(COMMPORT, 50, Service.getCurrentIp());
             /* This works ONLY as connection acceptors.
             accepted connections operations are then put into a new separate thread.
             when another peer connects to this device, put the IP address to peerTable,

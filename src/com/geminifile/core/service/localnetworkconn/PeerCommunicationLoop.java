@@ -53,7 +53,10 @@ public class PeerCommunicationLoop implements Runnable {
         while (true) {
             // Waits until there is an prompt to send.
             try {
-                MsgWrapper msg = (MsgWrapper) inStream.readObject();
+                Object inObj = inStream.readObject();
+
+                MsgWrapper msg = (MsgWrapper) inObj;
+
                 System.out.println("[PEER] Received Message Type " + msg.getType().name());
 
                 // Processes the message in a separate thread

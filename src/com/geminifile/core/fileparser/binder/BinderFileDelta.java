@@ -84,6 +84,10 @@ public class BinderFileDelta {
 
     }
 
+    public String getToken() {
+        return token;
+    }
+
     public JSONObject getBinderDeltaJSON() {
         JSONObject json = new JSONObject();
 

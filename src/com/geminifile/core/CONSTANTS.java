@@ -4,6 +4,7 @@ public class CONSTANTS {
 
     public static final int LOCALPORT = 43743; // localhost port communication
     public static final int COMMPORT = 54638; // local network port communication
+    public static final int FILEPORT = 54639;
     public static final boolean VERBOSE = true; // For verbose log in the cli
 
     public static final int IPPINGERTHREADS = 24; // Number of threads used to ping all the ip range (more means faster response.

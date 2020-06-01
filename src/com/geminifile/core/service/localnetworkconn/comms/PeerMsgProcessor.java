@@ -57,9 +57,11 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     break;
                 } else if (msg.getContent().startsWith("AskBinderReply-")) {
                     // Will process a message with content: "AskBinderReply-{id1:[files have], id3:[files have]}"
+                    // Will process it and return a statement: "AskBinderFileList-{"otherPeerNeed":[files], "id":id, "thisPeerNeed":[files], "token":token}-.......
                     // Do file Syncing
                     // Processes what the current device have, and doesn't have.
                     JSONObject otherJsonFileBinder = new JSONObject(contentWithoutStart); // The json format of the received message
+                    StringBuilder finalString = new StringBuilder();
                     for (String e : otherJsonFileBinder.keySet()) { // e is every id in the json object.
                         // Loops within the binder ids that the other machine has, and create a new list that
                         // Differentiates the files that other machine has and this.
@@ -78,16 +80,32 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             JSONObject switchedBinderDeltaJSON = fileDelta.getSwitchedBinderDeltaJSON(); // Switch the delta to send to the other device.
 
                             BinderManager.addBinderDeltaOperation(fileDelta);
-                            System.out.println(fileDelta.getBinderDeltaJSON().toString());
 
                             // Replies with what files does the other device need from this device.
-                            msgProc = new MsgWrapper("AskBinderFileList-" + switchedBinderDeltaJSON.toString(), MsgType.INFO);
+                            finalString.append(switchedBinderDeltaJSON.toString()).append("-");
 
                         } catch (NullPointerException ex) {
                             // If failed to get the current binder from the binder manager
                             ex.printStackTrace();
                         }
                     }
+
+                    msgProc = new MsgWrapper("AskBinderFileList-" + finalString.toString(), MsgType.INFO);
+
+                } else if (msg.getContent().startsWith("AskBinderFileList-")) {
+                    // Will process a message with content: "AskBinderFileList-{"otherPeerNeed":[files], "id":id, "thisPeerNeed":[files], "token":token}-.......
+                    // Puts the JSON object to the the list of BinderDeltas in BinderManager
+                    BinderFileDelta fileDelta = new BinderFileDelta(new JSONObject(contentWithoutStart));
+                    BinderManager.addBinderDeltaOperation(fileDelta);
+                    // Verify the message, and the file availability in the system, open the File port, and sends the files to the other device.
+
+                    // Start connection thread here.
+
+                    msgProc = new MsgWrapper("AskBinderConfirmed", MsgType.ASK);
+
+                } else if (msg.getContent().startsWith("AskBinderConfirmed")) {
+                    // Start connection thread here.
+
                 }
                 break;
             case INFO:

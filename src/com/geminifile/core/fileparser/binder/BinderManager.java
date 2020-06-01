@@ -168,4 +168,12 @@ public class BinderManager {
         binderDeltaOperations.add(delta);
         delta.printAllDelta();
     }
+
+    public static boolean isTokenInBinderDeltas(String token) {
+        for (BinderFileDelta e : binderDeltaOperations) {
+            if (e.getToken().equals(token)) return true;
+        }
+        return false;
+    }
+
 }
