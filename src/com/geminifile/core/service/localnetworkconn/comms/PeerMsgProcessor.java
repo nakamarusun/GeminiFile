@@ -3,6 +3,7 @@ package com.geminifile.core.service.localnetworkconn.comms;
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.fileparser.netfilemanager.NetFileSenderThread;
 import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.socketmsg.ExpectingReply;
@@ -90,22 +91,47 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         }
                     }
 
-                    msgProc = new MsgWrapper("AskBinderFileList-" + finalString.toString(), MsgType.INFO);
+                    msgProc = new MsgWrapper("AskBinderFileList-" + finalString.toString(), MsgType.ASK);
 
                 } else if (msg.getContent().startsWith("AskBinderFileList-")) {
                     // Will process a message with content: "AskBinderFileList-{"otherPeerNeed":[files], "id":id, "thisPeerNeed":[files], "token":token}-.......
+                    // Will process it and return a statement: "AskBinderConfirmed-token1-token2-
                     // Puts the JSON object to the the list of BinderDeltas in BinderManager
-                    BinderFileDelta fileDelta = new BinderFileDelta(new JSONObject(contentWithoutStart));
-                    BinderManager.addBinderDeltaOperation(fileDelta);
-                    // Verify the message, and the file availability in the system, open the File port, and sends the files to the other device.
 
-                    // Start connection thread here.
+                    StringBuilder finalString = new StringBuilder();
 
-                    msgProc = new MsgWrapper("AskBinderConfirmed", MsgType.ASK);
+                    String[] receivedJSON = contentWithoutStart.split("-");
+                    for (String e : receivedJSON) {
 
-                } else if (msg.getContent().startsWith("AskBinderConfirmed")) {
-                    // Start connection thread here.
+                        JSONObject fileDeltaJSON = new JSONObject(e);
+                        BinderFileDelta fileDelta = new BinderFileDelta(fileDeltaJSON);
+                        BinderManager.addBinderDeltaOperation(fileDelta);
 
+                        finalString.append(fileDelta.getToken()).append("-");
+
+                        // Verify the message, and the file availability in the system, open the File port, and sends the files to the other device.
+                        // Start connection thread here.
+                        Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                        fileSenderThread.start();
+                        System.out.println("[Should be in linux] " + fileDelta.getBinderDeltaJSON().toString());
+                    }
+
+                    msgProc = new MsgWrapper("AskBinderConfirmed-" + finalString.toString(), MsgType.ASK);
+                    System.out.println(msgProc.toString());
+
+                } else if (msg.getContent().startsWith("AskBinderConfirmed-")) {
+
+                    // Starts Binder delta operation based on received tokens..
+                    String[] receivedTokens = contentWithoutStart.split("-");
+                    for (String e : receivedTokens) {
+
+                        BinderFileDelta fileDelta = BinderManager.getBinderFileDelta(e);
+
+                        // Start connection thread here.
+                        Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                        fileSenderThread.start();
+                        System.out.println("[Should be in celine] " + fileDelta.getBinderDeltaJSON().toString());
+                    }
                 }
                 break;
             case INFO:

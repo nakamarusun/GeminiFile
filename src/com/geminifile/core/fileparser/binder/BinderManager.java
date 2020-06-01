@@ -176,4 +176,11 @@ public class BinderManager {
         return false;
     }
 
+    public static BinderFileDelta getBinderFileDelta(String token) {
+        for (BinderFileDelta e : binderDeltaOperations) {
+            if (e.getToken().equals(token)) return e;
+        }
+        return null;
+    }
+
 }

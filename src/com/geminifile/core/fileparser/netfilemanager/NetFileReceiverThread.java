@@ -1,4 +1,4 @@
-package com.geminifile.core.fileparser.filemanager;
+package com.geminifile.core.fileparser.netfilemanager;
 
 import com.geminifile.core.fileparser.binder.BinderManager;
 
