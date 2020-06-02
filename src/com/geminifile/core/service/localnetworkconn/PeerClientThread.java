@@ -30,30 +30,36 @@ public class PeerClientThread implements Runnable, OnConnectOperation {
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
-            // Accept query from the peer. Whether this is a query or not it is decided later.
-            MsgIdentification inQuery = (MsgIdentification)localObjectIn.readObject();
-            // Handle ping and exit. If not, then continue as usual
-            if (inQuery.getContent().equals("ping")) {
-                localObjectOut.writeObject(new MsgIdentification("pinggood", MsgType.CONNACCEPT, Service.getMyNode()));
-                return;
-            } else if ( !(inQuery.getContent().equals("query") && inQuery.getType() == MsgType.CONNQUERY)) {
-                // if message is not ping and not query then quit the thread
-                return;
-            }
-            // TODO: CHECK IN TRUSTED DEVICES FILE WHETHER PEER IS KNOWN. IF IT IS NOT KNOWN, PROMPT THE USER TO TRUST IT OR NOT.
-            // Send self id as CONNQUERY accept
-            localObjectOut.writeObject(new MsgIdentification("replyquery", MsgType.CONNQUERY, Service.getMyNode()));
+            try {
+                PeerCommunicatorManager.lockPeerConnectionLock();
 
-            // If the program has reached this point, preliminary peer identification is complete, and accept an OK request
-            MsgWrapper okMsg = (MsgWrapper)localObjectIn.readObject();
+                // Accept query from the peer. Whether this is a query or not it is decided later.
+                MsgIdentification inQuery = (MsgIdentification) localObjectIn.readObject();
+                // Handle ping and exit. If not, then continue as usual
+                if (inQuery.getContent().equals("ping")) {
+                    localObjectOut.writeObject(new MsgIdentification("pinggood", MsgType.CONNACCEPT, Service.getMyNode()));
+                    return;
+                } else if (!(inQuery.getContent().equals("query") && inQuery.getType() == MsgType.CONNQUERY)) {
+                    // if message is not ping and not query then quit the thread
+                    return;
+                }
+                // TODO: CHECK IN TRUSTED DEVICES FILE WHETHER PEER IS KNOWN. IF IT IS NOT KNOWN, PROMPT THE USER TO TRUST IT OR NOT.
+                // Send self id as CONNQUERY accept
+                localObjectOut.writeObject(new MsgIdentification("replyquery", MsgType.CONNQUERY, Service.getMyNode()));
 
-            // If connection is accepted and message is right then add to peerTable
-            if (okMsg.getType() == MsgType.CONNACCEPT && okMsg.getContent().equals("allok")) {
-                otherNode = inQuery.getSelfNode();
-            } else {
-                // Exit thread
-                sock.close();
-                return;
+                // If the program has reached this point, preliminary peer identification is complete, and accept an OK request
+                MsgWrapper okMsg = (MsgWrapper) localObjectIn.readObject();
+
+                // If connection is accepted and message is right then add to peerTable
+                if (okMsg.getType() == MsgType.CONNACCEPT && okMsg.getContent().equals("allok")) {
+                    otherNode = inQuery.getSelfNode();
+                } else {
+                    // Exit thread
+                    sock.close();
+                    return;
+                }
+            } finally {
+                PeerCommunicatorManager.unlockPeerConnectionLock();
             }
 
             // At this point, the device has successfully handshake and established connection with the other device

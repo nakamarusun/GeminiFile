@@ -1,7 +1,10 @@
 package com.geminifile.core.fileparser.netfilemanager;
 
+import com.geminifile.core.MathUtil;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
+import com.geminifile.core.fileparser.binder.BinderManager;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,8 +15,8 @@ import static com.geminifile.core.CONSTANTS.FILEPORT;
 
 public class NetFileSenderThread implements Runnable {
 
-    private BinderFileDelta fileDelta;
-    private InetAddress ip;
+    private final BinderFileDelta fileDelta;
+    private final InetAddress ip;
 
     public NetFileSenderThread(BinderFileDelta fileDelta, InetAddress ip) {
         this.fileDelta = fileDelta;
@@ -36,6 +39,22 @@ public class NetFileSenderThread implements Runnable {
             // If the other machine failed to verify it, then the socket will be closed by the other machine.
 
             // Sends all of the file
+            for (String files : fileDelta.getOtherPeerNeed()) {
+                // Opens the file and converts it into a binary stream
+                // TODO: Split into blocks if you have time.
+
+                // Opens file
+                String path = BinderManager.getBinder(fileDelta.getId()).getDirectory().getAbsolutePath() + MathUtil.fileSeparatorToOS(files);
+                File file = new File(path);
+
+                System.out.println("[NetFile] Will send file: " + path);
+
+                if (!file.exists()) {
+                    System.out.println("[NetFile] Error reading file to send: " + path);
+                }
+
+
+            }
 
         } catch (IOException e) {
             System.out.println("[NetFile] Error opening socket");

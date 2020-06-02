@@ -1,5 +1,7 @@
 package com.geminifile.core;
 
+import java.io.File;
+
 public class CONSTANTS {
 
     public static final int LOCALPORT = 43743; // localhost port communication
@@ -12,10 +14,10 @@ public class CONSTANTS {
     public static final int PORTCONNECTTIMEOUT = 3000; // in ms, max time to try to connect to a port.
     public static final int PINGEVERYXSECOND = 30; // in s, time to refresh all peers.
 
-    public static final String MYBINDERSPATH = "./"; // Path to the binder's json path. Default is the same as GeminiFile executable
+    public static final String MYBINDERSPATH = "." + File.separator; // Path to the binder's json path. Default is the same as GeminiFile executable
     public static final String MYBINDERSFILENAME = "MyBinders.json"; // Name of the MyBinders file
 
-    public static final String TEMPNETFILEPATH = "./"; // Path to the temporary folder to keep downloaded files.
+    public static final String TEMPNETFILEPATH = "." + File.separator;; // Path to the temporary folder to keep downloaded files.
     public static final String TEMPNETFOLDERNAME = "temp"; // Folder name
 
 }

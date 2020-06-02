@@ -10,12 +10,13 @@ import java.net.SocketException;
 
 import static com.geminifile.core.CONSTANTS.*;
 
-public class NetFileManager {
+public class NetFileManager implements Runnable {
 
     private static ServerSocket ssock;
     private static boolean stopSock;
 
-    public static void start() {
+    @Override
+    public void run() {
         // Starts the service.
         System.out.println("[NetFile] Starting file receiver service...");
 
@@ -53,6 +54,11 @@ public class NetFileManager {
             System.out.println("[NetFile] Socket error");
             e.printStackTrace();
         }
+    }
+
+    public static void start() {
+        Thread netFileManager = new Thread(new NetFileManager());
+        netFileManager.start();
     }
 
     public static void stopService() {

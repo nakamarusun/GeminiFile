@@ -1,5 +1,6 @@
 package com.geminifile.core;
 
+import java.io.File;
 import java.util.Random;
 
 public class MathUtil {
@@ -26,6 +27,26 @@ public class MathUtil {
             }
         }
         return str.toString();
+    }
+
+    public static String fileSeparatorToOS(String filePath) {
+        StringBuilder finalStr = new StringBuilder();
+
+        String[] separated;
+
+        if (filePath.contains("/")) {
+            // UNIX
+            separated = filePath.split("/");
+        } else {
+            // WINDOWS
+            separated = filePath.split("\\\\");
+        }
+
+        for (String e : separated) {
+            finalStr.append(e + File.separator);
+        }
+
+        return  finalStr.toString();
     }
 
 }

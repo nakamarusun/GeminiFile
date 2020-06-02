@@ -2,6 +2,7 @@ package com.geminifile.core.service;
 
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
@@ -108,6 +109,9 @@ public class Service {
                 // Starts folder checker service
                 BinderManager.start();
 
+                // Starts NetFileManager
+                NetFileManager.start();
+
             } else {
                 System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
                 System.out.println(myNode.toString());
@@ -128,6 +132,8 @@ public class Service {
                 PingerManager.stopService();
                 // Stops all the PeerCommunicatorManager processes.
                 PeerCommunicatorManager.stopService();
+                // Stops NerFileManager
+                NetFileManager.stopService();
             }
         }
     }

@@ -88,6 +88,10 @@ public class BinderFileDelta {
         return token;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public JSONObject getBinderDeltaJSON() {
         JSONObject json = new JSONObject();
 
@@ -122,6 +126,14 @@ public class BinderFileDelta {
         json.put("otherPeerNeed", temp);
 
         return json;
+    }
+
+    public Vector<String> getThisPeerNeed() {
+        return thisPeerNeed;
+    }
+
+    public Vector<String> getOtherPeerNeed() {
+        return otherPeerNeed;
     }
 
     public void printAllDelta() {

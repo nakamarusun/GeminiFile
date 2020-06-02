@@ -113,7 +113,6 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         // Start connection thread here.
                         Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
                         fileSenderThread.start();
-                        System.out.println("[Should be in linux] " + fileDelta.getBinderDeltaJSON().toString());
                     }
 
                     msgProc = new MsgWrapper("AskBinderConfirmed-" + finalString.toString(), MsgType.ASK);
@@ -130,7 +129,6 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         // Start connection thread here.
                         Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
                         fileSenderThread.start();
-                        System.out.println("[Should be in celine] " + fileDelta.getBinderDeltaJSON().toString());
                     }
                 }
                 break;

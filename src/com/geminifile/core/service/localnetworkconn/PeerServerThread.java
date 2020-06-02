@@ -39,23 +39,29 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
-            // Attempts a query
-            localObjectOut.writeObject(new MsgIdentification("query", MsgType.CONNQUERY, Service.getMyNode()));
+            try {
+                PeerCommunicatorManager.lockPeerConnectionLock();
 
-            // Receives a reply
-            MsgIdentification replyQuery = (MsgIdentification)localObjectIn.readObject();
+                // Attempts a query
+                localObjectOut.writeObject(new MsgIdentification("query", MsgType.CONNQUERY, Service.getMyNode()));
 
-            // Checks the reply
-            if (!(replyQuery.getContent().equals("replyquery") && replyQuery.getType() == MsgType.CONNQUERY)) {
-                // Condition does not meet, exits the thread.
-                sock.close();
-                return;
+                // Receives a reply
+                MsgIdentification replyQuery = (MsgIdentification) localObjectIn.readObject();
+
+                // Checks the reply
+                if (!(replyQuery.getContent().equals("replyquery") && replyQuery.getType() == MsgType.CONNQUERY)) {
+                    // Condition does not meet, exits the thread.
+                    sock.close();
+                    return;
+                }
+
+                // If the program has reached this point, preliminary peer identification is complete, and send OK message
+                localObjectOut.writeObject(new MsgWrapper("allok", MsgType.CONNACCEPT));
+                // Puts id into peerTable
+                otherNode = replyQuery.getSelfNode();
+            } finally {
+                PeerCommunicatorManager.unlockPeerConnectionLock();
             }
-
-            // If the program has reached this point, preliminary peer identification is complete, and send OK message
-            localObjectOut.writeObject(new MsgWrapper("allok", MsgType.CONNACCEPT));
-            // Puts id into peerTable
-            otherNode = replyQuery.getSelfNode();
 
             // At this point, the device has successfully handshake and established connection with the other device
             System.out.println("[PEER] Successfully established connection with " + sock.getInetAddress().getHostAddress());
