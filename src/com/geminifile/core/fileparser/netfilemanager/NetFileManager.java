@@ -2,12 +2,13 @@ package com.geminifile.core.fileparser.netfilemanager;
 
 import com.geminifile.core.service.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-import static com.geminifile.core.CONSTANTS.FILEPORT;
+import static com.geminifile.core.CONSTANTS.*;
 
 public class NetFileManager {
 
@@ -16,6 +17,21 @@ public class NetFileManager {
 
     public static void start() {
         // Starts the service.
+        System.out.println("[NetFile] Starting file receiver service...");
+
+        // Creates a new temporary folder at destination if it does not exist.
+        File tempFolder = new File(TEMPNETFILEPATH + TEMPNETFOLDERNAME);
+
+        // Checks if the directory exists
+        if ( !(tempFolder.isDirectory() && tempFolder.exists()) ) {
+            if (tempFolder.mkdir()) {
+                System.out.println("[NetFile] Successfully created TempNet folder.");
+            } else {
+                System.out.println("[NetFile] Error creating temp folder in:" + tempFolder.getAbsolutePath());
+                System.exit(5);
+            }
+        }
+
         // Open a new port at FilePort
         try {
             ssock = new ServerSocket(FILEPORT, 50, Service.getCurrentIp());

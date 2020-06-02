@@ -15,4 +15,7 @@ public class CONSTANTS {
     public static final String MYBINDERSPATH = "./"; // Path to the binder's json path. Default is the same as GeminiFile executable
     public static final String MYBINDERSFILENAME = "MyBinders.json"; // Name of the MyBinders file
 
+    public static final String TEMPNETFILEPATH = "./"; // Path to the temporary folder to keep downloaded files.
+    public static final String TEMPNETFOLDERNAME = "temp"; // Folder name
+
 }

@@ -23,7 +23,7 @@ public class NetFileReceiverThread implements Runnable {
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
             // Receives a preliminary token check.
-            String inToken = (String) localObjectIn.readObject();
+            String inToken = (String)localObjectIn.readObject();
             if (!BinderManager.isTokenInBinderDeltas(inToken)) {
                 // If the token in question is not in the device token list, then cancel operation.
                 sock.close();
@@ -31,6 +31,18 @@ public class NetFileReceiverThread implements Runnable {
             }
 
             // Continue operations as usual.
+            // Receives all of the necessary files to a temporary folder
+            while (true) {
+                NetFile file = (NetFile)localObjectIn.readObject();
+                if (file.getToken().equals("0")) {
+                    // Reaches end of file
+                    break;
+                }
+
+                // Puts the file into a temporary folder
+
+
+            }
 
         } catch (ClassNotFoundException e) {
             System.out.println("[NetFile] Class deserialization error.");
