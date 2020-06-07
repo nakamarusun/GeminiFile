@@ -7,6 +7,10 @@ import com.geminifile.core.fileparser.binder.BinderManager;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import static com.geminifile.core.CONSTANTS.*;
 
@@ -33,7 +37,10 @@ public class NetFileReceiverThread implements Runnable {
                 return;
             }
 
-            BinderFileDelta binder = BinderManager.getBinderFileDelta(inToken);
+            BinderFileDelta binderDelta = BinderManager.getBinderFileDelta(inToken);
+            Binder binder = BinderManager.getBinder(binderDelta.getId());
+            File destination = binder.getDirectory(); // Destination to copy files to.
+
 
             System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
@@ -43,7 +50,7 @@ public class NetFileReceiverThread implements Runnable {
 
             // Continue operations as usual.
             // Receives all of the necessary files to a temporary folder
-            for (int i = 0; i < binder.getThisPeerNeed().size(); i++) {
+            for (int i = 0; i < binderDelta.getThisPeerNeed().size(); i++) {
                 // Read file metadata
                 NetFile file = (NetFile) localObjectIn.readObject();
 
@@ -53,7 +60,16 @@ public class NetFileReceiverThread implements Runnable {
 //                }
 
                 // Creates the file from the metadata received.
-                File currentFile = new File(tempFolder.getAbsolutePath() + File.separator + file.getFilePathName());
+                String tempFilePath = tempFolder.getAbsolutePath() + File.separator + file.getFilePathName();
+                File currentFile = new File(tempFilePath);
+
+                if (!currentFile.exists()) {
+                    // If directory not found up until that point
+                    tempFilePath = tempFilePath.substring(0, tempFilePath.lastIndexOf(File.separator));
+                    File newFolder = new File(tempFilePath);
+                    newFolder.mkdirs(); // Make all of the folders up until that point
+                }
+
                 FileOutputStream fileStream = new FileOutputStream(currentFile);
 
                 int blocks = 0; // Blocks of NetFileBlock received
@@ -77,10 +93,30 @@ public class NetFileReceiverThread implements Runnable {
                 fileStream.flush(); // Flushes the buffer into the file.
                 fileStream.close(); // Closes fileOutputStream for safety
 
+                // Copies the files to the main binder folder
+                String destinationFilePath = destination.getAbsolutePath() + File.separator + file.getFilePathName();
+                File destinationFile = new File(destinationFilePath);
+
+                // Checks if the file is there or not
+                if (!destinationFile.exists()) {
+                    // Checks if the directory have been created up until that point
+                    destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf(File.separator));
+                    File newFolder = new File(destinationFilePath);
+                    newFolder.mkdirs(); // Creates file up until that point
+                    destinationFile.createNewFile(); // Creates new file
+                }
+
+                // Try atomic move
+                try {
+                    Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                } catch (AtomicMoveNotSupportedException e) {
+                    Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }
+
             }
 
             // delete temp folder
-//            tempFolder.delete();
+            tempFolder.delete();
             localObjectIn.close();
             localObjectOut.close();
             System.out.println("[NetFile] Completed operation token " + inToken);
