@@ -20,4 +20,6 @@ public class CONSTANTS {
     public static final String TEMPNETFILEPATH = "." + File.separator;; // Path to the temporary folder to keep downloaded files.
     public static final String TEMPNETFOLDERNAME = "temp"; // Folder name
 
+    public static final int BYTESIZE = 4096; // Divides the file into x amount of bytes to send.
+
 }

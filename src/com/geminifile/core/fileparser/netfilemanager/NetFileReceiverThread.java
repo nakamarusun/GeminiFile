@@ -1,5 +1,7 @@
 package com.geminifile.core.fileparser.netfilemanager;
 
+import com.geminifile.core.fileparser.binder.Binder;
+import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
 
 import java.io.*;
@@ -31,6 +33,8 @@ public class NetFileReceiverThread implements Runnable {
                 return;
             }
 
+            BinderFileDelta binder = BinderManager.getBinderFileDelta(inToken);
+
             System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
             // Creates the temporary binder token folder in the temp folder.
@@ -39,20 +43,48 @@ public class NetFileReceiverThread implements Runnable {
 
             // Continue operations as usual.
             // Receives all of the necessary files to a temporary folder
-            while (true) {
+            for (int i = 0; i < binder.getThisPeerNeed().size(); i++) {
+                // Read file metadata
                 NetFile file = (NetFile) localObjectIn.readObject();
-                if (file.getToken().equals("0")) {
-                    // Reaches end of file
-                    break;
+
+//                if (file.getToken().equals("0")) {
+//                    // Reaches end of file
+//                    break;
+//                }
+
+                // Creates the file from the metadata received.
+                File currentFile = new File(tempFolder.getAbsolutePath() + File.separator + file.getFilePathName());
+                FileOutputStream fileStream = new FileOutputStream(currentFile);
+
+                int blocks = 0; // Blocks of NetFileBlock received
+                long byteLength = 0; // bytes of file received.
+
+                // Downloads the file in blocks
+                while (true) {
+                    NetFileBlock fileBlock = (NetFileBlock) localObjectIn.readObject();
+                    // If fileBlock has reached the end, then stop process.
+                    if (fileBlock.getSize() <= 0) {
+                        break;
+                    }
+                    fileStream.write(fileBlock.getBlock(), 0, fileBlock.getSize());
+                    byteLength += fileBlock.getSize();
+                    blocks++;
                 }
 
-                // Puts the file into a temporary folder
+                System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
+                System.out.println("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
 
+                fileStream.flush(); // Flushes the buffer into the file.
+                fileStream.close(); // Closes fileOutputStream for safety
 
             }
 
             // delete temp folder
-            tempFolder.delete();
+//            tempFolder.delete();
+            localObjectIn.close();
+            localObjectOut.close();
+            System.out.println("[NetFile] Completed operation token " + inToken);
+
         } catch (SocketException | EOFException e) {
             System.out.println("[NetFile] Delta file connection disconnected from " + sock.getInetAddress().getHostName());
         } catch (ClassNotFoundException e) {

@@ -7,6 +7,7 @@ import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgIdentification;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -74,6 +75,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
 
             // Starts up the comms
             commsLoop.startComms();
+        } catch (EOFException ignored) {
 
         } catch (ClassNotFoundException e) {
             System.out.println("[PEER] Class deserialization error");
