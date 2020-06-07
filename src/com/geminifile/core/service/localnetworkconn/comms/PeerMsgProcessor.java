@@ -78,6 +78,10 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         try {
                             // Make a new entry in the binder delta operation based on the current files with the other machine's file.
                             BinderFileDelta fileDelta = new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing);
+                            if (fileDelta.getThisPeerNeed().size() == 0 && fileDelta.getOtherPeerNeed().size() == 0) {
+                                // If the file delta operations are empty, then do not send a message
+                                break;
+                            }
                             JSONObject switchedBinderDeltaJSON = fileDelta.getSwitchedBinderDeltaJSON(); // Switch the delta to send to the other device.
 
                             BinderManager.addBinderDeltaOperation(fileDelta);
