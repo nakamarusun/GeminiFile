@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -19,7 +20,7 @@ public class Binder {
     private File directory; // Directory of the binder in the machine
     private long directoryLastModified;
 
-    private final HashMap<String, Long> fileListing = new HashMap<>(); // A HashMap of all of the files recursively in the directory with their last modified time
+    private ArrayList<FileListing> fileListing = new ArrayList<>(); // A HashMap of all of the files recursively in the directory with their last modified time
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
     private final List<File> recurFiles = new ArrayList<>();
 
@@ -81,20 +82,27 @@ public class Binder {
         // Updates all of the file listing.
 
         fileListingLock.lock(); // Lock for safety
-        fileListing.clear(); // Clears the list.
+        fileListing.clear(); // Clears list
         try {
             // Loops within the new directory file listing and puts it into the hashmap.
             for (File e : listFilesRecursively(directory)) {
                 String relPath = e.getPath().substring(directory.getPath().length());
-                fileListing.put(relPath, e.lastModified());
+                FileListing currentFile = new FileListing(relPath, e);
+                fileListing.add(currentFile);
             }
             updated = true;
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("[Binder] Error getting hashing algorithm");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.out.println("[Binder] Error updating binder listing");
+            e.printStackTrace();
         } finally {
             fileListingLock.unlock();
         }
     }
 
-    public HashMap<String, Long> getFileListing() {
+    public ArrayList<FileListing> getFileListing() {
         if (!updated) {
             this.update();
         }

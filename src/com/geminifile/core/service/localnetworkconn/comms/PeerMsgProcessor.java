@@ -3,15 +3,19 @@ package com.geminifile.core.service.localnetworkconn.comms;
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.fileparser.binder.FileListing;
 import com.geminifile.core.fileparser.netfilemanager.NetFileSenderThread;
 import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 // TODO: Add locks to prevent file from being accessed.
@@ -36,7 +40,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                 if (msg.getContent().startsWith("AskBinderHave-")) {
                     // IMPORTANT: USE THIS ONLY FOR BEGINNING WHEN CONNECTION IS MADE. BECAUSE THE FILE CHECKING FUNCTION IS KIND OF HEAVY.
                     // Will process a message with content: "AskBinderHave-id1-id2-id3-id4"
-                    // Will process it and return a statement: "AskBinderReply-{id1:[files have], id3:[files have]}"
+                    // Will process it and return a statement: "AskBinderReply-{id1:[{relPath:x, lastModified:y, checkSum:z}, ..], id3:[{relPath:x, lastModified:y, checkSum:z}, ..]}"
                     // Asks if this peer has binders with the corresponding id
                     String[] ids = contentWithoutStart.split("-");
                     JSONObject reply = new JSONObject(); // JSONObject to return file listing.
@@ -49,7 +53,16 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         if (currentBinder != null) {
                             // Do something if have
                             // Gets all the file directory with their corresponding lastModified.
-                            reply.put(e, currentBinder.getFileListing()); // Puts the file listing into the reply object
+                            List<FileListing> fileListing = currentBinder.getFileListing();
+                            JSONArray fileListingJSONArr = new JSONArray(); // The array of file listings
+                            for (FileListing file : fileListing) {
+                                JSONObject fileListingJSON = new JSONObject();
+                                fileListingJSON.put("relPath", file.getRelativePath());
+                                fileListingJSON.put("lastModified", file.getLastModified());
+                                fileListingJSON.put("checkSum", file.getCheckSumMD5());
+                                fileListingJSONArr.put(fileListingJSON);
+                            }
+                            reply.put(e, fileListingJSONArr); // Puts the file listing into the reply object
                         }
 
                     }
@@ -57,29 +70,39 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     msgProc = new MsgWrapper("AskBinderReply-" + reply.toString(), MsgType.ASK);
                     break;
                 } else if (msg.getContent().startsWith("AskBinderReply-")) {
-                    // Will process a message with content: "AskBinderReply-{id1:[files have], id3:[files have]}"
+                    // Will process a message with content: "AskBinderReply-{id1:[{relPath:x, lastModified:y, checkSum:z}, ..], id3:[{relPath:x, lastModified:y, checkSum:z}, ..]}"
                     // Will process it and return a statement: "AskBinderFileList-{"otherPeerNeed":[files], "id":id, "thisPeerNeed":[files], "token":token}-.......
                     // Do file Syncing
                     // Processes what the current device have, and doesn't have.
+
+                    boolean noDelta = false; // If there is no delta in the files
+
                     JSONObject otherJsonFileBinder = new JSONObject(contentWithoutStart); // The json format of the received message
                     StringBuilder finalString = new StringBuilder();
                     for (String e : otherJsonFileBinder.keySet()) { // e is every id in the json object.
                         // Loops within the binder ids that the other machine has, and create a new list that
                         // Differentiates the files that other machine has and this.
-                        HashMap<String, Long> otherFileListing = new HashMap<>();
+                        ArrayList<FileListing> otherFileListing = new ArrayList<>();
 
                         // Iterates within the id to get all the fileListing
-                        JSONObject otherJsonFileListing = otherJsonFileBinder.getJSONObject(e);
-                        for (String file : otherJsonFileListing.keySet()) {
-                            // Puts into HashMap
-                            otherFileListing.put(file, otherJsonFileListing.getLong(file));
+                        JSONArray otherJsonFileListing = otherJsonFileBinder.getJSONArray(e);
+                        for (int i = 0; i < otherJsonFileListing.length(); i++) {
+                            // Puts into list
+                            JSONObject currentFileJSON = otherJsonFileListing.getJSONObject(i);
+                            otherFileListing.add(new FileListing(
+                                    currentFileJSON.getString("relPath"),
+                                    currentFileJSON.getLong("lastModified"),
+                                    currentFileJSON.getString("checkSum")
+                            ));
                         }
 
                         try {
                             // Make a new entry in the binder delta operation based on the current files with the other machine's file.
+                            // (e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing)
                             BinderFileDelta fileDelta = new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing);
                             if (fileDelta.getThisPeerNeed().size() == 0 && fileDelta.getOtherPeerNeed().size() == 0) {
                                 // If the file delta operations are empty, then do not send a message
+                                noDelta = true;
                                 break;
                             }
                             JSONObject switchedBinderDeltaJSON = fileDelta.getSwitchedBinderDeltaJSON(); // Switch the delta to send to the other device.
@@ -95,7 +118,9 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         }
                     }
 
-                    msgProc = new MsgWrapper("AskBinderFileList-" + finalString.toString(), MsgType.ASK);
+                    if (!noDelta) {
+                        msgProc = new MsgWrapper("AskBinderFileList-" + finalString.toString(), MsgType.ASK);
+                    }
 
                 } else if (msg.getContent().startsWith("AskBinderFileList-")) {
                     // Will process a message with content: "AskBinderFileList-{"otherPeerNeed":[files], "id":id, "thisPeerNeed":[files], "token":token}-.......
@@ -103,6 +128,8 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     // Puts the JSON object to the the list of BinderDeltas in BinderManager
 
                     StringBuilder finalString = new StringBuilder();
+
+                    System.out.println(contentWithoutStart);
 
                     String[] receivedJSON = contentWithoutStart.split("-");
                     for (String e : receivedJSON) {

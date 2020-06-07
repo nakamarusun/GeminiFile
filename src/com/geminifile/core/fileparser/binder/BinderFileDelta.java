@@ -5,10 +5,7 @@ import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 public class BinderFileDelta {
 
@@ -20,37 +17,41 @@ public class BinderFileDelta {
     private final Vector<String> thisPeerNeed = new Vector<>();
     private final Vector<String> otherPeerNeed = new Vector<>();
 
-    public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, HashMap<String, Long> thisPeerListing, HashMap<String, Long> otherPeerListing) {
+    public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, ArrayList<FileListing> thisPeerListing, ArrayList<FileListing> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
         this.peerNodeId = peerToSend.getNode().getId();
         this.id = id;
         token = MathUtil.generateRandomAlphaNum(7);
 
         @SuppressWarnings("unchecked")
-        HashMap<String, Long> otherPeerListingCopy = (HashMap<String, Long>) otherPeerListing.clone(); // A copy of the otherPeerListing to know the difference.
+        ArrayList<FileListing> otherPeerListingCopy = (ArrayList<FileListing>) otherPeerListing.clone(); // A copy of the otherPeerListing to know the difference.
 
         // This loops all the file entry in both listings, and puts them in the delta.
-        for (Map.Entry<String, Long> ei : thisPeerListing.entrySet()) {
+        for (FileListing ei : thisPeerListing) {
 
             boolean fileIsFound = false;
-            String fileI = ei.getKey().replace("\\", "/"); // Make the string of both entries to change their separators.
+            String fileI = ei.getRelativePath().replace("\\", "/"); // Make the string of both entries to change their separators.
 
-            for (Map.Entry<String, Long> ej : otherPeerListing.entrySet()) {
+            for (FileListing ej : otherPeerListing) {
                 // Iterates within all of the files.
-                String fileJ = ej.getKey().replace( "\\", "/"); // Make the string of both entries to change their separators.
+                String fileJ = ej.getRelativePath().replace( "\\", "/"); // Make the string of both entries to change their separators.
                 if (fileI.equals(fileJ)) {
-                    // If the filenames are the same, check the lastModified times.
-                    if (ei.getValue() > ej.getValue()) {
-                        // The file in the current device is newer than the other device
-                        otherPeerNeed.add(fileI);
-                    } else if (ei.getValue() < ej.getValue()) {
-                        // The file in the other device is newer than the current device
-                        thisPeerNeed.add(fileJ);
+
+                    if (!ei.getCheckSumMD5().equals(ej.getCheckSumMD5())) { // If both files has a different checksum
+                        // Evaluates delta by time
+                        // If the filenames are the same, check the lastModified times.
+                        if (ei.getLastModified() > ej.getLastModified()) {
+                            // The file in the current device is newer than the other device
+                            otherPeerNeed.add(fileI);
+                        } else if (ei.getLastModified() < ej.getLastModified()) {
+                            // The file in the other device is newer than the current device
+                            thisPeerNeed.add(fileJ);
+                        }
                     }
 
                     fileIsFound = true;
-                    otherPeerListingCopy.remove(ej.getKey());
-                    otherPeerListing.remove(fileJ); // To make things more efficient, remove from list once it is found to be same file.
+                    otherPeerListingCopy.remove(ej);
+                    otherPeerListing.remove(ej); // To make things more efficient, remove from list once it is found to be same file.
                     // If a file with the same name is in the device, then break the searching and continue with the other.
                     break;
                 }
@@ -61,8 +62,8 @@ public class BinderFileDelta {
             }
         }
         // Adds from the other copy to the need list.
-        for (String e : otherPeerListingCopy.keySet()) {
-            thisPeerNeed.add(e.replace("\\", "/")); // Replaces with linux / unix character
+        for (FileListing e : otherPeerListingCopy) {
+            thisPeerNeed.add(e.getRelativePath().replace("\\", "/")); // Replaces with linux / unix character
         }
 
     }
