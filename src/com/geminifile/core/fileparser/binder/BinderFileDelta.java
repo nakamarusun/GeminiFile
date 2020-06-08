@@ -17,11 +17,16 @@ public class BinderFileDelta {
     private final Vector<String> thisPeerNeed = new Vector<>();
     private final Vector<String> otherPeerNeed = new Vector<>();
 
+    private Status status;
+
+    private int closeCounter; // Tool to safely remove this BinderFileDelta from BinderManager safely requiring 2 removal process.
+
     public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, ArrayList<FileListing> thisPeerListing, ArrayList<FileListing> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
         this.peerNodeId = peerToSend.getNode().getId();
         this.id = id;
-        token = MathUtil.generateRandomAlphaNum(7);
+        this.status = Status.IDLE;
+        token = MathUtil.generateRandomAlphaNum(10);
 
         @SuppressWarnings("unchecked")
         ArrayList<FileListing> otherPeerListingCopy = (ArrayList<FileListing>) otherPeerListing.clone(); // A copy of the otherPeerListing to know the difference.
@@ -72,6 +77,7 @@ public class BinderFileDelta {
 
         token = binderDeltaJSON.getString("token"); // Sets token
         id = binderDeltaJSON.getString("id"); // Sets id
+        status = Status.IDLE;
 
         peerNodeId = binderDeltaJSON.getString("peerNodeId");
 
@@ -85,12 +91,30 @@ public class BinderFileDelta {
 
     }
 
+    public enum Status {
+        IDLE,
+        INPROCESS,
+        FAILED
+    }
+
     public String getToken() {
         return token;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getPeerNodeId() {
+        return peerNodeId;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public JSONObject getBinderDeltaJSON() {
@@ -140,6 +164,16 @@ public class BinderFileDelta {
     public void printAllDelta() {
         System.out.println("This device needs: " + thisPeerNeed.toString());
         System.out.println("Other device needs: " + otherPeerNeed.toString());
+    }
+
+    public boolean closeBinderFileDelta() {
+        // If this returns true, then you can safely remove this binderFileDelta from binderDeltaOperations @ BinderManager class
+        if ((thisPeerNeed.size() == 0 || otherPeerNeed.size() == 0) || (closeCounter == 1)) {
+            return true;
+        } else {
+            closeCounter++;
+        }
+        return false;
     }
 
 }

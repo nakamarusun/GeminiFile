@@ -146,6 +146,8 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
                             Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
                             fileSenderThread.start();
+                        } else {
+                            BinderManager.removeBinderDeltaOperation(fileDelta);
                         }
                     }
 
@@ -165,7 +167,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
                             fileSenderThread.start();
                         } else {
-//                            BinderManager.removeBinderDeltaOperation(fileDelta);
+                            BinderManager.removeBinderDeltaOperation(fileDelta);
                         }
                     }
                 }

@@ -31,6 +31,9 @@ public class CLIArgumentProcessor {
                     case "n":
                         msg = new MsgWrapper("MyNode", MsgType.ASK);
                         break;
+                    case "f":
+                        msg = new MsgWrapper("DeltaOperations", MsgType.ASK);
+                        break;
                     default:
                         msg = new MsgWrapper("", MsgType.NOACTION);
                 }

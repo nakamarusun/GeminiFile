@@ -46,6 +46,9 @@ public class NetFileReceiverThread implements Runnable {
 
             System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
+            // Sets binder file delta to in progress
+            binderDelta.setStatus(BinderFileDelta.Status.INPROCESS);
+
             // Creates the temporary binder token folder in the temp folder.
             File tempFolder = new File(TEMPNETFILEPATH + TEMPNETFOLDERNAME + File.separator + "FilesToken-" + inToken);
             tempFolder.mkdir();
@@ -120,9 +123,9 @@ public class NetFileReceiverThread implements Runnable {
                 }
 
             }
-//
-//            // Removes from binder delta operations
-//            BinderManager.removeBinderDeltaOperation(binderDelta);
+
+            // Removes from binder delta operations
+            BinderManager.removeBinderDeltaOperation(binderDelta);
 
             // delete temp folder
             tempFolder.delete(); // TODO: Not working

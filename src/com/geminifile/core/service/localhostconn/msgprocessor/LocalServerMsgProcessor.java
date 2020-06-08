@@ -5,6 +5,8 @@ This class takes an MsgWrapper object, and processes it depending on the content
 returns a corresponding reply MsgWrapper object.
  */
 
+import com.geminifile.core.fileparser.binder.BinderFileDelta;
+import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.PingerManager;
 import com.geminifile.core.service.MsgProcessor;
 import com.geminifile.core.service.Service;
@@ -34,29 +36,46 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
 
         switch(msg.getType()) {
             case ASK:
+                StringBuilder str;
                 switch (msg.getContent()) {
                     case "status":
                         // TODO: INFORMATIVE STATUS
                         msgProc = new MsgWrapper("All ok !", MsgType.INFO);
                         break;
                     case "threads":
+                        // Shows all of the threads
                         Set<Thread> threads = Thread.getAllStackTraces().keySet();
-                        StringBuilder strBuild = new StringBuilder();
-                        strBuild.append("Current running threads on GeminiFile Service:\n");
+                        str = new StringBuilder();
+                        str.append("Current running threads on GeminiFile Service:\n");
                         for (Thread t : threads) {
-                            strBuild.append(String.format("%-25s \t %s \t %-2d %s\n",
+                            str.append(String.format("%-25s \t %s \t %-2d %s\n",
                                     t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
                         }
-                        msgProc = new MsgWrapper(strBuild.toString(), MsgType.INFO);
+                        msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
                         break;
                     case "peers":
-                        StringBuilder str = new StringBuilder("\nIP:Port               |Name            |ID          |OS\n");
+                        // Shows all of the peer connected
+                        str = new StringBuilder("\nIP:Port               |Name            |ID          |OS\n");
                         for (PeerCommunicationLoop e : PeerCommunicatorManager.getPeerTable()) {
                             str.append(String.format("%-22s|%-16s|%-12s|%s\n",
                                     e.getSock().getInetAddress().getHostAddress() + ":" + e.getSock().getPort(),
                                     e.getNode().getName(),
                                     e.getNode().getId().substring(0, 8) + "..",
                                     e.getNode().getOs()));
+                        }
+                        msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
+                        break;
+                    case "DeltaOperations":
+                        // Shows all the current delta operations
+                        str = new StringBuilder("\nDeltaToken  |BinderID    |OtherPeerID |Status\n");
+                        for (BinderFileDelta e : BinderManager.getAllBinderFileDelta()) {
+                            str.append(String.format("\n%-12s|%-12s|%-12s|%s\n",
+                                    e.getToken(),
+                                    e.getId() + "..",
+                                    e.getPeerNodeId() + "..",
+                                    e.getStatus().name()));
+                            str.append("This peer needs: ").append(e.getThisPeerNeed().toString()).append("\n");
+                            str.append("Other peer needs: ").append(e.getOtherPeerNeed().toString()).append("\n\n");
                         }
                         msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
                         break;

@@ -70,6 +70,10 @@ public class BinderManager {
         return binders;
     }
 
+    public static Vector<BinderFileDelta> getAllBinderFileDelta() {
+        return binderDeltaOperations;
+    }
+
     public static void addToBinders(Binder binder) {
         binders.add(binder);
         updateMyBinders();

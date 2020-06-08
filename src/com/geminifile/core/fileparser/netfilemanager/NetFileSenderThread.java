@@ -15,11 +15,11 @@ import static com.geminifile.core.CONSTANTS.FILEPORT;
 
 public class NetFileSenderThread implements Runnable {
 
-    private final BinderFileDelta fileDelta;
+    private final BinderFileDelta binderDelta;
     private final InetAddress ip;
 
-    public NetFileSenderThread(BinderFileDelta fileDelta, InetAddress ip) {
-        this.fileDelta = fileDelta;
+    public NetFileSenderThread(BinderFileDelta binderDelta, InetAddress ip) {
+        this.binderDelta = binderDelta;
         this.ip = ip;
     }
 
@@ -34,14 +34,17 @@ public class NetFileSenderThread implements Runnable {
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
+            // Sets binder file delta to in progress
+            binderDelta.setStatus(BinderFileDelta.Status.INPROCESS);
+
             // Sends the token to verify
-            localObjectOut.writeObject(fileDelta.getToken());
+            localObjectOut.writeObject(binderDelta.getToken());
             // If the other machine failed to verify it, then the socket will be closed by the other machine.
 
-            Binder binder = BinderManager.getBinder(fileDelta.getId());
+            Binder binder = BinderManager.getBinder(binderDelta.getId());
 
             // Sends all of the file
-            for (String files : fileDelta.getOtherPeerNeed()) {
+            for (String files : binderDelta.getOtherPeerNeed()) {
                 // Opens the file and converts it into a binary stream
 
                 // Opens file
@@ -57,7 +60,7 @@ public class NetFileSenderThread implements Runnable {
                 System.out.println("[NetFile] Will send file: " + path);
 
                 // Sends the file metadata to the other peer.
-                NetFile fileMetadata = new NetFile(fileDelta.getToken(), files, file.length());
+                NetFile fileMetadata = new NetFile(binderDelta.getToken(), files, file.length());
                 localObjectOut.writeObject(fileMetadata);
 
                 // Opens file from the File object
@@ -93,15 +96,15 @@ public class NetFileSenderThread implements Runnable {
             }
 
             // Removes from binder delta operations
-//            BinderManager.removeBinderDeltaOperation(fileDelta);
+            BinderManager.removeBinderDeltaOperation(binderDelta);
 
             // Closes object IO
             localObjectOut.close();
             localObjectIn.close();
-            System.out.println("[NetFile] Completed delta send operation token " + fileDelta.getToken());
+            System.out.println("[NetFile] Completed delta send operation token " + binderDelta.getToken());
         } catch (SocketException e) {
             // Means connection suddenly severs
-            System.out.println("[NetFile] Failed to complete delta send operation token " + fileDelta.getToken());
+            System.out.println("[NetFile] Failed to complete delta send operation token " + binderDelta.getToken());
         } catch (IOException e) {
             System.out.println("[NetFile] Error opening socket");
             e.printStackTrace();
