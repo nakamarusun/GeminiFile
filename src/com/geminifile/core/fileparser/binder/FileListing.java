@@ -2,7 +2,6 @@ package com.geminifile.core.fileparser.binder;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +20,7 @@ public class FileListing {
         FileInputStream fileStream = new FileInputStream(file); // Opens input stream
         byte[] buffer = new byte[1024]; // Creates buffer
 
-        int fileUntil = 1;
+        int fileUntil;
 
         // Reads file and inserts it into the md5 algorithm
         do {
@@ -40,6 +39,8 @@ public class FileListing {
             if (hex.length() == 1) finalHash.append('0');
             finalHash.append(hex);
         }
+
+        fileStream.close(); // Don't forget to close the stream
 
         checkSumMD5 = finalHash.toString();
     }

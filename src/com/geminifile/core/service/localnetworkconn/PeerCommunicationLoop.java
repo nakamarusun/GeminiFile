@@ -72,6 +72,14 @@ public class PeerCommunicationLoop implements Runnable {
                     tr.interrupt();
                 }
                 System.out.println("[PEER] Disconnected with: " + node.getIp().getHostAddress());
+                // Tries to close the IO Stream
+                try {
+                    inStream.close();
+                    outStream.close();
+                } catch (IOException ex) {
+                    System.out.println("[PEER] Failed to close communication io stream");
+                    e.printStackTrace();
+                }
                 break;
             } catch (EOFException e) {
                 // Could mean that the server peer has disconnected from this machine.
@@ -80,6 +88,14 @@ public class PeerCommunicationLoop implements Runnable {
                     tr.interrupt();
                 }
                 System.out.println("[PEER] Disconnected from: " + node.getIp().getHostAddress());
+                // Tries to close the IO Stream
+                try {
+                    inStream.close();
+                    outStream.close();
+                } catch (IOException ex) {
+                    System.out.println("[PEER] Failed to close communication io stream");
+                    e.printStackTrace();
+                }
                 break;
             } catch (ClassNotFoundException e) {
                 System.out.println("[PEER] Class deserialization error.");

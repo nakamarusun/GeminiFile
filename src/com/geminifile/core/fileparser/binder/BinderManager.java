@@ -17,7 +17,7 @@ public class BinderManager {
     private static JSONObject myBinders = new JSONObject("{\nbinders: []\n}");
     private static File myBindersFile = new File(MYBINDERSPATH, MYBINDERSFILENAME);
 
-    private static Vector<BinderFileDelta> binderDeltaOperations = new Vector<>(); // Stores any delta from the id specified in the object
+    private static final Vector<BinderFileDelta> binderDeltaOperations = new Vector<>(); // Stores any delta from the id specified in the object
 
     private static Lock binderLock = new ReentrantLock();
 
@@ -37,6 +37,7 @@ public class BinderManager {
 
     public static void start() {
         System.out.println("[FILE] Binder Manager is Starting...");
+        binderDeltaOperations.clear(); // Clears delta operations
         // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
             // Creates the file
@@ -166,8 +167,9 @@ public class BinderManager {
 
     public static void addBinderDeltaOperation(BinderFileDelta delta) {
         binderDeltaOperations.add(delta);
-        delta.printAllDelta();
     }
+
+    public static void removeBinderDeltaOperation(BinderFileDelta delta) { binderDeltaOperations.remove(delta); }
 
     public static boolean isTokenInBinderDeltas(String token) {
         for (BinderFileDelta e : binderDeltaOperations) {

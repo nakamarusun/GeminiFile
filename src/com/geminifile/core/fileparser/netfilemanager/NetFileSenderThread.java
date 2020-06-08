@@ -8,6 +8,7 @@ import com.geminifile.core.fileparser.binder.BinderManager;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import static com.geminifile.core.CONSTANTS.BYTESIZE;
 import static com.geminifile.core.CONSTANTS.FILEPORT;
@@ -28,7 +29,7 @@ public class NetFileSenderThread implements Runnable {
         try {
             // Attempts a connection to the designated peer with the FILEPORT port.
             Socket sock = new Socket(ip, FILEPORT);
-
+            System.out.println("[NetFile] Starting delta send operation");
             // Define iostream
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
@@ -91,17 +92,19 @@ public class NetFileSenderThread implements Runnable {
                 fileStream.close(); // Close file input.
             }
 
+            // Removes from binder delta operations
+//            BinderManager.removeBinderDeltaOperation(fileDelta);
+
             // Closes object IO
             localObjectOut.close();
             localObjectIn.close();
-            System.out.println("[NetFile] Completed operation token " + fileDelta.getToken());
-
+            System.out.println("[NetFile] Completed delta send operation token " + fileDelta.getToken());
+        } catch (SocketException e) {
+            // Means connection suddenly severs
+            System.out.println("[NetFile] Failed to complete delta send operation token " + fileDelta.getToken());
         } catch (IOException e) {
             System.out.println("[NetFile] Error opening socket");
             e.printStackTrace();
         }
-
-
-
     }
 }

@@ -7,16 +7,16 @@ import com.geminifile.core.fileparser.binder.BinderManager;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.util.Objects;
 
-import static com.geminifile.core.CONSTANTS.*;
+import static com.geminifile.core.CONSTANTS.TEMPNETFILEPATH;
+import static com.geminifile.core.CONSTANTS.TEMPNETFOLDERNAME;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class NetFileReceiverThread implements Runnable {
 
-    private Socket sock;
+    private final Socket sock;
 
     public NetFileReceiverThread(Socket sock) {
         this.sock = sock;
@@ -26,6 +26,9 @@ public class NetFileReceiverThread implements Runnable {
     public void run() {
         // Defining iostream
         try {
+
+            System.out.println("[NetFile] Starting delta receive operation");
+
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
 
@@ -33,14 +36,13 @@ public class NetFileReceiverThread implements Runnable {
             String inToken = (String) localObjectIn.readObject();
             if (!BinderManager.isTokenInBinderDeltas(inToken)) {
                 // If the token in question is not in the device token list, then cancel operation.
+                System.out.println("[NetFile] Delta operation token " + inToken + " is not registered in machine");
                 sock.close();
                 return;
             }
 
-            BinderFileDelta binderDelta = BinderManager.getBinderFileDelta(inToken);
-            Binder binder = BinderManager.getBinder(binderDelta.getId());
-            File destination = binder.getDirectory(); // Destination to copy files to.
-
+            BinderFileDelta binderDelta = BinderManager.getBinderFileDelta(inToken); // Get the binder delta reference
+            Binder binder = BinderManager.getBinder(Objects.requireNonNull(binderDelta).getId()); // Get the binder delta reference
 
             System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
@@ -60,7 +62,7 @@ public class NetFileReceiverThread implements Runnable {
 //                }
 
                 // Creates the file from the metadata received.
-                String tempFilePath = tempFolder.getAbsolutePath() + File.separator + file.getFilePathName();
+                String tempFilePath = tempFolder.getAbsolutePath() + file.getFilePathName();
                 File currentFile = new File(tempFilePath);
 
                 if (!currentFile.exists()) {
@@ -94,7 +96,7 @@ public class NetFileReceiverThread implements Runnable {
                 fileStream.close(); // Closes fileOutputStream for safety
 
                 // Copies the files to the main binder folder
-                String destinationFilePath = destination.getAbsolutePath() + File.separator + file.getFilePathName();
+                String destinationFilePath = Objects.requireNonNull(binder).getDirectory().getAbsolutePath() + file.getFilePathName(); // Path destination to copy to.
                 File destinationFile = new File(destinationFilePath);
 
                 // Checks if the file is there or not
@@ -102,29 +104,39 @@ public class NetFileReceiverThread implements Runnable {
                     // Checks if the directory have been created up until that point
                     destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf(File.separator));
                     File newFolder = new File(destinationFilePath);
-                    newFolder.mkdirs(); // Creates file up until that point
-                    destinationFile.createNewFile(); // Creates new file
+                    newFolder.mkdirs(); // Creates directory up until that point
                 }
 
                 // Try atomic move
                 try {
                     Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
-                } catch (AtomicMoveNotSupportedException e) {
-                    Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } catch (AtomicMoveNotSupportedException | AccessDeniedException e) {
+                    try {
+                        Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    } catch (FileSystemException ex) {
+                        System.out.println("[NetFile] Moving file from temporary folder failed");
+                        ex.printStackTrace();
+                    }
                 }
 
             }
+//
+//            // Removes from binder delta operations
+//            BinderManager.removeBinderDeltaOperation(binderDelta);
 
             // delete temp folder
-            tempFolder.delete();
+            tempFolder.delete(); // TODO: Not working
             localObjectIn.close();
             localObjectOut.close();
-            System.out.println("[NetFile] Completed operation token " + inToken);
+            System.out.println("[NetFile] Completed delta receive operation token " + inToken);
 
         } catch (SocketException | EOFException e) {
             System.out.println("[NetFile] Delta file connection disconnected from " + sock.getInetAddress().getHostName());
         } catch (ClassNotFoundException e) {
             System.out.println("[NetFile] Class deserialization error.");
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            System.out.println("[NetFile] Binder file delta is not found in the database.");
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();

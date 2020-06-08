@@ -14,7 +14,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,6 +46,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
                     // Iterate the ids sent, and based if this device has the corresponding id, and reply with a JSONObject
                     // with their own File listing. Ignore if don't have
+                    boolean haveBinder = false; // If the machine does not have the binder in question, then don't send a reply
                     for (String e : ids) {
 
                         Binder currentBinder = BinderManager.getBinder(e);
@@ -63,11 +63,13 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                                 fileListingJSONArr.put(fileListingJSON);
                             }
                             reply.put(e, fileListingJSONArr); // Puts the file listing into the reply object
+                            haveBinder = true;
                         }
 
                     }
-
-                    msgProc = new MsgWrapper("AskBinderReply-" + reply.toString(), MsgType.ASK);
+                    if (haveBinder) {
+                        msgProc = new MsgWrapper("AskBinderReply-" + reply.toString(), MsgType.ASK);
+                    }
                     break;
                 } else if (msg.getContent().startsWith("AskBinderReply-")) {
                     // Will process a message with content: "AskBinderReply-{id1:[{relPath:x, lastModified:y, checkSum:z}, ..], id3:[{relPath:x, lastModified:y, checkSum:z}, ..]}"
@@ -129,21 +131,22 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
                     StringBuilder finalString = new StringBuilder();
 
-                    System.out.println(contentWithoutStart);
-
                     String[] receivedJSON = contentWithoutStart.split("-");
                     for (String e : receivedJSON) {
 
                         JSONObject fileDeltaJSON = new JSONObject(e);
                         BinderFileDelta fileDelta = new BinderFileDelta(fileDeltaJSON);
+
                         BinderManager.addBinderDeltaOperation(fileDelta);
 
                         finalString.append(fileDelta.getToken()).append("-");
 
                         // Verify the message, and the file availability in the system, open the File port, and sends the files to the other device.
                         // Start connection thread here.
-                        Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
-                        fileSenderThread.start();
+                        if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
+                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                            fileSenderThread.start();
+                        }
                     }
 
                     msgProc = new MsgWrapper("AskBinderConfirmed-" + finalString.toString(), MsgType.ASK);
@@ -158,8 +161,12 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         BinderFileDelta fileDelta = BinderManager.getBinderFileDelta(e);
 
                         // Start connection thread here.
-                        Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
-                        fileSenderThread.start();
+                        if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
+                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                            fileSenderThread.start();
+                        } else {
+//                            BinderManager.removeBinderDeltaOperation(fileDelta);
+                        }
                     }
                 }
                 break;
