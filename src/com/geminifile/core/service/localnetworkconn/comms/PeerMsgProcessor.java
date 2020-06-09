@@ -38,6 +38,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
             case ASK:
                 if (msg.getContent().startsWith("AskBinderHave-")) {
                     // IMPORTANT: USE THIS ONLY FOR BEGINNING WHEN CONNECTION IS MADE. BECAUSE THE FILE CHECKING FUNCTION IS KIND OF HEAVY.
+                    // TODO: Returns all of the mutual binders instead.
                     // Will process a message with content: "AskBinderHave-id1-id2-id3-id4"
                     // Will process it and return a statement: "AskBinderReply-{id1:[{relPath:x, lastModified:y, checkSum:z}, ..], id3:[{relPath:x, lastModified:y, checkSum:z}, ..]}"
                     // Asks if this peer has binders with the corresponding id
@@ -144,7 +145,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         // Verify the message, and the file availability in the system, open the File port, and sends the files to the other device.
                         // Start connection thread here.
                         if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
-                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()), "FileSender-" + fileDelta.getToken());
                             fileSenderThread.start();
                         } else {
                             BinderManager.removeBinderDeltaOperation(fileDelta);
@@ -164,7 +165,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
                         // Start connection thread here.
                         if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
-                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()));
+                            Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()), "FileSender-" + fileDelta.getToken());
                             fileSenderThread.start();
                         } else {
                             BinderManager.removeBinderDeltaOperation(fileDelta);

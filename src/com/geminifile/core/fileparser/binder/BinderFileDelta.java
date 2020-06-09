@@ -27,6 +27,7 @@ public class BinderFileDelta {
         this.id = id;
         this.status = Status.IDLE;
         token = MathUtil.generateRandomAlphaNum(10);
+        closeCounter = 0;
 
         @SuppressWarnings("unchecked")
         ArrayList<FileListing> otherPeerListingCopy = (ArrayList<FileListing>) otherPeerListing.clone(); // A copy of the otherPeerListing to know the difference.
@@ -78,6 +79,7 @@ public class BinderFileDelta {
         token = binderDeltaJSON.getString("token"); // Sets token
         id = binderDeltaJSON.getString("id"); // Sets id
         status = Status.IDLE;
+        closeCounter = 0;
 
         peerNodeId = binderDeltaJSON.getString("peerNodeId");
 

@@ -18,8 +18,6 @@ import com.geminifile.core.socketmsg.msgwrapper.*;
 
 import java.util.Set;
 
-import static com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager.getPeerTable;
-
 public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
 

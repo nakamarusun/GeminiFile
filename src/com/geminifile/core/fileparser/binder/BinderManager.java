@@ -173,7 +173,11 @@ public class BinderManager {
         binderDeltaOperations.add(delta);
     }
 
-    public static void removeBinderDeltaOperation(BinderFileDelta delta) { binderDeltaOperations.remove(delta); }
+    public static void removeBinderDeltaOperation(BinderFileDelta delta) {
+        if (delta.closeBinderFileDelta()) {
+            binderDeltaOperations.remove(delta);
+        }
+    }
 
     public static boolean isTokenInBinderDeltas(String token) {
         for (BinderFileDelta e : binderDeltaOperations) {

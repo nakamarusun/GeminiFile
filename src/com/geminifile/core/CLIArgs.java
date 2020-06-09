@@ -27,7 +27,7 @@ public class CLIArgs {
                 "   [--threads views all current threads running] [-p returns all active peers] [-n shows current node] [-f in-queue file delta operations]\n" +
 
                 "geminifile refresh: refreshes the specified services\n" +
-                "   [-n networking service], [-p pinger service]\n" +
+                "   [-n networking service] [-p pinger service]\n" +
 
                 "geminifile shutdown: shutdowns the service.\n" +
                 "");
@@ -36,7 +36,7 @@ public class CLIArgs {
     public static Map<String, String> argumentProcessor(String[] args) {
 
         // Maps the arguments with their respective arguments.
-        Map<String, String> argumentMap = new LinkedHashMap<String, String>();
+        Map<String, String> argumentMap = new LinkedHashMap<>();
 
         Pattern regSing = Pattern.compile("^(-)[a-zA-Z]{1,100}$"); // Regex for single hyphens
         Pattern regDoub = Pattern.compile("^(--)[a-zA-Z]{1,100}$"); // Regex for double hyphens

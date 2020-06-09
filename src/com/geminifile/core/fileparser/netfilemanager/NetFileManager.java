@@ -57,7 +57,7 @@ public class NetFileManager implements Runnable {
     }
 
     public static void start() {
-        Thread netFileManager = new Thread(new NetFileManager());
+        Thread netFileManager = new Thread(new NetFileManager(), "NetFileReceiver");
         netFileManager.start();
     }
 
