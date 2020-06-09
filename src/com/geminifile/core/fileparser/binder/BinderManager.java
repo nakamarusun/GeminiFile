@@ -63,7 +63,6 @@ public class BinderManager {
         // Communicates with other peers to sync files
         saveMyBinders();
 
-
     }
 
     public static List<Binder> getAllBinders() {
@@ -191,6 +190,14 @@ public class BinderManager {
             if (e.getToken().equals(token)) return e;
         }
         return null;
+    }
+
+    public static void restartService() {
+        System.out.println("[FILE] Binder Manager is Restarting...");
+        for (Binder e : binders) {
+            e.stopWatcher();
+        }
+        BinderManager.start();
     }
 
 }

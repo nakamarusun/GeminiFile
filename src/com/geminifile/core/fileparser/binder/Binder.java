@@ -175,6 +175,10 @@ public class Binder {
 //
 //                            }
 
+                        if (Thread.currentThread().isInterrupted()) {
+                            return;
+                        }
+
                         key.pollEvents();   // Removes all queue event.
                         boolean valid = key.reset();
                         if (!valid) {
@@ -192,5 +196,11 @@ public class Binder {
 
         directoryWatcher.start();
 
+    }
+
+    public void stopWatcher() {
+        if (directoryWatcher.isAlive()) {
+            directoryWatcher.interrupt();
+        }
     }
 }

@@ -27,14 +27,11 @@ public class CLIDriver {
                 case "start":
                     Service.start();
                     break;
-                case "conf":
-                    // conf argument
-                    break;
                 case "log":
                     // log
                     break;
                 case "sync":
-                    //sync
+                    CLIArgumentProcessor.sync(argMap);
                     break;
                 case "stop":
                     // stop

@@ -13,23 +13,19 @@ public class CLIArgs {
 
                 "geminifile start: Starts server based on configuration file (Starts localhost on port default 39494)\n" +
 
-                "geminifile conf: view configuration file in CLI\n" +
-                "   [-l <all local port>], [-s <sync port>]\n" +
-
                 "geminifile log: view update log and stuff\n" +
 
                 "geminifile sync: force sync of files\n" +
-                "   [-d <folder> syncs folder with ',' delimiter] [-f force sync]\n" +
+                "   [-d <binder name> syncs folder with ',' delimiter] [-f force sync]\n" +
 
                 "geminifile stop: stops service\n" +
 
                 "geminifile status: status of the server, folder locations to sync\n" +
                 "   [--threads views all current threads running] [-p returns all active peers] [-n shows current node] [-f in-queue file delta operations]\n" +
+                "   [--binders all of the binders in this device]\n" +
 
                 "geminifile refresh: refreshes the specified services\n" +
-                "   [-n networking service] [-p pinger service]\n" +
-
-                "geminifile shutdown: shutdowns the service.\n" +
+                "   [-n networking service] [-p pinger service] [-f binder services]\n" +
                 "");
     }
 

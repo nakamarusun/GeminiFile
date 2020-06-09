@@ -25,6 +25,9 @@ public class CLIArgumentProcessor {
                     case "threads":
                         msg = new MsgWrapper("threads", MsgType.ASK);
                         break;
+                    case "binders":
+                        msg = new MsgWrapper("binders", MsgType.ASK);
+                        break;
                     case "p":
                         msg = new MsgWrapper("peers", MsgType.ASK);
                         break;
@@ -56,6 +59,29 @@ public class CLIArgumentProcessor {
                     break;
                 case "p":
                     msg = new MsgWrapper("Ping", MsgType.COMMAND);
+                    break;
+                case "f":
+                    msg = new MsgWrapper("File", MsgType.COMMAND);
+                    break;
+            }
+        }
+
+        LocalClientCommunicator.sendLocalMessage(msg);
+    }
+
+    public static void sync(Map<String, String> args) {
+
+        MsgWrapper msg = new MsgWrapper("", MsgType.NOACTION);
+
+        for (Map.Entry<String, String> e : args.entrySet()) {
+            switch (e.getKey()) {
+                case "f":
+                    msg = new MsgWrapper("FSync", MsgType.COMMAND);
+                    break;
+                case "d":
+                    // Remove whitespaces
+                    String binderNames = args.get(e.getKey()).replace(" ", "");
+                    msg = new MsgWrapper("SyncFolders-" + binderNames, MsgType.COMMAND);
                     break;
             }
         }

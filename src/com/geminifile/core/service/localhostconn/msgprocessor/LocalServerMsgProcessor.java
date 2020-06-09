@@ -5,6 +5,7 @@ This class takes an MsgWrapper object, and processes it depending on the content
 returns a corresponding reply MsgWrapper object.
  */
 
+import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.PingerManager;
@@ -16,7 +17,11 @@ import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
+
+import static com.geminifile.core.fileparser.binder.BinderManager.getAllBinders;
 
 public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
@@ -43,17 +48,31 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                     case "threads":
                         // Shows all of the threads
                         Set<Thread> threads = Thread.getAllStackTraces().keySet();
-                        str = new StringBuilder();
-                        str.append("Current running threads on GeminiFile Service:\n");
+                        str = new StringBuilder("\nCurrent running threads on GeminiFile Service:\n");
                         for (Thread t : threads) {
                             str.append(String.format("%-25s \t %s \t %-2d %s\n",
-                                    t.getName(), t.getState(), t.getPriority(), t.isDaemon() ? "Daemon" : "Normal"));
+                                    t.getName(),
+                                    t.getState(),
+                                    t.getPriority(),
+                                    t.isDaemon() ? "Daemon" : "Normal"));
+                        }
+                        msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
+                        break;
+                    case "binders":
+                        str = new StringBuilder("\nAll of the binders in this device:\n\nName                |ID                |directory");
+                        List<Binder> binders = BinderManager.getAllBinders();
+                        for (Binder b : binders) {
+                            str.append(String.format("%-20s|%-18s|%s\n",
+                                    b.getName(),
+                                    b.getId(),
+                                    b.getDirectory()));
+                            str.append("Directory Last Modified: ").append(new Date(b.getDirectoryLastModified()).toString()).append("\n\n");
                         }
                         msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
                         break;
                     case "peers":
                         // Shows all of the peer connected
-                        str = new StringBuilder("\nIP:Port               |Name            |ID          |OS\n");
+                        str = new StringBuilder("\nConnected Peers:\n\nIP:Port               |Name            |ID          |OS\n");
                         for (PeerCommunicationLoop e : PeerCommunicatorManager.getPeerTable()) {
                             str.append(String.format("%-22s|%-16s|%-12s|%s\n",
                                     e.getSock().getInetAddress().getHostAddress() + ":" + e.getSock().getPort(),
@@ -65,7 +84,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         break;
                     case "DeltaOperations":
                         // Shows all the current delta operations
-                        str = new StringBuilder("\nDeltaToken  |BinderID    |OtherPeerID |Status\n");
+                        str = new StringBuilder("\nCurrent Delta Operations:\n\nDeltaToken  |BinderID    |OtherPeerID |Status\n");
                         for (BinderFileDelta e : BinderManager.getAllBinderFileDelta()) {
                             str.append(String.format("\n%-12s|%-12s|%-12s|%s\n",
                                     e.getToken(),
@@ -92,16 +111,27 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                 System.out.println(msg.toString());
                 break;
             case COMMAND:
-                // TODO: DOES NOT WORK PROPERLY
-                switch (msg.getContent()) {
+                StringBuilder additionalStr = new StringBuilder();
+                String msgBeginning = msg.getContent().split("-")[0]; // The beginning of the message
+                switch (msgBeginning) {
                     case "RefNet":
                         Service.restartNetworkingService();
                         break;
                     case "Ping":
                         PingerManager.restartService();
                         break;
+                    case "File":
+                        BinderManager.restartService();
+                        break;
+                    case "FSync":
+                        PeerCommunicatorManager.sendToAllPeers(BinderManager.getAskBinderHave());
+                        break;
+                    case "SyncFolders":
+                        String[] foldersToSync = msg.getContent().replace("SyncFolders-", "").split(",");
+                        // TODO: DO THE FOLDER SYNCING
+                        break;
                 }
-                msgProc = new MsgWrapper("Done", MsgType.ASK);
+                msgProc = new MsgWrapper("Done" + additionalStr, MsgType.ASK);
                 break;
         }
 
