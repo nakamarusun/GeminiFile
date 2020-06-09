@@ -38,6 +38,12 @@ public class BinderManager {
     public static void start() {
         System.out.println("[FILE] Binder Manager is Starting...");
         binderDeltaOperations.clear(); // Clears delta operations
+        binders.clear(); // clear binders
+
+        for (Binder e : binders) { // Clears the watcher
+            e.stopWatcher();
+        }
+
         // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
             // Creates the file
@@ -71,16 +77,6 @@ public class BinderManager {
 
     public static Vector<BinderFileDelta> getAllBinderFileDelta() {
         return binderDeltaOperations;
-    }
-
-    public static void addToBinders(Binder binder) {
-        binders.add(binder);
-        updateMyBinders();
-    }
-
-    public static void deleteFromBinders(Binder binder) {
-        binders.remove(binder);
-        updateMyBinders();
     }
 
     public static void updateMyBinders() {

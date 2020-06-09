@@ -59,7 +59,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         msgProc = new MsgWrapper(str.toString(), MsgType.INFO);
                         break;
                     case "binders":
-                        str = new StringBuilder("\nAll of the binders in this device:\n\nName                |ID                |directory");
+                        str = new StringBuilder("\n\nAll of the binders in this device:\nName                |ID                |directory\n");
                         List<Binder> binders = BinderManager.getAllBinders();
                         for (Binder b : binders) {
                             str.append(String.format("%-20s|%-18s|%s\n",
@@ -72,7 +72,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         break;
                     case "peers":
                         // Shows all of the peer connected
-                        str = new StringBuilder("\nConnected Peers:\n\nIP:Port               |Name            |ID          |OS\n");
+                        str = new StringBuilder("\n\nConnected Peers:\nIP:Port               |Name            |ID          |OS\n");
                         for (PeerCommunicationLoop e : PeerCommunicatorManager.getPeerTable()) {
                             str.append(String.format("%-22s|%-16s|%-12s|%s\n",
                                     e.getSock().getInetAddress().getHostAddress() + ":" + e.getSock().getPort(),
@@ -84,7 +84,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         break;
                     case "DeltaOperations":
                         // Shows all the current delta operations
-                        str = new StringBuilder("\nCurrent Delta Operations:\n\nDeltaToken  |BinderID    |OtherPeerID |Status\n");
+                        str = new StringBuilder("\n\nCurrent Delta Operations:\nDeltaToken  |BinderID    |OtherPeerID |Status\n");
                         for (BinderFileDelta e : BinderManager.getAllBinderFileDelta()) {
                             str.append(String.format("\n%-12s|%-12s|%-12s|%s\n",
                                     e.getToken(),

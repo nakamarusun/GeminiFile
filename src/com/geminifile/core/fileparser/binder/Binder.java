@@ -24,7 +24,7 @@ public class Binder {
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
     private final List<File> recurFiles = new ArrayList<>();
 
-    private Thread directoryWatcher;
+    private Thread directoryWatcher = new Thread();
 
     private boolean updated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change
 
@@ -160,6 +160,8 @@ public class Binder {
                             // Quit the thread
                             return;
                         }
+
+
 
                         // At this point, the service has detected a change in the directory it is watching.
                         System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() + ": " + new Date() );
