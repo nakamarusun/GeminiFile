@@ -11,7 +11,7 @@ public class BinderFileDelta {
 
     private final String token; // Special random alphanumeric characters that represent this delta operation.
 
-    private final String peerNodeId; // Other node's id that this delta operation is handling
+    private String peerNodeId; // Other node's id that this delta operation is handling
 
     private final String id; // Binder id that this file delta is handling.
     private final Vector<String> thisPeerNeed = new Vector<>();
@@ -21,10 +21,10 @@ public class BinderFileDelta {
 
     private int closeCounter; // Tool to safely remove this BinderFileDelta from BinderManager safely requiring 2 removal process.
 
-    public BinderFileDelta(String id, PeerCommunicationLoop peerToSend) {
+    public BinderFileDelta(String id) {
         // Empty delta operation
         token = MathUtil.generateRandomAlphaNum(10);
-        this.peerNodeId = peerToSend.getNode().getId();
+        this.peerNodeId = "";
         this.id = id;
         this.status = Status.IDLE;
         closeCounter = 0;
@@ -33,7 +33,11 @@ public class BinderFileDelta {
 
     public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, ArrayList<FileListing> thisPeerListing, ArrayList<FileListing> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
-        this.peerNodeId = peerToSend.getNode().getId();
+        if (peerToSend == null) {
+            this.peerNodeId = "";
+        } else {
+            this.peerNodeId = peerToSend.getNode().getId();
+        }
         this.id = id;
         this.status = Status.IDLE;
         token = MathUtil.generateRandomAlphaNum(10);
@@ -109,6 +113,7 @@ public class BinderFileDelta {
         FAILED
     }
 
+
     public String getToken() {
         return token;
     }
@@ -127,6 +132,10 @@ public class BinderFileDelta {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setPeerNodeId(String peerNodeId) {
+        this.peerNodeId = peerNodeId;
     }
 
     public JSONObject getBinderDeltaJSON() {

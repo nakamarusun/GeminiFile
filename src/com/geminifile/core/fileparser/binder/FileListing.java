@@ -11,10 +11,19 @@ public class FileListing {
     private final String relativePath;
     private final long lastModified;
     private final String checkSumMD5;
+    private final Action action;
+
+    public FileListing(String pathToDelete, long lastModified) {
+        action = Action.DELETE;
+        checkSumMD5 = "";
+        this.lastModified = lastModified;
+        relativePath = pathToDelete;
+    }
 
     public FileListing(String relativePath, File file) throws NoSuchAlgorithmException, IOException {
         this.relativePath = relativePath;
         lastModified = file.lastModified();
+        action = Action.MODIFY;
         // Gets the MD5 sum
         MessageDigest md5 = MessageDigest.getInstance("MD5"); // Gets the algorithm
         FileInputStream fileStream = new FileInputStream(file); // Opens input stream
@@ -46,9 +55,15 @@ public class FileListing {
     }
 
     public FileListing(String relativePath, long lastModified, String checkSumMD5) {
+        action = Action.MODIFY;
         this.relativePath = relativePath;
         this.lastModified = lastModified;
         this.checkSumMD5 = checkSumMD5;
+    }
+
+    public enum Action {
+        MODIFY,
+        DELETE
     }
 
     public String getRelativePath() {

@@ -34,6 +34,8 @@ public class Binder {
     private WatchService mainWatcher;
     private Map<WatchKey, Path> keyDirectoryMap = new HashMap<>(); // The list of all of the directory watchers.
 
+    private final List<FileListing> filesToSync = new ArrayList<>();
+
     // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {
         this.name = name;
@@ -163,16 +165,47 @@ public class Binder {
                         for (WatchEvent<?> event : key.pollEvents()) {
                             // Checks what events that happened.
                             WatchEvent.Kind<?> kind = event.kind(); // Kind of the modify operation.
-
                             @SuppressWarnings("unchecked")
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event; // Name of the file that is modified.
-
+                            WatchEvent<Path> ev = (WatchEvent<Path>) event; // Event object of the file that is modified.
                             Path path = keyDirectoryMap.get(key); // Directory of where the change is located.
 
-                            System.out.println("[Binder] Change in binder: " + kind.name() + " " + name + " @ " + path.resolve(ev.context()) + ": " + new Date());
+                            String pathName = path.resolve(ev.context()).toString(); // Name of the file that is modified.
+
+                            System.out.println("[Binder] Change in binder: " + kind.name() + " " + name + " @ " + pathName + ": " + new Date());
+
+                            // Creates a new watcher if a new directory has been created.
+                            if (kind == ENTRY_CREATE) {
+                                try {
+                                    if (Files.isDirectory(path.resolve(ev.context()))) {
+                                        registerSubWatcherService(new File( pathName ));
+                                    }
+                                } catch (IOException e) {
+                                    System.out.println("[Binder] Error adding new watcher to directory " + pathName);
+                                    e.printStackTrace();
+                                }
+                            }
 
                             // Puts the deletions, modifies and adds to the list
-
+                            if (!Files.isDirectory(path.resolve(ev.context()))) {
+                                if (kind != ENTRY_DELETE) {
+                                    // Adds this to the entry if it is not there yet
+                                    boolean isThere = false;
+                                    for (FileListing e : filesToSync) {
+                                        if (e.getRelativePath().equals(pathName)) {
+                                            isThere = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!isThere) {
+                                        try {
+                                            filesToSync.add(new FileListing(pathName, new File(pathName)));
+                                        } catch (IOException ignored) {}
+                                    }
+                                } else {
+                                    // Removes from the entry if it is there.
+                                    filesToSync.removeIf(e -> e.getRelativePath().equals(pathName));
+                                }
+                            }
 
                             // Starts file change waiter thread
                             changeInBinderCheck = true;
@@ -195,6 +228,9 @@ public class Binder {
                             mainWatcher.close();
                             return;
                         }
+                    } catch (NoSuchAlgorithmException e) {
+                        System.out.println("[Binder] Wrong algorithm in the file hashing.");
+                        e.printStackTrace();
                     }
 
                 }
@@ -218,7 +254,7 @@ public class Binder {
     }
 
     private void fileChangeWaiter() throws InterruptedException {
-        // Binder folder waiter for another change in the binder, so that when one change registers, doesnt immediately sync.
+        // Binder folder waiter for another change in the binder, so that when one change registers, does not immediately sync.
         // Object lock waiting
         Object obj = new Object();
         synchronized (obj) {
@@ -228,12 +264,14 @@ public class Binder {
             } while (changeInBinderCheck);
         }
         System.out.println("[Binder] X Change detected in binder '" + name + "'. Will query to other peers.");
-//        sendQuery = true;
-//        directoryWatcher.interrupt();
+        sendQuery = true;
+        directoryWatcher.interrupt();
     }
 
     private void queryFileWithOtherPeers() {
-
+        // Do the send operations here
+        System.out.println(filesToSync.toString());
+        filesToSync.clear();
     }
 
     public void stopWatcher() {
