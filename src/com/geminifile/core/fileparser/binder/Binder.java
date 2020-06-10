@@ -1,6 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
-import org.json.JSONObject;
+import com.geminifile.core.CONSTANTS;
+import com.geminifile.core.fileparser.DirectoryRecurUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +21,18 @@ public class Binder {
     private File directory; // Directory of the binder in the machine
     private long directoryLastModified;
 
-    private ArrayList<FileListing> fileListing = new ArrayList<>(); // A HashMap of all of the files recursively in the directory with their last modified time
+    private final ArrayList<FileListing> fileListing = new ArrayList<>(); // A HashMap of all of the files recursively in the directory with their last modified time
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
-    private final List<File> recurFiles = new ArrayList<>();
 
     private Thread directoryWatcher = new Thread();
+    private Thread binderUpdateWaiter = new Thread();
 
-    private boolean updated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change
+    private boolean listingUpdated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change
+    private boolean sendQuery = false; // If this is true, when the thread is interrupted, sends queries about the files.
+    private boolean changeInBinderCheck = false; // If true, then restarts the waiting service.
+
+    private WatchService mainWatcher;
+    private Map<WatchKey, Path> keyDirectoryMap = new HashMap<>(); // The list of all of the directory watchers.
 
     // If the id is not specified in the constructor, then a length 7 random alphanumeric id will be generated
     public Binder(String name, String id, File directory) {
@@ -85,12 +91,13 @@ public class Binder {
         fileListing.clear(); // Clears list
         try {
             // Loops within the new directory file listing and puts it into the hashmap.
-            for (File e : listFilesRecursively(directory)) {
+            DirectoryRecurUtil recurUtil = new DirectoryRecurUtil(directory);
+            for (File e : recurUtil.listFilesRecursively()) {
                 String relPath = e.getPath().substring(directory.getPath().length());
                 FileListing currentFile = new FileListing(relPath, e);
                 fileListing.add(currentFile);
             }
-            updated = true;
+            listingUpdated = true;
         } catch (NoSuchAlgorithmException e) {
             System.out.println("[Binder] Error getting hashing algorithm");
             e.printStackTrace();
@@ -103,36 +110,10 @@ public class Binder {
     }
 
     public ArrayList<FileListing> getFileListing() {
-        if (!updated) {
+        if (!listingUpdated) {
             this.update();
         }
         return fileListing;
-    }
-
-    private List<File> listFilesRecursivelyUtil(File path) {
-
-        try {
-            for (File e : Objects.requireNonNull(path.listFiles())) {
-                // Loops through the list, if a directory is found, then recur.
-                if (e.isFile()) {
-                    recurFiles.add(e);
-                } else if (e.isDirectory()) {
-                    listFilesRecursivelyUtil(e);
-                }
-            }
-        } catch (NullPointerException e) {
-            System.out.println("[BINDER] Folder is null");
-            e.printStackTrace();
-        }
-
-        return recurFiles;
-    }
-
-    public List<File> listFilesRecursively(File path) {
-
-        // Clears the private variable first.
-        recurFiles.clear();
-        return listFilesRecursivelyUtil(path);
     }
 
     public String getFileListingJSON() {
@@ -143,60 +124,115 @@ public class Binder {
 
     public void startWatcher() {
 
-        directoryWatcher = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    WatchService watcher = FileSystems.getDefault().newWatchService(); // New watcher service for filesystems
-                    Path dir = Paths.get(directory.getAbsolutePath()); // The path of the directory to check
-                    dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY); // Registers the watcher to the directory, with the following args to watch for
+        // If thread is already running, don't run.
+        if (directoryWatcher.isAlive()) {
+            return;
+        }
 
-                    // Always checking for difference
-                    while (true) {
-                        WatchKey key; // key object
-                        try {
-                            key = watcher.take();
-                        } catch (InterruptedException ex) {
-                            // Quit the thread
-                            return;
-                        }
+        // Registers every directory inside of the binder.
+        directoryWatcher = new Thread(() -> {
+            try {
 
+                // Clears all of the watcher fields.
+                keyDirectoryMap.clear();
+                sendQuery = false;
+                changeInBinderCheck = false;
 
+                // Initializes the main binder directory watcher
+                mainWatcher = FileSystems.getDefault().newWatchService(); // New watcher service for filesystems
+                registerSubWatcherService(directory);
+
+                // Initializes all of the sub-path directory watchers
+                List<File> subFileListing = (new DirectoryRecurUtil(directory)).listFilesRecursivelyWithDirectory();
+                for (File e : subFileListing) {
+                    // Checks if the file is a directory
+                    if (e.isDirectory()) {
+                        registerSubWatcherService(e); // Registers the the new folder.
+                    }
+                }
+
+                // Always checking for difference
+                while (true) {
+                    WatchKey key; // key object
+                    try {
+                        key = mainWatcher.take();
 
                         // At this point, the service has detected a change in the directory it is watching.
-                        System.out.println("[FILE] Change in binder: " + name + " @ " + directory.getAbsolutePath() + ": " + new Date() );
-                        updated = false; // Sets updated status to false.
+                        listingUpdated = false; // Sets updated status to false.
 
-//                        for (WatchEvent<?> event : key.pollEvents()) {
-//                            // Checks what events that happened.
-//                            // TODO: Wait for several seconds before syncing with the other machine
-//                            WatchEvent.Kind<?> kind = event.kind();
-//
-//                            @SuppressWarnings("unchecked")
-//                            WatchEvent<Path> ev = (WatchEvent<Path>) event; //
-//
-//                            }
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            // Checks what events that happened.
+                            WatchEvent.Kind<?> kind = event.kind(); // Kind of the modify operation.
 
-                        if (Thread.currentThread().isInterrupted()) {
-                            return;
+                            @SuppressWarnings("unchecked")
+                            WatchEvent<Path> ev = (WatchEvent<Path>) event; // Name of the file that is modified.
+
+                            Path path = keyDirectoryMap.get(key); // Directory of where the change is located.
+
+                            System.out.println("[Binder] Change in binder: " + kind.name() + " " + name + " @ " + path.resolve(ev.context()) + ": " + new Date());
+
+                            // Puts the deletions, modifies and adds to the list
+
+
+                            // Starts file change waiter thread
+                            changeInBinderCheck = true;
+                            if (!binderUpdateWaiter.isAlive()) {
+                                binderUpdateWaiter = new Thread(() -> { try { fileChangeWaiter(); } catch (InterruptedException ignored) {} }, "Waiter-" + name);
+                                binderUpdateWaiter.start();
+                            }
                         }
 
-                        key.pollEvents();   // Removes all queue event.
                         boolean valid = key.reset();
                         if (!valid) {
                             break;
                         }
 
+                    } catch (InterruptedException ex) {
+                        if (sendQuery) {
+                            queryFileWithOtherPeers(); // If thread is interrupted but the interrupt is about querying then send files.
+                        } else {
+                            // Quit the thread
+                            mainWatcher.close();
+                            return;
+                        }
                     }
 
-                } catch (IOException e) {
-                    System.out.println("Error creating watcher");
-                    e.printStackTrace();
                 }
+
+            } catch (IOException e) {
+                System.out.println("[Binder] Error creating watcher");
+                e.printStackTrace();
             }
         }, "BinderWatcher-" + id);
 
         directoryWatcher.start();
+
+    }
+
+    private void registerSubWatcherService(File directory) throws IOException {
+        // Registers the watcher service of the current's folder in the list.
+        Path subDir = Paths.get(directory.getAbsolutePath());
+        WatchKey key = subDir.register(mainWatcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+
+        keyDirectoryMap.put(key, subDir); // Puts the keyDirectoryMap
+    }
+
+    private void fileChangeWaiter() throws InterruptedException {
+        // Binder folder waiter for another change in the binder, so that when one change registers, doesnt immediately sync.
+        // Object lock waiting
+        Object obj = new Object();
+        synchronized (obj) {
+            do {
+                changeInBinderCheck = false;
+                obj.wait(CONSTANTS.WAITUPDATEFOR * 1000);
+            } while (changeInBinderCheck);
+        }
+        System.out.println("[Binder] X Change detected in binder '" + name + "'. Will query to other peers.");
+//        sendQuery = true;
+//        directoryWatcher.interrupt();
+    }
+
+    private void queryFileWithOtherPeers() {
 
     }
 

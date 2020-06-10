@@ -22,4 +22,6 @@ public class CONSTANTS {
 
     public static final int BYTESIZE = 4096; // Divides the file into x amount of bytes to send.
 
+    public static final int WAITUPDATEFOR = 10; // in s, the amount of time to wait for another update in a binder before sending a query message.
+
 }

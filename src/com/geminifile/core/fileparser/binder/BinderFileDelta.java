@@ -9,17 +9,27 @@ import java.util.*;
 
 public class BinderFileDelta {
 
-    private final String token;
+    private final String token; // Special random alphanumeric characters that represent this delta operation.
 
-    private final String peerNodeId;
+    private final String peerNodeId; // Other node's id that this delta operation is handling
 
-    private final String id;
+    private final String id; // Binder id that this file delta is handling.
     private final Vector<String> thisPeerNeed = new Vector<>();
     private final Vector<String> otherPeerNeed = new Vector<>();
 
-    private Status status;
+    private Status status; // Operation status
 
     private int closeCounter; // Tool to safely remove this BinderFileDelta from BinderManager safely requiring 2 removal process.
+
+    public BinderFileDelta(String id, PeerCommunicationLoop peerToSend) {
+        // Empty delta operation
+        token = MathUtil.generateRandomAlphaNum(10);
+        this.peerNodeId = peerToSend.getNode().getId();
+        this.id = id;
+        this.status = Status.IDLE;
+        closeCounter = 0;
+
+    }
 
     public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, ArrayList<FileListing> thisPeerListing, ArrayList<FileListing> otherPeerListing) {
         // This function is used to calculate what machine needs what file.
