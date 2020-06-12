@@ -4,7 +4,6 @@ package com.geminifile.core;
 @author Jason Christian @ https://www.github.com/nakamarusun
 */
 
-import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.Service;
 
@@ -26,9 +25,6 @@ public class CLIDriver {
                     break;
                 case "start":
                     Service.start();
-                    break;
-                case "log":
-                    // log
                     break;
                 case "sync":
                     CLIArgumentProcessor.sync(argMap);

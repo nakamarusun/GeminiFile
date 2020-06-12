@@ -1,15 +1,24 @@
 package com.geminifile.core.fileparser.binder;
 
-import java.io.*;
-import java.util.*;
+import com.geminifile.core.socketmsg.MsgType;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
-import org.json.*;
-
-import static com.geminifile.core.CONSTANTS.*;
+import static com.geminifile.core.CONSTANTS.MYBINDERSFILENAME;
+import static com.geminifile.core.CONSTANTS.MYBINDERSPATH;
 
 public class BinderManager {
 

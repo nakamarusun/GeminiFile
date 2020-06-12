@@ -7,7 +7,9 @@ import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 import static com.geminifile.core.CONSTANTS.*;
 

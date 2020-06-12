@@ -1,8 +1,8 @@
 package com.geminifile.core;
 
 import java.util.LinkedHashMap;
-import java.util.regex.*;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class CLIArgs {
 
@@ -12,8 +12,6 @@ public class CLIArgs {
                 "Common geminifile commands:\n\n" +
 
                 "geminifile start: Starts server based on configuration file (Starts localhost on port default 39494)\n" +
-
-                "geminifile log: view update log and stuff\n" +
 
                 "geminifile sync: force sync of files\n" +
                 "   [-d <binder name> syncs folder with ',' delimiter] [-f force sync]\n" +

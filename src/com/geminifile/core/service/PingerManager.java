@@ -6,7 +6,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.geminifile.core.CONSTANTS.*;
+import static com.geminifile.core.CONSTANTS.IPPINGERTHREADS;
+import static com.geminifile.core.CONSTANTS.PINGEVERYXSECOND;
 
 /* This service runs every X seconds, to get all the concurrently running geminifile services
 in the network.

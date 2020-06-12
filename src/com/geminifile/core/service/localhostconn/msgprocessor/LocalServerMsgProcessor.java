@@ -8,20 +8,18 @@ returns a corresponding reply MsgWrapper object.
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
-import com.geminifile.core.service.PingerManager;
 import com.geminifile.core.service.MsgProcessor;
+import com.geminifile.core.service.PingerManager;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.msgwrapper.*;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import static com.geminifile.core.fileparser.binder.BinderManager.getAllBinders;
 
 public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingReply {
 

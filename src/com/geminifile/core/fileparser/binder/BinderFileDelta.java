@@ -6,7 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class BinderFileDelta implements Serializable {
 

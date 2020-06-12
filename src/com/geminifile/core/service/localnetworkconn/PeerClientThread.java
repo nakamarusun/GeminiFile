@@ -3,7 +3,8 @@ package com.geminifile.core.service.localnetworkconn;
 import com.geminifile.core.service.Node;
 import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.msgwrapper.*;
+import com.geminifile.core.socketmsg.msgwrapper.MsgIdentification;
+import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

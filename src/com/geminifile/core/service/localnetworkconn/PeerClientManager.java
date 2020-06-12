@@ -3,7 +3,6 @@ package com.geminifile.core.service.localnetworkconn;
 import com.geminifile.core.service.Service;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;

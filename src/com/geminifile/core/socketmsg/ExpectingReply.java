@@ -1,6 +1,5 @@
 package com.geminifile.core.socketmsg;
 
-import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 public interface ExpectingReply {

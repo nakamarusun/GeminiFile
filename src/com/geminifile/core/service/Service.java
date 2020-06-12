@@ -1,26 +1,21 @@
 package com.geminifile.core.service;
 
-import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
-import com.geminifile.core.socketmsg.MsgType;
-import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
-import static com.geminifile.core.fileparser.binder.BinderManager.getAllBinders;
 
 public class Service {
 
