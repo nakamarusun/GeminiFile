@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-// TODO: Add locks to prevent file from being accessed.
 public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
     PeerCommunicationLoop communicatedPeer; // To get a reference of the peer the message is dealing with.
@@ -38,7 +37,6 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
             case ASK:
                 if (msg.getContent().startsWith("AskBinderHave-")) {
                     // IMPORTANT: USE THIS ONLY FOR BEGINNING WHEN CONNECTION IS MADE. BECAUSE THE FILE CHECKING FUNCTION IS KIND OF HEAVY.
-                    // TODO: Returns all of the mutual binders instead.
                     // Will process a message with content: "AskBinderHave-id1-id2-id3-id4"
                     // Will process it and return a statement: "AskBinderReply-{id1:[{relPath:x, lastModified:y, checkSum:z}, ..], id3:[{relPath:x, lastModified:y, checkSum:z}, ..]}"
                     // Asks if this peer has binders with the corresponding id
@@ -108,6 +106,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                                 noDelta = true;
                                 break;
                             }
+
                             JSONObject switchedBinderDeltaJSON = fileDelta.getSwitchedBinderDeltaJSON(); // Switch the delta to send to the other device.
 
                             BinderManager.addBinderDeltaOperation(fileDelta);
@@ -170,6 +169,31 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         } else {
                             BinderManager.removeBinderDeltaOperation(fileDelta);
                         }
+                    }
+                } else if (msg.getContent().startsWith("WantToSync-")) {
+                    // Will return the list of binders that this machine have in common.
+                    String reply;
+                    String id = contentWithoutStart.split(":")[0];
+                    String token = contentWithoutStart.split(":")[1];
+                    int filesToReceive = Integer.parseInt(contentWithoutStart.split(":")[2]);
+                    if (BinderManager.getBinder(id) != null) {
+                        BinderFileDelta delta = new BinderFileDelta(id, token);
+                        for (int i = 0; i < filesToReceive; i++) {
+                            delta.addThisPeedNeed(""); // Bogus
+                        }
+                        BinderManager.addBinderDeltaOperation(delta);
+                        reply = "T:" + token;
+                    } else {
+                        reply = "F";
+                    }
+
+                    msgProc = new MsgWrapper("WantToSyncHave-" + reply, MsgType.ASK);
+
+                } else if (msg.getContent().startsWith("WantToSyncHave-")) {
+                    if (contentWithoutStart.startsWith("T:")) {
+                        BinderFileDelta fileDelta = BinderManager.getBinderFileDelta( contentWithoutStart.substring(contentWithoutStart.indexOf(":") + 1) );
+                        Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()), "FileSender-" + fileDelta.getToken());
+                        fileSenderThread.start();
                     }
                 }
                 break;

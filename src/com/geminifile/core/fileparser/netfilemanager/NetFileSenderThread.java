@@ -95,6 +95,12 @@ public class NetFileSenderThread implements Runnable {
                 fileStream.close(); // Close file input.
             }
 
+            // Just wait 1 second before deleting.
+            // TODO: Absolute jank. too bad !
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ignored) { }
+
             // Removes from binder delta operations
             BinderManager.removeBinderDeltaOperation(binderDelta);
 
@@ -102,6 +108,7 @@ public class NetFileSenderThread implements Runnable {
             localObjectOut.close();
             localObjectIn.close();
             System.out.println("[NetFile] Completed delta send operation token " + binderDelta.getToken());
+
         } catch (SocketException e) {
             // Means connection suddenly severs
             System.out.println("[NetFile] Failed to complete delta send operation token " + binderDelta.getToken());

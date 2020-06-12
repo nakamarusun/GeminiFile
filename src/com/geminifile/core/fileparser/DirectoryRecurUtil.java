@@ -40,9 +40,9 @@ public class DirectoryRecurUtil {
         try {
             for (File e : Objects.requireNonNull(path.listFiles())) {
                 // Loops through the list, if a directory is found, then recur.
-                    recurFiles.add(e);
+                recurFiles.add(e);
                 if (e.isDirectory()) {
-                    listFilesRecursivelyUtil(e);
+                    listFilesRecursivelyWithDirectoryUtil(e);
                 }
             }
         } catch (NullPointerException e) {

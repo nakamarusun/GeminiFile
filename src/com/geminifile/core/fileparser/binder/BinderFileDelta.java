@@ -5,9 +5,10 @@ import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class BinderFileDelta {
+public class BinderFileDelta implements Serializable {
 
     private final String token; // Special random alphanumeric characters that represent this delta operation.
 
@@ -21,6 +22,8 @@ public class BinderFileDelta {
 
     private int closeCounter; // Tool to safely remove this BinderFileDelta from BinderManager safely requiring 2 removal process.
 
+    private int clients = 1; // How many clients does this binderFileDelta is sending to.
+
     public BinderFileDelta(String id) {
         // Empty delta operation
         token = MathUtil.generateRandomAlphaNum(10);
@@ -29,6 +32,15 @@ public class BinderFileDelta {
         this.status = Status.IDLE;
         closeCounter = 0;
 
+    }
+
+    public BinderFileDelta(String id, String token) {
+        // Empty delta operation
+        this.token = token;
+        this.peerNodeId = "";
+        this.id = id;
+        this.status = Status.IDLE;
+        closeCounter = 0;
     }
 
     public BinderFileDelta(String id, PeerCommunicationLoop peerToSend, ArrayList<FileListing> thisPeerListing, ArrayList<FileListing> otherPeerListing) {
@@ -138,6 +150,18 @@ public class BinderFileDelta {
         this.peerNodeId = peerNodeId;
     }
 
+    public void addOtherPeerNeed(String otherPeerNeed) {
+        this.otherPeerNeed.add(otherPeerNeed);
+    }
+
+    public void addThisPeedNeed(String thisPeerNeed) {
+        this.thisPeerNeed.add(thisPeerNeed);
+    }
+
+    public void addClient() {
+        clients++;
+    }
+
     public JSONObject getBinderDeltaJSON() {
         JSONObject json = new JSONObject();
 
@@ -189,11 +213,10 @@ public class BinderFileDelta {
 
     public boolean closeBinderFileDelta() {
         // If this returns true, then you can safely remove this binderFileDelta from binderDeltaOperations @ BinderManager class
-        if ((thisPeerNeed.size() == 0 || otherPeerNeed.size() == 0) || (closeCounter == 1)) {
+        if (closeCounter == 1) {
             return true;
-        } else {
-            closeCounter++;
         }
+        closeCounter++;
         return false;
     }
 

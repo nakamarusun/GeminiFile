@@ -1,14 +1,18 @@
 package com.geminifile.core.fileparser.netfilemanager;
 
+import com.geminifile.core.MathUtil;
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.fileparser.binder.FileListing;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static com.geminifile.core.CONSTANTS.TEMPNETFILEPATH;
 import static com.geminifile.core.CONSTANTS.TEMPNETFOLDERNAME;
@@ -24,6 +28,7 @@ public class NetFileReceiverThread implements Runnable {
 
     @Override
     public void run() {
+        Binder binder = null;
         // Defining iostream
         try {
 
@@ -42,7 +47,7 @@ public class NetFileReceiverThread implements Runnable {
             }
 
             BinderFileDelta binderDelta = BinderManager.getBinderFileDelta(inToken); // Get the binder delta reference
-            Binder binder = BinderManager.getBinder(Objects.requireNonNull(binderDelta).getId()); // Get the binder delta reference
+            binder = BinderManager.getBinder(Objects.requireNonNull(binderDelta).getId()); // Get the binder delta reference
 
             System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
@@ -64,8 +69,10 @@ public class NetFileReceiverThread implements Runnable {
 //                    break;
 //                }
 
+                String relPathMachine = file.getFilePathName();
+
                 // Creates the file from the metadata received.
-                String tempFilePath = tempFolder.getAbsolutePath() + file.getFilePathName();
+                String tempFilePath = tempFolder.getAbsolutePath() + relPathMachine;
                 File currentFile = new File(tempFilePath);
 
                 if (!currentFile.exists()) {
@@ -74,6 +81,8 @@ public class NetFileReceiverThread implements Runnable {
                     File newFolder = new File(tempFilePath);
                     newFolder.mkdirs(); // Make all of the folders up until that point
                 }
+
+                System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
 
                 FileOutputStream fileStream = new FileOutputStream(currentFile);
 
@@ -92,25 +101,36 @@ public class NetFileReceiverThread implements Runnable {
                     blocks++;
                 }
 
-                System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
                 System.out.println("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
 
                 fileStream.flush(); // Flushes the buffer into the file.
                 fileStream.close(); // Closes fileOutputStream for safety
 
                 // Copies the files to the main binder folder
-                String destinationFilePath = Objects.requireNonNull(binder).getDirectory().getAbsolutePath() + file.getFilePathName(); // Path destination to copy to.
+                String destinationFilePath = Objects.requireNonNull(binder).getDirectory().getAbsolutePath() + relPathMachine; // Path destination to copy to.
                 File destinationFile = new File(destinationFilePath);
 
-                // Checks if the file is there or not
+                // Checks if the file is there or not to create directories. Then, registers it to the binder's watcher
                 if (!destinationFile.exists()) {
+
                     // Checks if the directory have been created up until that point
                     destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf(File.separator));
                     File newFolder = new File(destinationFilePath);
                     newFolder.mkdirs(); // Creates directory up until that point
+
+                    // Register the watchers for all of the folders up until that point.
+                    String[] folderDepth = relPathMachine.split(Pattern.quote(File.separator));
+                    StringBuilder addPath = new StringBuilder();
+
+                    for (int j = 0; j < (folderDepth.length - 1); j++) {
+                        addPath.append(folderDepth[j]).append(File.separator);
+                        if (folderDepth[j].equals("")) continue; // If its an empty string, then don't bother.
+                        binder.registerSubWatcherService(new File( binder.getDirectory().getAbsolutePath() + File.separator + addPath ));
+                    }
                 }
 
                 // Try atomic move
+                binder.setFileToIgnore(destinationFile.toPath().toString());
                 try {
                     Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
                 } catch (AtomicMoveNotSupportedException | AccessDeniedException e) {
@@ -121,8 +141,12 @@ public class NetFileReceiverThread implements Runnable {
                         ex.printStackTrace();
                     }
                 }
-
             }
+
+            // Just wait 1 second before deleting.
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException ignored) { binder.setFileToIgnore(""); }
 
             // Removes from binder delta operations
             BinderManager.removeBinderDeltaOperation(binderDelta);
@@ -131,6 +155,7 @@ public class NetFileReceiverThread implements Runnable {
             tempFolder.delete(); // TODO: Not working
             localObjectIn.close();
             localObjectOut.close();
+            binder.setFileToIgnore("");
             System.out.println("[NetFile] Completed delta receive operation token " + inToken);
 
         } catch (SocketException | EOFException e) {
@@ -143,6 +168,9 @@ public class NetFileReceiverThread implements Runnable {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            assert binder != null;
+            binder.setFileToIgnore("");
         }
     }
 
