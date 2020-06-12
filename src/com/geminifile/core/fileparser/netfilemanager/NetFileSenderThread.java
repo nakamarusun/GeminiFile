@@ -45,54 +45,67 @@ public class NetFileSenderThread implements Runnable {
 
             // Sends all of the file
             for (String files : binderDelta.getOtherPeerNeed()) {
-                // Opens the file and converts it into a binary stream
 
-                // Opens file
-                String path = binder.getDirectory().getAbsolutePath() + MathUtil.fileSeparatorToOS(files);
-                File file = new File(path); // The current file we are working with
+                FileInputStream fileStream = null;
 
-                if (!file.exists()) {
-                    // If file does not exist then, skip
-                    System.out.println("[NetFile] Error reading file to send: " + path);
-                    continue;
-                }
+                try {
+                    // Opens the file and converts it into a binary stream
+                    // Opens file
+                    String path = binder.getDirectory().getAbsolutePath() + MathUtil.fileSeparatorToOS(files);
+                    File file = new File(path); // The current file we are working with
 
-                System.out.println("[NetFile] Will send file: " + path);
-
-                // Sends the file metadata to the other peer.
-                NetFile fileMetadata = new NetFile(binderDelta.getToken(), files, file.length());
-                localObjectOut.writeObject(fileMetadata);
-
-                // Opens file from the File object
-                FileInputStream fileStream = new FileInputStream(file);
-                byte[] bytes = new byte[BYTESIZE];
-                int bytesSendSize = 0; // Bytes read from the current block of the file
-                int byteSent = 0;
-                int blockNum = 0; // current block in operation
-
-                // Main loop to send files
-                do {
-                    if (bytesSendSize > 0) {
-                        byteSent += bytesSendSize; // Keeps track of how many bytes have been sent.
+                    if (!file.exists()) {
+                        // If file does not exist then, skip
+                        System.out.println("[NetFile] Error reading file to send: " + path);
+                        continue;
                     }
 
-                    bytesSendSize = fileStream.read(bytes, 0, BYTESIZE);
+                    System.out.println("[NetFile] Will send file: " + path);
 
-                    NetFileBlock fileBlock;
-                    // Checks if file input stream reaches EOF,
-                    if (bytesSendSize > 0) {
-                        fileBlock = new NetFileBlock(bytes.clone(), bytesSendSize, ++blockNum); // Creates a new file block to send to other machine.
-                    } else {
-                        byte[] empty = new byte[0]; // Empty byte array
-                        fileBlock = new NetFileBlock(empty, 0, 0); // Sends an empty block to the other machine, signifying EOF.
-                    }
-                    localObjectOut.writeObject(fileBlock); // Sends it to the other machine.
-                } while (bytesSendSize > 0);
+                    // Sends the file metadata to the other peer.
+                    NetFile fileMetadata = new NetFile(binderDelta.getToken(), files, file.length());
+                    localObjectOut.writeObject(fileMetadata);
 
-                System.out.println("[NetFile] Sent " + fileMetadata.getFileName() + " with " + byteSent + " Bytes in " + blockNum + " block(s)");
+                    // Opens file from the File object
+                    fileStream = new FileInputStream(file);
+                    byte[] bytes = new byte[BYTESIZE];
+                    int bytesSendSize = 0; // Bytes read from the current block of the file
+                    int byteSent = 0;
+                    int blockNum = 0; // current block in operation
+
+                    // Main loop to send files
+                    do {
+                        if (bytesSendSize > 0) {
+                            byteSent += bytesSendSize; // Keeps track of how many bytes have been sent.
+                        }
+
+                        bytesSendSize = fileStream.read(bytes, 0, BYTESIZE);
+
+                        NetFileBlock fileBlock;
+                        // Checks if file input stream reaches EOF,
+                        if (bytesSendSize > 0) {
+                            fileBlock = new NetFileBlock(bytes.clone(), bytesSendSize, ++blockNum); // Creates a new file block to send to other machine.
+                        } else {
+                            byte[] empty = new byte[0]; // Empty byte array
+                            fileBlock = new NetFileBlock(empty, 0, 0); // Sends an empty block to the other machine, signifying EOF.
+                        }
+                        localObjectOut.writeObject(fileBlock); // Sends it to the other machine.
+                    } while (bytesSendSize > 0);
+
+                    System.out.println("[NetFile] Sent " + fileMetadata.getFileName() + " with " + byteSent + " Bytes in " + blockNum + " block(s)");
 
 //                localObjectOut.writeObject(new NetFile("0", "", 0)); // Sends an EOF prompt
-                fileStream.close(); // Close file input.
+                    fileStream.close(); // Close file input.
+                } catch (IOException e) {
+                    System.out.println("[NetFile] Error processing file block");
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (fileStream != null) {
+                            fileStream.close();
+                        }
+                    } catch (IOException ignored) {}
+                }
             }
 
             // Just wait 1 second before deleting.

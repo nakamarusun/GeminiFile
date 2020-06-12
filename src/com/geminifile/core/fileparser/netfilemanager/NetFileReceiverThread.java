@@ -61,85 +61,98 @@ public class NetFileReceiverThread implements Runnable {
             // Continue operations as usual.
             // Receives all of the necessary files to a temporary folder
             for (int i = 0; i < binderDelta.getThisPeerNeed().size(); i++) {
-                // Read file metadata
-                NetFile file = (NetFile) localObjectIn.readObject();
+
+                FileOutputStream fileStream = null;
+                try {
+                    // Read file metadata
+                    NetFile file = (NetFile) localObjectIn.readObject();
 
 //                if (file.getToken().equals("0")) {
 //                    // Reaches end of file
 //                    break;
 //                }
 
-                String relPathMachine = file.getFilePathName();
+                    String relPathMachine = file.getFilePathName();
 
-                // Creates the file from the metadata received.
-                String tempFilePath = tempFolder.getAbsolutePath() + relPathMachine;
-                File currentFile = new File(tempFilePath);
+                    // Creates the file from the metadata received.
+                    String tempFilePath = tempFolder.getAbsolutePath() + relPathMachine;
+                    File currentFile = new File(tempFilePath);
 
-                if (!currentFile.exists()) {
-                    // If directory not found up until that point
-                    tempFilePath = tempFilePath.substring(0, tempFilePath.lastIndexOf(File.separator));
-                    File newFolder = new File(tempFilePath);
-                    newFolder.mkdirs(); // Make all of the folders up until that point
-                }
-
-                System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
-
-                FileOutputStream fileStream = new FileOutputStream(currentFile);
-
-                int blocks = 0; // Blocks of NetFileBlock received
-                long byteLength = 0; // bytes of file received.
-
-                // Downloads the file in blocks
-                while (true) {
-                    NetFileBlock fileBlock = (NetFileBlock) localObjectIn.readObject();
-                    // If fileBlock has reached the end, then stop process.
-                    if (fileBlock.getSize() <= 0) {
-                        break;
+                    if (!currentFile.exists()) {
+                        // If directory not found up until that point
+                        tempFilePath = tempFilePath.substring(0, tempFilePath.lastIndexOf(File.separator));
+                        File newFolder = new File(tempFilePath);
+                        newFolder.mkdirs(); // Make all of the folders up until that point
                     }
-                    fileStream.write(fileBlock.getBlock(), 0, fileBlock.getSize());
-                    byteLength += fileBlock.getSize();
-                    blocks++;
-                }
 
-                System.out.println("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
+                    System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
 
-                fileStream.flush(); // Flushes the buffer into the file.
-                fileStream.close(); // Closes fileOutputStream for safety
+                    fileStream = new FileOutputStream(currentFile);
 
-                // Copies the files to the main binder folder
-                String destinationFilePath = Objects.requireNonNull(binder).getDirectory().getAbsolutePath() + relPathMachine; // Path destination to copy to.
-                File destinationFile = new File(destinationFilePath);
+                    int blocks = 0; // Blocks of NetFileBlock received
+                    long byteLength = 0; // bytes of file received.
 
-                // Checks if the file is there or not to create directories. Then, registers it to the binder's watcher
-                if (!destinationFile.exists()) {
-
-                    // Checks if the directory have been created up until that point
-                    destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf(File.separator));
-                    File newFolder = new File(destinationFilePath);
-                    newFolder.mkdirs(); // Creates directory up until that point
-
-                    // Register the watchers for all of the folders up until that point.
-                    String[] folderDepth = relPathMachine.split(Pattern.quote(File.separator));
-                    StringBuilder addPath = new StringBuilder();
-
-                    for (int j = 0; j < (folderDepth.length - 1); j++) {
-                        addPath.append(folderDepth[j]).append(File.separator);
-                        if (folderDepth[j].equals("")) continue; // If its an empty string, then don't bother.
-                        binder.registerSubWatcherService(new File( binder.getDirectory().getAbsolutePath() + File.separator + addPath ));
+                    // Downloads the file in blocks
+                    while (true) {
+                        NetFileBlock fileBlock = (NetFileBlock) localObjectIn.readObject();
+                        // If fileBlock has reached the end, then stop process.
+                        if (fileBlock.getSize() <= 0) {
+                            break;
+                        }
+                        fileStream.write(fileBlock.getBlock(), 0, fileBlock.getSize());
+                        byteLength += fileBlock.getSize();
+                        blocks++;
                     }
-                }
 
-                // Try atomic move
-                binder.setFileToIgnore(destinationFile.toPath().toString());
-                try {
-                    Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
-                } catch (AtomicMoveNotSupportedException | AccessDeniedException e) {
+                    System.out.println("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
+
+                    fileStream.flush(); // Flushes the buffer into the file.
+                    fileStream.close(); // Closes fileOutputStream for safety
+
+                    // Copies the files to the main binder folder
+                    String destinationFilePath = Objects.requireNonNull(binder).getDirectory().getAbsolutePath() + relPathMachine; // Path destination to copy to.
+                    File destinationFile = new File(destinationFilePath);
+
+                    // Checks if the file is there or not to create directories. Then, registers it to the binder's watcher
+                    if (!destinationFile.exists()) {
+
+                        // Checks if the directory have been created up until that point
+                        destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf(File.separator));
+                        File newFolder = new File(destinationFilePath);
+                        newFolder.mkdirs(); // Creates directory up until that point
+
+                        // Register the watchers for all of the folders up until that point.
+                        String[] folderDepth = relPathMachine.split(Pattern.quote(File.separator));
+                        StringBuilder addPath = new StringBuilder();
+
+                        for (int j = 0; j < (folderDepth.length - 1); j++) {
+                            addPath.append(folderDepth[j]).append(File.separator);
+                            if (folderDepth[j].equals("")) continue; // If its an empty string, then don't bother.
+                            binder.registerSubWatcherService(new File(binder.getDirectory().getAbsolutePath() + File.separator + addPath));
+                        }
+                    }
+
+                    // Try atomic move
+                    binder.setFileToIgnore(destinationFile.toPath().toString());
                     try {
-                        Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    } catch (FileSystemException ex) {
-                        System.out.println("[NetFile] Moving file from temporary folder failed");
-                        ex.printStackTrace();
+                        Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                    } catch (AtomicMoveNotSupportedException | AccessDeniedException e) {
+                        try {
+                            Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        } catch (FileSystemException ex) {
+                            System.out.println("[NetFile] Moving file from temporary folder failed");
+                            ex.printStackTrace();
+                        }
                     }
+                } catch (IOException e) {
+                    System.out.println("[NetFile] Error file");
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (fileStream != null) {
+                            fileStream.close();
+                        }
+                    } catch (IOException ignored) {}
                 }
             }
 
