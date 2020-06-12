@@ -22,8 +22,6 @@ public class BinderFileDelta implements Serializable {
 
     private int closeCounter; // Tool to safely remove this BinderFileDelta from BinderManager safely requiring 2 removal process.
 
-    private int clients = 1; // How many clients does this binderFileDelta is sending to.
-
     public BinderFileDelta(String id) {
         // Empty delta operation
         token = MathUtil.generateRandomAlphaNum(10);
@@ -156,10 +154,6 @@ public class BinderFileDelta implements Serializable {
 
     public void addThisPeedNeed(String thisPeerNeed) {
         this.thisPeerNeed.add(thisPeerNeed);
-    }
-
-    public void addClient() {
-        clients++;
     }
 
     public JSONObject getBinderDeltaJSON() {

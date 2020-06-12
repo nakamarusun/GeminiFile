@@ -82,7 +82,6 @@ public class BinderManager {
     public static void updateMyBinders() {
         // Updates the JSONObject myBinders with the current arraylist
         // Iterate within the binders ArrayList
-        // TODO: CAN YOU MAKE WAIT FOR THIS TO COMPLETE IF QUIT
         binderLock.lock();
         try {
             JSONObject newBinders = new JSONObject();

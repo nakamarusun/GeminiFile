@@ -98,9 +98,25 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         }
 
                         try {
+                            // This block is to check whether another AskBinderReply- query is in this machine with the same binder.
+                            // TODO: Check if there is already an operation inside of deltaOperations with the same binder.
+                            boolean cancelThisBinder = false; // If binder is cancelled, then proceed to the next of binder operation
+                            Binder binderRef = Objects.requireNonNull(BinderManager.getBinder(e));
+                            for (BinderFileDelta delta : BinderManager.getAllBinderFileDelta()) {
+                                // If there is a binder of the same id in the delta operation.
+                                if (delta.getId().equals(binderRef.getId())) {
+                                    System.out.println("[Binder] Binder " + binderRef.getName() + " is currently in operation. Cancelling AskBinderReply..." );
+                                    cancelThisBinder = true;
+                                    break;
+                                }
+                            }
+                            if (cancelThisBinder) {
+                                continue;
+                            }
+
                             // Make a new entry in the binder delta operation based on the current files with the other machine's file.
                             // (e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing)
-                            BinderFileDelta fileDelta = new BinderFileDelta(e, communicatedPeer, Objects.requireNonNull(BinderManager.getBinder(e)).getFileListing(), otherFileListing);
+                            BinderFileDelta fileDelta = new BinderFileDelta(e, communicatedPeer, binderRef.getFileListing(), otherFileListing);
                             if (fileDelta.getThisPeerNeed().size() == 0 && fileDelta.getOtherPeerNeed().size() == 0) {
                                 // If the file delta operations are empty, then do not send a message
                                 noDelta = true;
@@ -130,6 +146,8 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     // Puts the JSON object to the the list of BinderDeltas in BinderManager
 
                     StringBuilder finalString = new StringBuilder();
+
+                    if (contentWithoutStart.length() == 0) return msgProc; // If the contents is empty.
 
                     String[] receivedJSON = contentWithoutStart.split("-");
                     for (String e : receivedJSON) {
@@ -163,6 +181,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                         BinderFileDelta fileDelta = BinderManager.getBinderFileDelta(e);
 
                         // Start connection thread here.
+                        assert fileDelta != null;
                         if (fileDelta.getOtherPeerNeed().size() != 0) { // If there is no file needed by the other device, then don't bother to start the process
                             Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()), "FileSender-" + fileDelta.getToken());
                             fileSenderThread.start();
@@ -192,6 +211,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                 } else if (msg.getContent().startsWith("WantToSyncHave-")) {
                     if (contentWithoutStart.startsWith("T:")) {
                         BinderFileDelta fileDelta = BinderManager.getBinderFileDelta( contentWithoutStart.substring(contentWithoutStart.indexOf(":") + 1) );
+                        assert fileDelta != null;
                         Thread fileSenderThread = new Thread(new NetFileSenderThread(fileDelta, communicatedPeer.getSock().getInetAddress()), "FileSender-" + fileDelta.getToken());
                         fileSenderThread.start();
                     }

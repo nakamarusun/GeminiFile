@@ -46,6 +46,8 @@ public class Binder {
         this.id = id;
         this.directory = directory;
         directoryLastModified = directory.lastModified();
+        directoryWatcher.setName("BinderWatcher-" + id);
+        binderUpdateWaiter.setName("UpdateWaiter-" + id);
     }
 
     public Binder(String name, File directory) {
@@ -86,6 +88,10 @@ public class Binder {
 
     public void setDirectoryLastModified(long directoryLastModified) {
         this.directoryLastModified = directoryLastModified;
+    }
+
+    public void updateDirectoryLastModified() {
+        directoryLastModified = directory.lastModified();
     }
 
     public String getFileToIgnore() {
@@ -175,6 +181,7 @@ public class Binder {
 
                         // At this point, the service has detected a change in the directory it is watching.
                         listingUpdated = false; // Sets updated status to false.
+                        updateDirectoryLastModified();
 
                         for (WatchEvent<?> event : key.pollEvents()) {
                             // Checks what events that happened.
@@ -228,7 +235,7 @@ public class Binder {
                                                 fileChangeWaiter();
                                             } catch (InterruptedException ignored) {
                                             }
-                                        }, "Waiter-" + name);
+                                        }, "UpdateWaiter-" + name);
                                         binderUpdateWaiter.start();
                                     }
                                 }

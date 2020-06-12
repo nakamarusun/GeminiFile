@@ -30,6 +30,12 @@ public class Service {
 
     public static void start() {
 
+        // Add a shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // Save all of the binders before quitting.
+            BinderManager.saveMyBinders();
+        }));
+
         System.out.println("Service is starting...");
         // Starts local server message command processor
         LocalServerCommunicator.startLocalServer();
