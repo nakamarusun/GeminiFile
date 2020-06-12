@@ -34,7 +34,7 @@ public class Service {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // Save all of the binders before quitting.
             BinderManager.saveMyBinders();
-        }));
+        }, "ShutdownHook"));
 
         System.out.println("Service is starting...");
         // Starts local server message command processor

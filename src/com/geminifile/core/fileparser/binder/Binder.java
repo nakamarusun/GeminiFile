@@ -27,8 +27,8 @@ public class Binder {
     private final ArrayList<FileListing> fileListing = new ArrayList<>(); // A HashMap of all of the files recursively in the directory with their last modified time
     private final Lock fileListingLock = new ReentrantLock(true); // Lock to ensure fileListing access safety.
 
-    private Thread directoryWatcher = new Thread();
-    private Thread binderUpdateWaiter = new Thread();
+    private Thread directoryWatcher = new Thread("BinderWatcher");
+    private Thread binderUpdateWaiter = new Thread("UpdateWaiter");
 
     private boolean listingUpdated = false; // whether the FileListing has been updated or not. Sets to false if Watcher senses a change
     private boolean changeInBinderCheck = false; // If true, then restarts the waiting service.
