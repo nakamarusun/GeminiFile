@@ -127,7 +127,18 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                     case "SyncFolders":
                         String[] foldersToSync = msg.getContent().replace("SyncFolders-", "").split(",");
                         // TODO: DO THE FOLDER SYNCING
+                        for (Binder e : BinderManager.getAllBinders()) {
+                            for (String name : foldersToSync) {
+                                if (e.getName().equals(name)) {
+                                    // Sync
+                                    System.out.println("[Binder] Got request to sync binder " + name + ". Sending request to all peers.");
+                                    PeerCommunicatorManager.sendToAllPeers(new MsgWrapper("AskBinderHave-" + e.getId(), MsgType.ASK));
+                                }
+                            }
+                        }
                         break;
+                    case "SHUTDOWN":
+                        System.exit(0);
                 }
                 msgProc = new MsgWrapper("Done" + additionalStr, MsgType.ASK);
                 break;

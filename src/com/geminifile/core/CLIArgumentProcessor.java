@@ -89,4 +89,7 @@ public class CLIArgumentProcessor {
         LocalClientCommunicator.sendLocalMessage(msg);
     }
 
+    public static void stop() {
+        LocalClientCommunicator.sendLocalMessage(new MsgWrapper("SHUTDOWN", MsgType.COMMAND));
+    }
 }

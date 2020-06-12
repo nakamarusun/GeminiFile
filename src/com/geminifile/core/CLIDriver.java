@@ -30,7 +30,7 @@ public class CLIDriver {
                     CLIArgumentProcessor.sync(argMap);
                     break;
                 case "stop":
-                    // stop
+                    CLIArgumentProcessor.stop();
                     break;
                 case "status":
                     CLIArgumentProcessor.status(argMap);
