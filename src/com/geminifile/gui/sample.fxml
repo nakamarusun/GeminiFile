@@ -1,14 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.geminifile.gui.Controller"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+<VBox minHeight="300.0" minWidth="400.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.Controller">
+  <children>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <children>
+            <VBox alignment="BOTTOM_CENTER" layoutY="329.0" prefHeight="71.0" prefWidth="600.0" styleClass="bottom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="43.0" prefWidth="600.0">
+                     <children>
+                        <ToggleButton fx:id="homeToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Home">
+                           <graphic>
+                              <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
+                                 <image>
+                                    <Image url="@img/icon/icons8-home-50.png" />
+                                 </image>
+                                 <effect>
+                                    <Blend mode="SRC_ATOP">
+                                       <topInput>
+                                          <ColorInput height="35.58" paint="WHITE" width="32.62" />
+                                       </topInput>
+                                    </Blend>
+                                 </effect>
+                              </ImageView>
+                           </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="bindersToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Binders">
+                           <graphic>
+                              <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
+                                 <image>
+                                    <Image url="@img/icon/icons8-binder-50.png" />
+                                 </image>
+                                 <effect>
+                                    <Blend mode="SRC_ATOP">
+                                       <topInput>
+                                          <ColorInput height="35.58" paint="WHITE" width="32.62" />
+                                       </topInput>
+                                    </Blend>
+                                 </effect>
+                              </ImageView>
+                           </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="settingsToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Settings">
+                           <graphic>
+                              <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
+                                 <image>
+                                    <Image url="@img/icon/icons8-settings-50.png" />
+                                 </image>
+                                 <effect>
+                                    <Blend mode="SRC_ATOP">
+                                       <topInput>
+                                          <ColorInput height="35.58" paint="WHITE" width="32.62" />
+                                       </topInput>
+                                    </Blend>
+                                 </effect>
+                              </ImageView>
+                           </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="aboutToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="About">
+                           <graphic>
+                              <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
+                                 <image>
+                                    <Image url="@img/icon/icons8-about-50.png" />
+                                 </image>
+                                 <effect>
+                                    <Blend mode="SRC_ATOP">
+                                       <topInput>
+                                          <ColorInput height="35.58" paint="WHITE" width="32.62" />
+                                       </topInput>
+                                    </Blend>
+                                 </effect>
+                              </ImageView>
+                           </graphic>
+                        </ToggleButton>
+                     </children>
+                  </HBox>
+                  <Text fill="#87449e" strokeType="OUTSIDE" strokeWidth="0.0" text="-   G E M I N I F I L E   -" textAlignment="CENTER">
+                     <font>
+                        <Font name="Times New Roman" size="12.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </VBox.margin>
+                  </Text>
+               </children>
+            </VBox>
+            <AnchorPane fx:id="mainCanvas" layoutX="14.0" layoutY="14.0" prefHeight="316.0" prefWidth="572.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
