@@ -12,7 +12,7 @@ public class GUIDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml")); // Sets the main stage
+        Parent root = FXMLLoader.load(getClass().getResource("main.fxml")); // Sets the main stage
         primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("img\\icon\\logo64.png"))); // Sets the application logo
         primaryStage.setTitle("GeminiFile Prototype 1"); // Title
 

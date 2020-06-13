@@ -20,7 +20,7 @@
                <children>
                   <HBox alignment="CENTER" prefHeight="43.0" prefWidth="600.0">
                      <children>
-                        <ToggleButton fx:id="homeToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Home">
+                        <ToggleButton fx:id="homeToggleNavigation" mnemonicParsing="false" onAction="#changePaneToHome" styleClass="bottom-button" text="Home">
                            <graphic>
                               <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
                                  <image>
@@ -36,7 +36,7 @@
                               </ImageView>
                            </graphic>
                         </ToggleButton>
-                        <ToggleButton fx:id="bindersToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Binders">
+                        <ToggleButton fx:id="bindersToggleNavigation" mnemonicParsing="false" onAction="#changePaneToBinders" styleClass="bottom-button" text="Binders">
                            <graphic>
                               <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
                                  <image>
