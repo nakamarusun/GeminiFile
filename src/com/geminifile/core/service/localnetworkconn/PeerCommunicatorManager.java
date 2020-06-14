@@ -10,6 +10,7 @@ meanwhile PeerServerSender manages new connections to another device.
  */
 
 import com.geminifile.core.service.Node;
+import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.net.InetAddress;
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 public class PeerCommunicatorManager {
 
@@ -30,7 +32,7 @@ public class PeerCommunicatorManager {
 
     public static void start() {
 
-        System.out.println("[PEER] Starting Peer Communicator Manager...");
+        Service.LOGGER.info("[PEER] Starting Peer Communicator Manager...");
         // Run thread for PeerClientAcceptor
         peerClient = new Thread(new PeerClientManager(), "PeerClientManager");
         peerClient.start();
@@ -77,8 +79,8 @@ public class PeerCommunicatorManager {
             try {
                 e.getSock().close();
             } catch (IOException ioException) {
-                System.out.println("[PEER] Error closing socket" + e.toString());
-                ioException.printStackTrace();
+                Service.LOGGER.severe("[PEER] Error closing socket" + e.toString());
+                Service.LOGGER.log(Level.SEVERE, "exception", ioException);
             }
         }
         // Clear peerTable when stopping service

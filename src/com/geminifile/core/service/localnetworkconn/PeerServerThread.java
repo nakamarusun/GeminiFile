@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
@@ -65,7 +66,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
             }
 
             // At this point, the device has successfully handshake and established connection with the other device
-            System.out.println("[PEER] Successfully established connection with " + sock.getInetAddress().getHostAddress());
+            Service.LOGGER.severe("[PEER] Successfully established connection with " + sock.getInetAddress().getHostAddress());
 
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
@@ -78,17 +79,17 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
         } catch (EOFException ignored) {
 
         } catch (ClassNotFoundException e) {
-            System.out.println("[PEER] Class deserialization error");
-            e.printStackTrace();
+            Service.LOGGER.severe("[PEER] Class deserialization error");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
 
         } catch (SocketException e) {
             // If an io exception occurs, usually because of a connection reset, quit the thread.
-            System.out.println("[PEER] Disconnected from " + nodeIp.getHostAddress());
+            Service.LOGGER.warning("[PEER] Disconnected from " + nodeIp.getHostAddress());
             PeerCommunicatorManager.removePeerTable(otherNode);
 
         } catch (IOException e) {
-            System.out.println("[PEER] IOException occurred");
-            e.printStackTrace();
+            Service.LOGGER.severe("[PEER] IOException occurred");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
 
         // For safety, remove when thread is done.
@@ -101,7 +102,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
         // Do stuff when this peer connects to other peer after query.
         // Usually preliminary stuff
         // Ask the other device if binders is in sync
-        System.out.println("[FILE] Sent AskBinderHave to " + nodeIp.getHostAddress());
+        Service.LOGGER.info("[FILE] Sent AskBinderHave to " + nodeIp.getHostAddress());
         peer.sendMsg(BinderManager.getAskBinderHave());
     }
 }

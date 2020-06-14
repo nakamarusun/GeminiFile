@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
 
 // This thread can also handle ping queries.
 // TODO: DO SOME SOCKET CLOSES
@@ -64,7 +65,7 @@ public class PeerClientThread implements Runnable, OnConnectOperation {
             }
 
             // At this point, the device has successfully handshake and established connection with the other device
-            System.out.println("[PEER] Successfully accepted connection from " + sock.getInetAddress().getHostAddress());
+            Service.LOGGER.info("[PEER] Successfully accepted connection from " + sock.getInetAddress().getHostAddress());
 
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);
@@ -72,17 +73,17 @@ public class PeerClientThread implements Runnable, OnConnectOperation {
             newConnectionMade(commsLoop);
 
         } catch (ClassNotFoundException e) {
-            System.out.println("[PEER] Class deserialization error");
-            e.printStackTrace();
+            Service.LOGGER.severe("[PEER] Class deserialization error");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
 
         } catch (SocketException e) {
             // Stops the socket.
-            System.out.println("[PEER] Disconnected from " + sock.getInetAddress().getHostAddress());
+            Service.LOGGER.warning("[PEER] Disconnected from " + sock.getInetAddress().getHostAddress());
             PeerCommunicatorManager.removePeerTable(otherNode);
 
         } catch (IOException e) {
-            System.out.println("[PEER] IOException occurred");
-            e.printStackTrace();
+            Service.LOGGER.severe("[PEER] IOException occurred");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
 
         }
 

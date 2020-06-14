@@ -1,5 +1,6 @@
 package com.geminifile.core.service.localhostconn;
 
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localhostconn.msgprocessor.LocalClientMsgProcessor;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.LOCALPORT;
 
@@ -41,7 +43,7 @@ public class LocalClientCommunicator {
                     msg = msgReply;
                 } catch (ClassNotFoundException e) {
                     System.out.println("[LCLIENT] Class error not found");
-                    e.printStackTrace();
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 }
             }
 
@@ -49,7 +51,7 @@ public class LocalClientCommunicator {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
 
 

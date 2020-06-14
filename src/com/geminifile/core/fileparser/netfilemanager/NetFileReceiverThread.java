@@ -3,12 +3,14 @@ package com.geminifile.core.fileparser.netfilemanager;
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.service.Service;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.file.*;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 import static com.geminifile.core.CONSTANTS.TEMPNETFILEPATH;
@@ -29,7 +31,7 @@ public class NetFileReceiverThread implements Runnable {
         // Defining iostream
         try {
 
-            System.out.println("[NetFile] Starting delta receive operation");
+            Service.LOGGER.info("[NetFile] Starting delta receive operation");
 
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
@@ -38,7 +40,7 @@ public class NetFileReceiverThread implements Runnable {
             String inToken = (String) localObjectIn.readObject();
             if (!BinderManager.isTokenInBinderDeltas(inToken)) {
                 // If the token in question is not in the device token list, then cancel operation.
-                System.out.println("[NetFile] Delta operation token " + inToken + " is not registered in machine");
+                Service.LOGGER.severe("[NetFile] Delta operation token " + inToken + " is not registered in machine");
                 sock.close();
                 return;
             }
@@ -46,7 +48,7 @@ public class NetFileReceiverThread implements Runnable {
             BinderFileDelta binderDelta = BinderManager.getBinderFileDelta(inToken); // Get the binder delta reference
             binder = BinderManager.getBinder(Objects.requireNonNull(binderDelta).getId()); // Get the binder delta reference
 
-            System.out.println("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
+            Service.LOGGER.info("[NetFile] Accepted and verified delta file connection from " + sock.getInetAddress().getHostName());
 
             // Sets binder file delta to in progress
             binderDelta.setStatus(BinderFileDelta.Status.INPROCESS);
@@ -82,7 +84,7 @@ public class NetFileReceiverThread implements Runnable {
                         newFolder.mkdirs(); // Make all of the folders up until that point
                     }
 
-                    System.out.println("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
+                    Service.LOGGER.info("[NetFile] Expected to receive " + file.getFileName() + " with " + file.getFileSize() + " Bytes");
 
                     fileStream = new FileOutputStream(currentFile);
 
@@ -101,7 +103,7 @@ public class NetFileReceiverThread implements Runnable {
                         blocks++;
                     }
 
-                    System.out.println("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
+                    Service.LOGGER.info("[NetFile] Received " + file.getFileName() + " in " + blocks + " block(s) totalling " + byteLength + " Bytes");
 
                     fileStream.flush(); // Flushes the buffer into the file.
                     fileStream.close(); // Closes fileOutputStream for safety
@@ -137,13 +139,13 @@ public class NetFileReceiverThread implements Runnable {
                         try {
                             Files.move(currentFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } catch (FileSystemException ex) {
-                            System.out.println("[NetFile] Moving file from temporary folder failed");
-                            ex.printStackTrace();
+                            Service.LOGGER.severe("[NetFile] Moving file from temporary folder failed");
+                            Service.LOGGER.log(Level.SEVERE, "exception", ex);
                         }
                     }
                 } catch (IOException e) {
-                    System.out.println("[NetFile] Error file");
-                    e.printStackTrace();
+                    Service.LOGGER.severe("[NetFile] Error file");
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 } finally {
                     try {
                         if (fileStream != null) {
@@ -166,18 +168,18 @@ public class NetFileReceiverThread implements Runnable {
             localObjectIn.close();
             localObjectOut.close();
             binder.setFileToIgnore("");
-            System.out.println("[NetFile] Completed delta receive operation token " + inToken);
+            Service.LOGGER.info("[NetFile] Completed delta receive operation token " + inToken);
 
         } catch (SocketException | EOFException e) {
-            System.out.println("[NetFile] Delta file connection disconnected from " + sock.getInetAddress().getHostName());
+            Service.LOGGER.warning("[NetFile] Delta file connection disconnected from " + sock.getInetAddress().getHostName());
         } catch (ClassNotFoundException e) {
-            System.out.println("[NetFile] Class deserialization error.");
-            e.printStackTrace();
+            Service.LOGGER.severe("[NetFile] Class deserialization error.");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         } catch (NullPointerException e) {
-            System.out.println("[NetFile] Binder file delta is not found in the database.");
-            e.printStackTrace();
+            Service.LOGGER.severe("[NetFile] Binder file delta is not found in the database.");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         } finally {
             assert binder != null;
             binder.setFileToIgnore("");

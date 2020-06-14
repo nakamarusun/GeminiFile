@@ -1,6 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
 import com.geminifile.core.MathUtil;
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -202,8 +203,8 @@ public class BinderFileDelta implements Serializable {
     }
 
     public void printAllDelta() {
-        System.out.println("This device needs: " + thisPeerNeed.toString());
-        System.out.println("Other device needs: " + otherPeerNeed.toString());
+        Service.LOGGER.info("This device needs: " + thisPeerNeed.toString());
+        Service.LOGGER.info("Other device needs: " + otherPeerNeed.toString());
     }
 
     public boolean closeBinderFileDelta() {

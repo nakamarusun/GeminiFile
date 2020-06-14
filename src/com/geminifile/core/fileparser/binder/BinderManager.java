@@ -1,5 +1,6 @@
 package com.geminifile.core.fileparser.binder;
 
+import com.geminifile.core.service.Service;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import org.json.JSONArray;
@@ -16,6 +17,7 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.MYBINDERSFILENAME;
 import static com.geminifile.core.CONSTANTS.MYBINDERSPATH;
@@ -45,7 +47,7 @@ public class BinderManager {
      */
 
     public static void start() {
-        System.out.println("[FILE] Binder Manager is Starting...");
+        Service.LOGGER.info("[FILE] Binder Manager is Starting...");
         binderDeltaOperations.clear(); // Clears delta operations
         binders.clear(); // clear binders
 
@@ -62,8 +64,8 @@ public class BinderManager {
                 // Creates a default entry in the file
                 saveMyBinders();
             } catch (IOException e) {
-                System.out.println("[FILE] Failed to create MyBinders file at: " + myBindersFile.getAbsolutePath());
-                e.printStackTrace();
+                Service.LOGGER.severe("[FILE] Failed to create MyBinders file at: " + myBindersFile.getAbsolutePath());
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
                 System.exit(5);
             }
         }
@@ -120,8 +122,8 @@ public class BinderManager {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            System.out.println("[FILE] Failed to open MyBinders file at: " + myBindersFile.getAbsolutePath());
-            e.printStackTrace();
+            Service.LOGGER.severe("[FILE] Failed to open MyBinders file at: " + myBindersFile.getAbsolutePath());
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 
@@ -135,11 +137,11 @@ public class BinderManager {
             }
             myBinders = new JSONObject(content.toString());
         } catch (JSONException e) {
-            System.out.println("[FILE] Error opening " + MYBINDERSPATH + MYBINDERSFILENAME);
+            Service.LOGGER.severe("[FILE] Error opening " + MYBINDERSPATH + MYBINDERSFILENAME);
             System.exit(5);
         } catch (FileNotFoundException e) {
-            System.out.println("[FILE] MyBinders file is not found: " + myBindersFile.getAbsolutePath());
-            e.printStackTrace();
+            Service.LOGGER.severe("[FILE] MyBinders file is not found: " + myBindersFile.getAbsolutePath());
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
         // Loads json file to binder array
         JSONArray jArr = myBinders.getJSONArray("binders");
@@ -197,7 +199,7 @@ public class BinderManager {
     }
 
     public static void restartService() {
-        System.out.println("[FILE] Binder Manager is Restarting...");
+        Service.LOGGER.info("[FILE] Binder Manager is Restarting...");
         for (Binder e : binders) {
             e.stopWatcher();
         }

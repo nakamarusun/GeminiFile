@@ -1,9 +1,13 @@
 package com.geminifile.core.fileparser;
 
+import com.geminifile.core.service.Service;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DirectoryRecurUtil {
 
@@ -14,7 +18,6 @@ public class DirectoryRecurUtil {
     public DirectoryRecurUtil(File directoryToRecur) {
         this.directoryToRecur = directoryToRecur;
     }
-
 
     private List<File> listFilesRecursivelyUtil(File path) {
 
@@ -28,8 +31,8 @@ public class DirectoryRecurUtil {
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("[BINDER] Folder is null");
-            e.printStackTrace();
+            Service.LOGGER.severe("[BINDER] Folder is null");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
 
         return recurFiles;
@@ -46,8 +49,8 @@ public class DirectoryRecurUtil {
                 }
             }
         } catch (NullPointerException e) {
-            System.out.println("[BINDER] Folder is null");
-            e.printStackTrace();
+            Service.LOGGER.severe("[BINDER] Folder is null");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
 
         return recurFiles;

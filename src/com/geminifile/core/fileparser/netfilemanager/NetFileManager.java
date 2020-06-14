@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.*;
 
@@ -18,7 +19,7 @@ public class NetFileManager implements Runnable {
     @Override
     public void run() {
         // Starts the service.
-        System.out.println("[NetFile] Starting file receiver service...");
+        Service.LOGGER.info("[NetFile] Starting file receiver service...");
 
         // Creates a new temporary folder at destination if it does not exist.
         File tempFolder = new File(TEMPNETFILEPATH + TEMPNETFOLDERNAME);
@@ -26,9 +27,9 @@ public class NetFileManager implements Runnable {
         // Checks if the directory exists
         if ( !(tempFolder.isDirectory() && tempFolder.exists()) ) {
             if (tempFolder.mkdir()) {
-                System.out.println("[NetFile] Successfully created TempNet folder.");
+                Service.LOGGER.info("[NetFile] Successfully created TempNet folder.");
             } else {
-                System.out.println("[NetFile] Error creating temp folder in:" + tempFolder.getAbsolutePath());
+                Service.LOGGER.info("[NetFile] Error creating temp folder in:" + tempFolder.getAbsolutePath());
                 System.exit(5);
             }
         }
@@ -51,8 +52,8 @@ public class NetFileManager implements Runnable {
                 // Restart PeerClientManager.
             }
         } catch (IOException e) {
-            System.out.println("[NetFile] Socket error");
-            e.printStackTrace();
+            Service.LOGGER.severe("[NetFile] Socket error");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 
@@ -66,7 +67,7 @@ public class NetFileManager implements Runnable {
             stopSock = true; // Signifies the interruption is because this method is invoked.
             ssock.close(); // Close ServerSocket
         } catch (IOException e) {
-            e.printStackTrace();
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 
