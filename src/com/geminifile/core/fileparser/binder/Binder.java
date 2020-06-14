@@ -2,6 +2,7 @@ package com.geminifile.core.fileparser.binder;
 
 import com.geminifile.core.CONSTANTS;
 import com.geminifile.core.fileparser.DirectoryRecurUtil;
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
@@ -13,6 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import static com.geminifile.core.MathUtil.generateRandomAlphaNum;
 import static java.nio.file.StandardWatchEventKinds.*;
@@ -119,11 +121,11 @@ public class Binder {
             }
             listingUpdated = true;
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("[Binder] Error getting hashing algorithm");
-            e.printStackTrace();
+            Service.LOGGER.severe("[Binder] Error getting hashing algorithm");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         } catch (IOException e) {
-            System.out.println("[Binder] Error updating binder listing");
-            e.printStackTrace();
+            Service.LOGGER.severe("[Binder] Error updating binder listing");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         } finally {
             fileListingLock.unlock();
         }
@@ -148,7 +150,7 @@ public class Binder {
         if (directoryWatcher.isAlive()) {
             return;
         }
-        System.out.println("[Binder] Starting directory watcher " + name);
+        Service.LOGGER.info("[Binder] Starting directory watcher " + name);
 
         // Registers every directory inside of the binder.
         directoryWatcher = new Thread(() -> {
@@ -168,7 +170,7 @@ public class Binder {
                 for (File e : subFileListing) {
                     // Checks if the file is a directory
                     if (e.isDirectory()) {
-//                        System.out.println("Registered: " + e.getAbsolutePath());
+//                        Service.LOGGER.info("Registered: " + e.getAbsolutePath());
                         registerSubWatcherService(e); // Registers the the new folder.
                     }
                 }
@@ -199,15 +201,15 @@ public class Binder {
                                     try {
                                         registerSubWatcherService(new File(pathName));
                                     } catch (IOException e) {
-                                        System.out.println("[Binder] Error adding new watcher to directory " + pathName);
-                                        e.printStackTrace();
+                                        Service.LOGGER.severe("[Binder] Error adding new watcher to directory " + pathName);
+                                        Service.LOGGER.log(Level.SEVERE, "exception", e);
                                     }
                                 }
 
                                 // Puts the deletions, modifies and adds to the list
                                 // If the current change is a file
                                 if (!Files.isDirectory( path.resolve(ev.context()) )) {
-                                    System.out.println("[Binder] Change in binder: " + kind.name() + " " + name + " @ " + pathName + ": " + new Date());
+                                    Service.LOGGER.fine("[Binder] Change in binder: " + kind.name() + " " + name + " @ " + pathName + ": " + new Date());
                                     String relPath = pathName.replace(directory.getAbsolutePath(), "");
                                     if (kind != ENTRY_DELETE) {
                                         // Adds this to the entry if it is not there yet
@@ -251,19 +253,19 @@ public class Binder {
 
                     } catch (InterruptedException ex) {
                         // Quit the thread
-                        System.out.println("[Binder] Closing watcher " + id);
+                        Service.LOGGER.info("[Binder] Closing watcher " + id);
                         mainWatcher.close();
                         return;
                     } catch (NoSuchAlgorithmException e) {
-                        System.out.println("[Binder] Wrong algorithm in the file hashing.");
-                        e.printStackTrace();
+                        Service.LOGGER.severe("[Binder] Wrong algorithm in the file hashing.");
+                        Service.LOGGER.log(Level.SEVERE, "exception", e);
                     }
 
                 }
 
             } catch (IOException e) {
-                System.out.println("[Binder] Error creating watcher");
-                e.printStackTrace();
+                Service.LOGGER.severe("[Binder] Error creating watcher");
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
         }, "BinderWatcher-" + id);
 
@@ -281,7 +283,7 @@ public class Binder {
             }
         }
         WatchKey key = subDir.register(mainWatcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-        System.out.println("Registered " + subDir.toString() + " to directory watcher");
+        Service.LOGGER.info("Registered " + subDir.toString() + " to directory watcher");
 
         keyDirectoryMap.put(key, subDir); // Puts the keyDirectoryMap
     }
@@ -296,7 +298,7 @@ public class Binder {
                 obj.wait(CONSTANTS.WAITUPDATEFOR * 1000);
             } while (changeInBinderCheck);
         }
-        System.out.println("[Binder] " + filesToSync.size() + " Change detected in binder '" + name + "'. Will query to other peers.");
+        Service.LOGGER.info("[Binder] " + filesToSync.size() + " Change detected in binder '" + name + "'. Will query to other peers.");
         queryFileWithOtherPeers();
     }
 
@@ -304,10 +306,10 @@ public class Binder {
         if (filesToSync.size() == 0) return;
         // Do the send operations here.
         BinderFileDelta delta = new BinderFileDelta(id);
-        System.out.println("Will send files:");
+        Service.LOGGER.info("Will send files:");
         for (FileListing e : filesToSync) {
             delta.addOtherPeerNeed(e.getRelativePath());
-            System.out.println(e.getRelativePath());
+            Service.LOGGER.info(e.getRelativePath());
         }
         BinderManager.addBinderDeltaOperation(delta);
         PeerCommunicatorManager.sendToAllPeers(new MsgWrapper("WantToSync-" + id + ":" + delta.getToken() + ":" + filesToSync.size(), MsgType.ASK));

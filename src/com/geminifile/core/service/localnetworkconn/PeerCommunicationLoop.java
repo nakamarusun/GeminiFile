@@ -1,6 +1,7 @@
 package com.geminifile.core.service.localnetworkconn;
 
 import com.geminifile.core.service.Node;
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localnetworkconn.comms.PeerMsgProcessorThread;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
@@ -13,6 +14,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
 
 // TODO: STOP THIS LOOP WHEN SERVICE IS STOPPED.
 public class PeerCommunicationLoop implements Runnable {
@@ -57,7 +59,7 @@ public class PeerCommunicationLoop implements Runnable {
 
                 MsgWrapper msg = (MsgWrapper) inObj;
 
-                System.out.println("[PEER] Received Message Type " + msg.getType().name());
+                Service.LOGGER.info("[PEER] Received Message Type " + msg.getType().name());
 
                 // Processes the message in a separate thread
                 PeerMsgProcessorThread inProcessorThread = new PeerMsgProcessorThread(this, msg);
@@ -71,14 +73,14 @@ public class PeerCommunicationLoop implements Runnable {
                 for (PeerMsgProcessorThread tr : msgProcessorThreads) {
                     tr.interrupt();
                 }
-                System.out.println("[PEER] Disconnected with: " + node.getIp().getHostAddress());
+                Service.LOGGER.warning("[PEER] Disconnected with: " + node.getIp().getHostAddress());
                 // Tries to close the IO Stream
                 try {
                     inStream.close();
                     outStream.close();
                 } catch (IOException ex) {
-                    System.out.println("[PEER] Failed to close communication io stream");
-                    e.printStackTrace();
+                    Service.LOGGER.severe("[PEER] Failed to close communication io stream");
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 }
                 break;
             } catch (EOFException e) {
@@ -87,21 +89,21 @@ public class PeerCommunicationLoop implements Runnable {
                 for (PeerMsgProcessorThread tr : msgProcessorThreads) {
                     tr.interrupt();
                 }
-                System.out.println("[PEER] Disconnected from: " + node.getIp().getHostAddress());
+                Service.LOGGER.warning("[PEER] Disconnected from: " + node.getIp().getHostAddress());
                 // Tries to close the IO Stream
                 try {
                     inStream.close();
                     outStream.close();
                 } catch (IOException ex) {
-                    System.out.println("[PEER] Failed to close communication io stream");
-                    e.printStackTrace();
+                    Service.LOGGER.severe("[PEER] Failed to close communication io stream");
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 }
                 break;
             } catch (ClassNotFoundException e) {
-                System.out.println("[PEER] Class deserialization error.");
-                e.printStackTrace();
+                Service.LOGGER.severe("[PEER] Class deserialization error.");
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
         }
     }
@@ -112,14 +114,14 @@ public class PeerCommunicationLoop implements Runnable {
         while(true) {
             try {
                 MsgWrapper msg = outMessageQueue.take();
-                System.out.println("[PEER] Sending Message Type " + msg.getType().name());
+                Service.LOGGER.info("[PEER] Sending Message Type " + msg.getType().name());
                 outStream.writeObject(msg);
             } catch (InterruptedException e) {
                 // TODO: QUIT OR RESTART WHEN INTERRUPTED.
                 return;
             } catch (IOException e) {
-                System.out.println("Error writing message to: " + node.getName() + " " + node.getIp().getHostAddress());
-                e.printStackTrace();
+                Service.LOGGER.info("Error writing message to: " + node.getName() + " " + node.getIp().getHostAddress());
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
         }
 

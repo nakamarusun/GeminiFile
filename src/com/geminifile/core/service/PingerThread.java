@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.*;
 
@@ -33,7 +34,7 @@ public class PingerThread implements Runnable {
 
     @Override
     public void run() {
-//        System.out.println("Starting pinger " + factor);
+//        Service.LOGGER.finer("Starting pinger " + factor);
         Thread.currentThread().setName("Pinger-" + factor);
         // This sections test for all the ip address connections.
         // Checks for active ip addresses, and inserts it into an arrayList
@@ -41,7 +42,7 @@ public class PingerThread implements Runnable {
         for (int i = 0; i < repetition; i++) {
             // Check whether thread is interrupted, and stops it if it has to.
             if (Thread.currentThread().isInterrupted()) {
-//                System.out.println("Pinger thread interrupted at " + factor );
+//                Service.LOGGER.warning("Pinger thread interrupted at " + factor );
                 return;
             }
             int ipToPing = factor + (i * IPPINGERTHREADS);
@@ -58,14 +59,14 @@ public class PingerThread implements Runnable {
                 try {
                     Socket tryOpen = new Socket();
                     tryOpen.connect(new InetSocketAddress(ip, COMMPORT), PINGTIMEOUT);
-//                System.out.println("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
+//                Service.LOGGER.finer("Connected with ip: " + tryOpen.getInetAddress().getHostAddress());
                     // Do the msg query here
                     ObjectOutputStream localObjectOut = new ObjectOutputStream(tryOpen.getOutputStream());
                     ObjectInputStream localObjectIn = new ObjectInputStream(tryOpen.getInputStream());
 
                     // Send a connection query to the device with intention to ping
                     localObjectOut.writeObject(new MsgIdentification("ping", MsgType.CONNQUERY, Service.getMyNode()));
-//                System.out.println("Sent ping to ip: " + tryOpen.getInetAddress().getHostAddress());
+//                Service.LOGGER.finer("Sent ping to ip: " + tryOpen.getInetAddress().getHostAddress());
                     // See if the reply is good
                     try {
                         MsgWrapper reply = (MsgWrapper)localObjectIn.readObject();
@@ -74,31 +75,31 @@ public class PingerThread implements Runnable {
                             throw new IOException("Reply not expected from peer");
                         }
                     } catch (ClassNotFoundException e) {
-                        System.out.println("Class deserialization error");
-                        e.printStackTrace();
+                        Service.LOGGER.severe("Class deserialization error");
+                        Service.LOGGER.log(Level.SEVERE, "exception", e);
                     }
                     // Msg query ends
 
                     if (Thread.currentThread().isInterrupted()) {
-//                    System.out.println("Pinger thread interrupted at " + factor );
+//                    Service.LOGGER.warning("Pinger thread interrupted at " + factor );
                         return;
                     }
                     PingerManager.addActiveTempIp(ip);   // add to temporary vector
                     tryOpen.close();
-                    System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
+                    Service.LOGGER.info(ip.getHostAddress() + ":" + COMMPORT + " Is open!");
                 } catch (IOException e) {
                     // If connection is error
-//                    System.out.println(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
+//                    Service.LOGGER.finer(ip.getHostAddress() + ":" + COMMPORT + " Not open deh or timeout");
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
 
         }
 
 
-//        System.out.println("Stopping pinger " + factor);
+//        Service.LOGGER.warning("Stopping pinger " + factor);
     }
 
     public static void setIpBeginning(String ipBeginning) {

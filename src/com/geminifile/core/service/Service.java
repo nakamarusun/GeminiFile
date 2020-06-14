@@ -1,11 +1,13 @@
 package com.geminifile.core.service;
 
+import com.geminifile.core.GeminiLogger;
 import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 
+import java.io.IOException;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -14,6 +16,8 @@ import java.util.Enumeration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
@@ -23,7 +27,16 @@ public class Service {
     private static Thread networkingThread;
     private static Node myNode;
 
+    public final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME); // Main logger
+
     public static void start() {
+
+        // Initializes the logger
+        try {
+            GeminiLogger.initialize();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "exception", e);
+        }
 
         // Add a shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -31,7 +44,7 @@ public class Service {
             BinderManager.saveMyBinders();
         }, "ShutdownHook"));
 
-        System.out.println("Service is starting...");
+        LOGGER.info("Service is starting...");
         // Starts local server message command processor
         LocalServerCommunicator.startLocalServer();
 
@@ -39,7 +52,7 @@ public class Service {
         networkingThread = Thread.currentThread();
 
         while (true) {
-            System.out.println("Networking service is starting...");
+            LOGGER.info("Networking service is starting...");
 
             // Checking thread.
             // Assigns the current ip address to the service variable
@@ -49,10 +62,10 @@ public class Service {
                 String ip = currentIp.getHostAddress();
                 // Sets a beginning for all of the pinger threads.
                 PingerThread.setIpBeginning(ip.substring(0, ip.lastIndexOf('.') + 1));
-                System.out.println("ip is: " + currentIp.getHostAddress());
+                LOGGER.info("ip is: " + currentIp.getHostAddress());
             } catch (SocketException e) {
-                System.out.println("System cannot resolve a valid IP address !");
-                e.printStackTrace();
+                LOGGER.info("System cannot resolve a valid IP address !");
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
                 System.exit(-1);
             }
 
@@ -80,7 +93,7 @@ public class Service {
                 try {
                     name = InetAddress.getLocalHost().getHostName(); // Tries to get the machine's name from InetAddress stuff.
                 } catch (UnknownHostException e) {
-                    e.printStackTrace();
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 }
 
                 // Assigns myNode
@@ -91,7 +104,7 @@ public class Service {
                         System.getProperty("os.name")
                 );
             } catch (NoSuchAlgorithmException | SocketException e) {
-                e.printStackTrace();
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
                 System.exit(5);
             }
 
@@ -114,8 +127,8 @@ public class Service {
                 NetFileManager.start();
 
             } else {
-                System.out.println("Cannot start networking service, ip is " + currentIp.getHostAddress());
-                System.out.println(myNode.toString());
+                LOGGER.info("Cannot start networking service, ip is " + currentIp.getHostAddress());
+                LOGGER.info(myNode.toString());
             }
 
             // ScheduledExecutionService for checking whether self ip address is the same to warrant a restart.

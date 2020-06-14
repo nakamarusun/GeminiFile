@@ -106,7 +106,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                 msgProc = new MsgWrapper("Pong", MsgType.INFO);
                 break;
             case INFO:
-                System.out.println(msg.toString());
+                Service.LOGGER.info(msg.toString());
                 break;
             case COMMAND:
                 StringBuilder additionalStr = new StringBuilder();
@@ -131,7 +131,7 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                             for (String name : foldersToSync) {
                                 if (e.getName().equals(name)) {
                                     // Sync
-                                    System.out.println("[Binder] Got request to sync binder " + name + ". Sending request to all peers.");
+                                    Service.LOGGER.info("[Binder] Got request to sync binder " + name + ". Sending request to all peers.");
                                     PeerCommunicatorManager.sendToAllPeers(new MsgWrapper("AskBinderHave-" + e.getId(), MsgType.ASK));
                                 }
                             }

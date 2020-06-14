@@ -4,11 +4,13 @@ import com.geminifile.core.MathUtil;
 import com.geminifile.core.fileparser.binder.Binder;
 import com.geminifile.core.fileparser.binder.BinderFileDelta;
 import com.geminifile.core.fileparser.binder.BinderManager;
+import com.geminifile.core.service.Service;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.BYTESIZE;
 import static com.geminifile.core.CONSTANTS.FILEPORT;
@@ -29,7 +31,7 @@ public class NetFileSenderThread implements Runnable {
         try {
             // Attempts a connection to the designated peer with the FILEPORT port.
             Socket sock = new Socket(ip, FILEPORT);
-            System.out.println("[NetFile] Starting delta send operation");
+            Service.LOGGER.info("[NetFile] Starting delta send operation");
             // Define iostream
             ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
             ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
@@ -56,11 +58,11 @@ public class NetFileSenderThread implements Runnable {
 
                     if (!file.exists()) {
                         // If file does not exist then, skip
-                        System.out.println("[NetFile] Error reading file to send: " + path);
+                        Service.LOGGER.severe("[NetFile] Error reading file to send: " + path);
                         continue;
                     }
 
-                    System.out.println("[NetFile] Will send file: " + path);
+                    Service.LOGGER.info("[NetFile] Will send file: " + path);
 
                     // Sends the file metadata to the other peer.
                     NetFile fileMetadata = new NetFile(binderDelta.getToken(), files, file.length());
@@ -92,13 +94,13 @@ public class NetFileSenderThread implements Runnable {
                         localObjectOut.writeObject(fileBlock); // Sends it to the other machine.
                     } while (bytesSendSize > 0);
 
-                    System.out.println("[NetFile] Sent " + fileMetadata.getFileName() + " with " + byteSent + " Bytes in " + blockNum + " block(s)");
+                    Service.LOGGER.info("[NetFile] Sent " + fileMetadata.getFileName() + " with " + byteSent + " Bytes in " + blockNum + " block(s)");
 
 //                localObjectOut.writeObject(new NetFile("0", "", 0)); // Sends an EOF prompt
                     fileStream.close(); // Close file input.
                 } catch (IOException e) {
-                    System.out.println("[NetFile] Error processing file block");
-                    e.printStackTrace();
+                    Service.LOGGER.severe("[NetFile] Error processing file block");
+                    Service.LOGGER.log(Level.SEVERE, "exception", e);
                 } finally {
                     try {
                         if (fileStream != null) {
@@ -120,14 +122,14 @@ public class NetFileSenderThread implements Runnable {
             // Closes object IO
             localObjectOut.close();
             localObjectIn.close();
-            System.out.println("[NetFile] Completed delta send operation token " + binderDelta.getToken());
+            Service.LOGGER.info("[NetFile] Completed delta send operation token " + binderDelta.getToken());
 
         } catch (SocketException e) {
             // Means connection suddenly severs
-            System.out.println("[NetFile] Failed to complete delta send operation token " + binderDelta.getToken());
+            Service.LOGGER.severe("[NetFile] Failed to complete delta send operation token " + binderDelta.getToken());
         } catch (IOException e) {
-            System.out.println("[NetFile] Error opening socket");
-            e.printStackTrace();
+            Service.LOGGER.severe("[NetFile] Error opening socket");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 }

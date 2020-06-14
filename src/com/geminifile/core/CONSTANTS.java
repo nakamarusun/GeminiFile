@@ -24,4 +24,7 @@ public class CONSTANTS {
 
     public static final int WAITUPDATEFOR = 10; // in s, the amount of time to wait for another update in a binder before sending a query message.
 
+    public static final String LOGFILE = "gemini.log"; // log file name.
+    public static final String LOGFILEPATH = "." + File.separator; // Path to the log file.
+
 }

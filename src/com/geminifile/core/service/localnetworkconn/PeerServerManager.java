@@ -4,6 +4,7 @@ package com.geminifile.core.service.localnetworkconn;
 // Requests will be send to PeerClientManager in the other's server geminifile instance.
 
 import com.geminifile.core.service.PingerManager;
+import com.geminifile.core.service.Service;
 
 import java.net.InetAddress;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class PeerServerManager implements Runnable {
                         // Checks if the ip is in the PeerTable
                         if (PeerCommunicatorManager.isInPeerTable(e)) {
                             // if it's inside, then restart the loop.
-                            System.out.println("[PEER] Already connected with " + e.getHostAddress());
+                            Service.LOGGER.info("[PEER] Already connected with " + e.getHostAddress());
                             continue;
                         }
                         // TODO: DO THIS TO ALL OF THE THREAD INTERRUPTIONS BY stopService()

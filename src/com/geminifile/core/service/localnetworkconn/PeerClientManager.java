@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.COMMPORT;
 
@@ -40,7 +41,7 @@ public class PeerClientManager implements Runnable {
                 Socket socketRef = ssock.accept();
                 PeerCommunicatorManager.lockPeerConnectionLock(); // Attempts to get lock
                 try {
-//                System.out.println("Connected with ip: " + socketRef.getInetAddress().getHostAddress());
+//                Service.LOGGER.info("Connected with ip: " + socketRef.getInetAddress().getHostAddress());
                     // Check if the socket's ip is already in the peer table
                     if (PeerCommunicatorManager.isInPeerTable(socketRef.getInetAddress())) {
                         socketRef.close();
@@ -60,8 +61,8 @@ public class PeerClientManager implements Runnable {
                 // Restart PeerClientManager.
             }
         } catch (IOException e) {
-            System.out.println("[PEER] Socket error");
-            e.printStackTrace();
+            Service.LOGGER.severe("[PEER] Socket error");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 
@@ -70,7 +71,7 @@ public class PeerClientManager implements Runnable {
             stopSock = true; // Signifies the interruption is because this method is invoked.
             ssock.close(); // Close ServerSocket
         } catch (IOException e) {
-            e.printStackTrace();
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 

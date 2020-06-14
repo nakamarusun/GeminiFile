@@ -1,5 +1,6 @@
 package com.geminifile.core.service.localhostconn;
 
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localhostconn.msgprocessor.LocalServerMsgProcessor;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
@@ -13,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Scanner;
+import java.util.logging.Level;
 
 import static com.geminifile.core.CONSTANTS.LOCALPORT;
 
@@ -39,7 +41,7 @@ public class LocalServerCommunicator implements Runnable {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
 
         try {
@@ -58,7 +60,7 @@ public class LocalServerCommunicator implements Runnable {
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
         }
     }
 
@@ -70,13 +72,13 @@ public class LocalServerCommunicator implements Runnable {
         This module is used to query information and send commands towards that service.
         By setting up a local host server, it can receive and send messages and commands.
          */
-        System.out.println("[LSERVER] Opening in localhost:" + LOCALPORT);
+        Service.LOGGER.info("[LSERVER] Opening in localhost:" + LOCALPORT);
         ServerSocket ssock = null;
         try {
             ssock = new ServerSocket(LOCALPORT);
         } catch (IOException e) {
-            System.out.println("[LSERVER] Failed to open server socket");
-            e.printStackTrace();
+            Service.LOGGER.severe("[LSERVER] Failed to open server socket");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
             System.exit(5); // Failed to open local server socket
         }
 
@@ -84,7 +86,7 @@ public class LocalServerCommunicator implements Runnable {
             // Main loop for accepting new clients
             try {
                 Socket sock = ssock.accept(); // Accepts connection
-                System.out.println("[LSERVER] Connected !");
+                Service.LOGGER.info("[LSERVER] Connected !");
 
                 ObjectOutputStream localObjectOut = new ObjectOutputStream(sock.getOutputStream());
                 ObjectInputStream localObjectIn = new ObjectInputStream(sock.getInputStream());
@@ -94,7 +96,7 @@ public class LocalServerCommunicator implements Runnable {
                     // Main loop for receiving local message.
                     try {
                         MsgWrapper msg = (MsgWrapper) localObjectIn.readObject();
-                        System.out.println("[LCLIENT] " + msg.toString());
+                        Service.LOGGER.info("[LCLIENT] " + msg.toString());
 
                         MsgWrapper msgReply = (new LocalServerMsgProcessor(msg)).process(); // Processes the input message
 
@@ -104,16 +106,16 @@ public class LocalServerCommunicator implements Runnable {
                         }
 
                     } catch (ClassNotFoundException e) {
-                        System.out.println("[LSERVER] Class deserialization error");
-                        e.printStackTrace();
+                        Service.LOGGER.severe("[LSERVER] Class deserialization error");
+                        Service.LOGGER.log(Level.SEVERE, "exception", e);
                     }
                 }
 
             } catch (SocketException | EOFException ec) {
-                System.out.println("[LSERVER] Client Disconnected.");
+                Service.LOGGER.severe("[LSERVER] Client Disconnected.");
             } catch (IOException e) {
-                System.out.println("[LSERVER] Socket error.");
-                e.printStackTrace();
+                Service.LOGGER.severe("[LSERVER] Socket error.");
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
         }
     }

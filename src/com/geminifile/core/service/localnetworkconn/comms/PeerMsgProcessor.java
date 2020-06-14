@@ -6,6 +6,7 @@ import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.fileparser.binder.FileListing;
 import com.geminifile.core.fileparser.netfilemanager.NetFileSenderThread;
 import com.geminifile.core.service.MsgProcessor;
+import com.geminifile.core.service.Service;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicationLoop;
 import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
@@ -105,7 +107,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             for (BinderFileDelta delta : BinderManager.getAllBinderFileDelta()) {
                                 // If there is a binder of the same id in the delta operation.
                                 if (delta.getId().equals(binderRef.getId())) {
-                                    System.out.println("[Binder] Binder " + binderRef.getName() + " is currently in operation. Cancelling AskBinderReply..." );
+                                    Service.LOGGER.info("[Binder] Binder " + binderRef.getName() + " is currently in operation. Cancelling AskBinderReply..." );
                                     cancelThisBinder = true;
                                     break;
                                 }
@@ -132,7 +134,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
                         } catch (NullPointerException ex) {
                             // If failed to get the current binder from the binder manager
-                            ex.printStackTrace();
+                            Service.LOGGER.log(Level.SEVERE, "exception", ex);
                         }
                     }
 
@@ -170,7 +172,6 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     }
 
                     msgProc = new MsgWrapper("AskBinderConfirmed-" + finalString.toString(), MsgType.ASK);
-                    System.out.println(msgProc.toString());
 
                 } else if (msg.getContent().startsWith("AskBinderConfirmed-")) {
 
@@ -218,7 +219,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                 }
                 break;
             case INFO:
-                System.out.println(msg.toString());
+                Service.LOGGER.info(msg.toString());
                 break;
         }
 
