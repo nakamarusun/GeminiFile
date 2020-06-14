@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
@@ -26,6 +27,7 @@ public class Controller {
     public AnchorPane currentPane;
 
     private final ToggleGroup navigationToggle = new ToggleGroup();
+    public VBox navigationBar;
 
     public void initialize() throws IOException {
         // Sets all of the navigation toggle buttons into a group
@@ -44,18 +46,33 @@ public class Controller {
         // Loads the homePane to the canvas
         currentPane = homePane;
         mainCanvas.getChildren().add(homePane);
+        updateMainCanvasConstraints();
     }
 
     public void changePaneToHome() {
-        mainCanvas.getChildren().remove(currentPane);
-        currentPane = homePane;
-        mainCanvas.getChildren().add(currentPane);
+        changeMainCanvasPane(homePane);
+        updateMainCanvasConstraints();
     }
 
     public void changePaneToBinders() {
+        changeMainCanvasPane(bindersPane);
+        updateMainCanvasConstraints();
+    }
+
+    private void changeMainCanvasPane(AnchorPane pane) {
+        // Changes the main canvas panel into something else specified.
         mainCanvas.getChildren().remove(currentPane);
-        currentPane = bindersPane;
+//        pane.setPrefWidth(mainCanvas.getWidth());
+//        pane.setPrefHeight(mainCanvas.getHeight());
+        currentPane = pane;
         mainCanvas.getChildren().add(currentPane);
+    }
+
+    public void updateMainCanvasConstraints() {
+        AnchorPane.setRightAnchor(currentPane, 0.0);
+        AnchorPane.setLeftAnchor(currentPane, 0.0);
+        AnchorPane.setTopAnchor(currentPane, 0.0);
+        AnchorPane.setBottomAnchor(currentPane, 0.0);
     }
 
 }

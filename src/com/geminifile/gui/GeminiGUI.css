@@ -5,26 +5,37 @@
 .bottom-button {
     -fx-background-color: #582a62;
     -fx-text-alignment: center;
-    -fx-font-family: "Helvetica";
+    -fx-font-family: "sans-serif";
     -fx-text-fill: #FFF;
     -fx-font-size: 16px;
     -fx-pref-width: 8em;
 }
 
-.bottom-button:hover{
+.bottom-button:hover {
     -fx-background-color: #7e3587;
 }
 
-.bottom-button:pressed{
+.bottom-button:pressed {
     -fx-background-color: #1B9AAA;
 }
 
-.bottom-button:selected{
+.bottom-button:selected {
     -fx-background-color: #1B9AAA;
 }
 
 .bottom-button-icon {
     -fx-blend-mode: src-over;
+}
+
+.common-text {
+    -fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+}
+
+.header-text {
+    -fx-font-family: "sans-serif";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
 }
 
 .bottom {

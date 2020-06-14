@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.HomeController">
+   <children>
+      <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Settings" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
+      <CheckBox layoutX="32.0" layoutY="72.0" mnemonicParsing="false" text="Auto start service" />
+      <CheckBox layoutX="32.0" layoutY="97.0" mnemonicParsing="false" text="Save logs" />
+      <CheckBox layoutX="32.0" layoutY="122.0" mnemonicParsing="false" text="Bababooey" />
+   </children>
+</AnchorPane>

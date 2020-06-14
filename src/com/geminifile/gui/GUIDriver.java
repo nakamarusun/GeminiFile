@@ -17,10 +17,10 @@ public class GUIDriver extends Application {
         primaryStage.setTitle("GeminiFile Prototype 1"); // Title
 
         // Minimum sizes
-        primaryStage.setMinHeight(400);
-        primaryStage.setMinWidth(600);
+        primaryStage.setMinWidth(600.0);
+        primaryStage.setMinHeight(437.0);
 
-        primaryStage.setScene(new Scene(root, 600, 400)); // Initial app size
+        primaryStage.setScene(new Scene(root, 800, 600)); // Initial app size
 
         primaryStage.show(); // Show the app
     }

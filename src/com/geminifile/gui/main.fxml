@@ -12,11 +12,11 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox minHeight="300.0" minWidth="400.0" prefHeight="400.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.Controller">
+<VBox minHeight="400.0" minWidth="600.0" prefHeight="600.0" prefWidth="800.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.Controller">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
       <children>
-            <VBox alignment="BOTTOM_CENTER" layoutY="329.0" prefHeight="71.0" prefWidth="600.0" styleClass="bottom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <VBox fx:id="navigationBar" alignment="BOTTOM_CENTER" layoutY="329.0" prefHeight="70.0" prefWidth="600.0" styleClass="bottom" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
                   <HBox alignment="CENTER" prefHeight="43.0" prefWidth="600.0">
                      <children>
@@ -96,7 +96,7 @@
                   </Text>
                </children>
             </VBox>
-            <AnchorPane fx:id="mainCanvas" layoutX="14.0" layoutY="14.0" prefHeight="316.0" prefWidth="572.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <AnchorPane fx:id="mainCanvas" layoutX="14.0" layoutY="14.0" minHeight="330.0" minWidth="600.0" prefHeight="330.0" prefWidth="600.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       </children>
     </AnchorPane>
   </children>

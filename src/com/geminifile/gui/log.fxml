@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.HomeController">
+   <children>
+      <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Log" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
+   </children>
+</AnchorPane>

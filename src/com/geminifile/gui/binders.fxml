@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Arc?>
+<?import javafx.scene.text.Text?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.BindersController">
    <children>
-      <Arc fill="DODGERBLUE" layoutX="315.0" layoutY="150.0" length="270.0" radiusX="100.0" radiusY="100.0" startAngle="45.0" stroke="BLACK" strokeType="INSIDE" type="ROUND" />
+      <Text layoutX="48.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Binders" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
    </children>
 </AnchorPane>
