@@ -52,7 +52,7 @@
                               </ImageView>
                            </graphic>
                         </ToggleButton>
-                        <ToggleButton fx:id="settingsToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="Settings">
+                        <ToggleButton fx:id="settingsToggleNavigation" mnemonicParsing="false" onAction="#changePaneToSettings" styleClass="bottom-button" text="Settings">
                            <graphic>
                               <ImageView fitHeight="21.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
                                  <image>
@@ -68,7 +68,7 @@
                               </ImageView>
                            </graphic>
                         </ToggleButton>
-                        <ToggleButton fx:id="aboutToggleNavigation" mnemonicParsing="false" styleClass="bottom-button" text="About">
+                        <ToggleButton fx:id="logToggleNavigation" mnemonicParsing="false" onAction="#changePaneToLog" styleClass="bottom-button" text="Log">
                            <graphic>
                               <ImageView fitHeight="19.0" fitWidth="19.0" pickOnBounds="true" preserveRatio="true" styleClass="bottom-button-icon">
                                  <image>

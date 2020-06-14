@@ -2,6 +2,24 @@
 
 }
 
+.logo-font-main {
+    -fx-text-alignment: center;
+    -fx-font-family: "sans-serif";
+    -fx-fill: #FFF;
+    -fx-font-size: 18px;
+}
+
+.logo-font-sub {
+    -fx-text-alignment: center;
+    -fx-font-family: "sans-serif";
+    -fx-fill: #FFF;
+    -fx-font-size: 10px;
+}
+
+.logo-circle {
+    -fx-fill: #1c2454;
+}
+
 .bottom-button {
     -fx-background-color: #582a62;
     -fx-text-alignment: center;

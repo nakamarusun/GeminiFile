@@ -1,18 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.HomeController">
    <children>
-      <Text layoutX="38.0" layoutY="277.515625" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binders:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="49.517578125" AnchorPane.leftAnchor="38.0" />
-      <Text layoutX="38.0" layoutY="294.828125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Last Synced:" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="38.0" />
-      <Text fx:id="binderCount" layoutX="155.0" layoutY="277.13671875" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="49.896484375" AnchorPane.leftAnchor="155.0" />
-      <Text fx:id="lastSyncedDate" layoutX="155.0" layoutY="293.828125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="33.0" AnchorPane.leftAnchor="155.0" />
+      <Text layoutX="38.0" layoutY="296.34375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binders:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="30.689453125" AnchorPane.leftAnchor="38.0" />
+      <Text layoutX="38.0" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Last Synced:" AnchorPane.bottomAnchor="14.171875" AnchorPane.leftAnchor="38.0" />
+      <Text fx:id="binderCount" layoutX="155.0" layoutY="295.96484375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="31.068359375" AnchorPane.leftAnchor="155.0" />
+      <Text fx:id="lastSyncedDate" layoutX="155.0" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="14.171875" AnchorPane.leftAnchor="155.0" />
       <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Home" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
-      <Text layoutX="398.048828125" layoutY="294.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="IP Address:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="33.0" AnchorPane.rightAnchor="115.16796875" />
-      <Text fx:id="selfIpAddress" layoutX="493.0" layoutY="293.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" textAlignment="RIGHT" AnchorPane.bottomAnchor="34.033203125" AnchorPane.rightAnchor="38.0" />
-      <Separator layoutX="20.0" layoutY="247.0" prefHeight="0.0" prefWidth="556.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+      <Text layoutX="388.29296875" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="IP Address:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="14.171875" AnchorPane.rightAnchor="124.923828125" />
+      <Text fx:id="selfIpAddress" layoutX="544.58984375" layoutY="311.828125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" textAlignment="RIGHT" AnchorPane.bottomAnchor="15.205078125" AnchorPane.rightAnchor="47.6240234375" />
+      <Separator layoutX="20.0" layoutY="273.0" prefHeight="0.0" prefWidth="556.0" AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+      <VBox alignment="CENTER" layoutX="174.0" layoutY="57.0" prefHeight="216.0" prefWidth="252.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="174.0" AnchorPane.rightAnchor="174.0" AnchorPane.topAnchor="57.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                     <children>
+                        <ImageView fx:id="logoMainFlap" fitHeight="210.0" fitWidth="212.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <image>
+                              <Image url="@img/GeminiFlap1.png" />
+                           </image>
+                        </ImageView>
+                        <ImageView fx:id="logoSubFlap" fitHeight="210.0" fitWidth="212.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@img/GeminiFlap2.png" />
+                           </image>
+                        </ImageView>
+                        <Circle fx:id="logoCircle" fill="#1c2452" layoutX="106.5" layoutY="105.0" radius="40.5" stroke="TRANSPARENT" strokeType="INSIDE" styleClass="logo-circle" />
+                        <Text layoutX="50.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-main" text="Synced" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
+                        <Text layoutX="50.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-sub" text="Status OK" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
+                        <Button fx:id="logoButton" layoutX="75.0" layoutY="74.0" mnemonicParsing="false" onMouseClicked="#clickCircle" onMouseEntered="#hoverCircle" onMouseExited="#exitCircle" opacity="0.0" prefHeight="63.0" prefWidth="64.0" text="Button" />
+                     </children>
+                  </AnchorPane>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
    </children>
 </AnchorPane>

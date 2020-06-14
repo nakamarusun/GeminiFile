@@ -11,6 +11,11 @@ public class MathUtil {
         return (rand.nextInt(max - min + 1) + min);
     }
 
+    public static boolean randomBoolean() {
+        Random rand = new Random();
+        return rand.nextBoolean();
+    }
+
     public static String generateRandomAlphaNum(int length) {
         // Generates an alpha numeric string with specified length
         StringBuilder str = new StringBuilder();
