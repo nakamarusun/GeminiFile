@@ -33,6 +33,11 @@ public class HomeController {
     public final Paint hoverColor = Paint.valueOf("#243d75");
     public final Paint clickColor = Paint.valueOf("#3b689c");
 
+    public Text logoMainText;
+    public Text logoSubText;
+
+    private boolean serviceStarted = false;
+
     public void initialize() {
         binderCount.setText("-");
         selfIpAddress.setText("-");
@@ -41,12 +46,10 @@ public class HomeController {
         // Sets the animation for the main flap
         mainFlapRotator = new RotateTransition();
         mainFlapRotator.setOnFinished(actionEvent -> regenerateMainFlapRotator());
-        regenerateMainFlapRotator();
 
         // Sets the animation for sub flap
         subFlapRotator = new RotateTransition();
         subFlapRotator.setOnFinished(actionEvent -> regenerateSubFlapRotator());
-        regenerateSubFlapRotator();
 
         logoCircle.setFill(defaultColor);
     }
@@ -75,6 +78,17 @@ public class HomeController {
 
     public void clickCircle() {
         logoCircle.setFill(clickColor);
+        // If service hasn't been started yet, start service.
+        if (!serviceStarted) {
+            serviceStarted = true;
+            // Change texts
+            logoMainText.setText("Starting");
+            logoSubText.setText("Please Wait..");
+
+            // Start animations
+            regenerateMainFlapRotator();
+            regenerateSubFlapRotator();
+        }
     }
 
     public void exitCircle() {

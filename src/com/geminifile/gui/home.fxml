@@ -37,8 +37,8 @@
                            </image>
                         </ImageView>
                         <Circle fx:id="logoCircle" fill="#1c2452" layoutX="106.5" layoutY="105.0" radius="40.5" stroke="TRANSPARENT" strokeType="INSIDE" styleClass="logo-circle" />
-                        <Text layoutX="50.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-main" text="Synced" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
-                        <Text layoutX="50.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-sub" text="Status OK" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
+                        <Text fx:id="logoMainText" layoutX="50.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-main" text="Start" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
+                        <Text fx:id="logoSubText" layoutX="50.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-sub" text="GeminiFile" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
                         <Button fx:id="logoButton" layoutX="75.0" layoutY="74.0" mnemonicParsing="false" onMouseClicked="#clickCircle" onMouseEntered="#hoverCircle" onMouseExited="#exitCircle" opacity="0.0" prefHeight="63.0" prefWidth="64.0" text="Button" />
                      </children>
                   </AnchorPane>
