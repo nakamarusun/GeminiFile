@@ -33,7 +33,7 @@ public class Service {
 
         // Initializes the logger
         try {
-            GeminiLogger.initialize();
+            GeminiLogger.initialize(true, true);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "exception", e);
         }

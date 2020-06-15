@@ -27,4 +27,7 @@ public class CONSTANTS {
     public static final String LOGFILE = "gemini.log"; // log file name.
     public static final String LOGFILEPATH = "." + File.separator; // Path to the log file.
 
+    public static final String CONFIGFILE = "gemini.conf"; // config file name.
+    public static final String CONFIGFILEPATH = "." + File.separator; // Path to the config file.
+
 }

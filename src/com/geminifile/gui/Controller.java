@@ -1,5 +1,9 @@
 package com.geminifile.gui;
 
+import com.geminifile.gui.canvas.BindersController;
+import com.geminifile.gui.canvas.HomeController;
+import com.geminifile.gui.canvas.LogController;
+import com.geminifile.gui.canvas.SettingsController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
@@ -11,9 +15,12 @@ import java.io.IOException;
 
 public class Controller {
 
+    public static Controller mainControllerReference;
+
     // All of the FXML objects
     public AnchorPane mainCanvas; // Main canvas in the app.
 
+    // Navigation toggle button
     public ToggleButton logToggleNavigation;
     public ToggleButton settingsToggleNavigation;
     public ToggleButton bindersToggleNavigation;
@@ -30,7 +37,16 @@ public class Controller {
     private final ToggleGroup navigationToggle = new ToggleGroup(); // Navigation button toggle controller
     public VBox navigationBar; // VBox for navigationBar
 
+    // References to canvas controllers
+    private HomeController homeController;
+    private BindersController bindersController;
+    private SettingsController settingsController;
+    private LogController logController;
+
     public void initialize() throws IOException {
+
+        mainControllerReference = this;
+
         // Sets all of the navigation toggle buttons into a group
         logToggleNavigation.setToggleGroup(navigationToggle);
         settingsToggleNavigation.setToggleGroup(navigationToggle);
@@ -52,6 +68,7 @@ public class Controller {
         updateMainCanvasConstraints();
     }
 
+    //region panel changer
     public void changePaneToHome() {
         reToggleNavigationButton(homeToggleNavigation);
         changeMainCanvasPane(homePane);
@@ -80,12 +97,14 @@ public class Controller {
         // Changes the main canvas panel into something else specified.
         if (currentPane != pane) {
             mainCanvas.getChildren().remove(currentPane);
-//        pane.setPrefWidth(mainCanvas.getWidth());
-//        pane.setPrefHeight(mainCanvas.getHeight());
+//            pane.setPrefWidth(mainCanvas.getWidth());
+//            pane.setPrefHeight(mainCanvas.getHeight());
             currentPane = pane;
             mainCanvas.getChildren().add(currentPane);
         }
     }
+    //endregion
+
 
     private void reToggleNavigationButton(Toggle toggleButton) {
         // If a current button has been deactivated, that means that no button is active. So, reactivate it.
@@ -101,4 +120,41 @@ public class Controller {
         AnchorPane.setBottomAnchor(currentPane, 0.0);
     }
 
+    //region Setter and getter for controllers
+    public HomeController getHomeController() {
+        return homeController;
+    }
+
+    public void setHomeController(HomeController homeController) {
+        this.homeController = homeController;
+    }
+
+    public BindersController getBindersController() {
+        return bindersController;
+    }
+
+    public void setBindersController(BindersController bindersController) {
+        this.bindersController = bindersController;
+    }
+
+    public SettingsController getSettingsController() {
+        return settingsController;
+    }
+
+    public void setSettingsController(SettingsController settingsController) {
+        this.settingsController = settingsController;
+    }
+
+    public LogController getLogController() {
+        return logController;
+    }
+
+    public void setLogController(LogController logController) {
+        this.logController = logController;
+    }
+
+    public static Controller getMainControllerReference() {
+        return mainControllerReference;
+    }
+    //endregion
 }

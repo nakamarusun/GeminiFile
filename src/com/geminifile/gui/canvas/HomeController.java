@@ -1,6 +1,7 @@
 package com.geminifile.gui.canvas;
 
 import com.geminifile.core.MathUtil;
+import com.geminifile.gui.Controller;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
@@ -39,6 +40,9 @@ public class HomeController {
     private boolean serviceStarted = false;
 
     public void initialize() {
+        // Sets the reference for easy access.
+        Controller.getMainControllerReference().setHomeController(this);
+
         binderCount.setText("-");
         selfIpAddress.setText("-");
         lastSyncedDate.setText("-");
