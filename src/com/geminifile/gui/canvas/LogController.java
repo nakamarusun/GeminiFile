@@ -4,6 +4,7 @@ import com.geminifile.core.DefaultFormatter;
 import com.geminifile.core.GeminiLogger;
 import com.geminifile.core.service.Service;
 import com.geminifile.gui.Controller;
+import com.geminifile.gui.Refresh;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.text.Text;
@@ -18,7 +19,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.StreamHandler;
 
-public class LogController {
+public class LogController implements Refresh {
 
     public Button logButton;
     public TextArea logTextArea;
@@ -39,14 +40,10 @@ public class LogController {
         logStream = new StreamHandler(printStream, new DefaultFormatter());
         logStream.setFormatter(new DefaultFormatter());
         Service.LOGGER.addHandler(logStream);
+    }
 
-        // Initializes a scheduler to refreshes the log every time
-        ScheduledExecutorService autoLogger = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread trd = new Thread(r, "autoLogger");
-            trd.setDaemon(true); // Sets it into daemon, so it automatically quits when the program is closed.
-            return trd;
-        });
-        autoLogger.scheduleAtFixedRate(this::refreshLogger, 500, 500, TimeUnit.MILLISECONDS); // Runs this function every 500 milliseconds
+    public void onRefresh() {
+        refreshLogger();
     }
 
     public void logButtonAction() {

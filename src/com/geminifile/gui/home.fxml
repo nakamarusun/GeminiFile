@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.Image?>
@@ -13,12 +14,10 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.HomeController">
    <children>
       <Text layoutX="38.0" layoutY="296.34375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binders:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="30.689453125" AnchorPane.leftAnchor="38.0" />
-      <Text layoutX="38.0" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Last Synced:" AnchorPane.bottomAnchor="14.171875" AnchorPane.leftAnchor="38.0" />
       <Text fx:id="binderCount" layoutX="155.0" layoutY="295.96484375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="31.068359375" AnchorPane.leftAnchor="155.0" />
-      <Text fx:id="lastSyncedDate" layoutX="155.0" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="14.171875" AnchorPane.leftAnchor="155.0" />
       <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Home" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
-      <Text layoutX="388.29296875" layoutY="312.861328125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="IP Address:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="14.171875" AnchorPane.rightAnchor="124.923828125" />
-      <Text fx:id="selfIpAddress" layoutX="544.58984375" layoutY="311.828125" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" textAlignment="RIGHT" AnchorPane.bottomAnchor="15.205078125" AnchorPane.rightAnchor="47.6240234375" />
+      <Text layoutX="37.349609375" layoutY="314.921875" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="IP Address:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="12.111328125" AnchorPane.leftAnchor="37.349609375" />
+      <Text fx:id="selfIpAddress" layoutX="155.0" layoutY="314.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="13.033203125" AnchorPane.leftAnchor="155.0" />
       <Separator layoutX="20.0" layoutY="273.0" prefHeight="0.0" prefWidth="556.0" AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
       <VBox alignment="CENTER" layoutX="174.0" layoutY="57.0" prefHeight="216.0" prefWidth="252.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="174.0" AnchorPane.rightAnchor="174.0" AnchorPane.topAnchor="57.0">
          <children>
@@ -31,18 +30,21 @@
                               <Image url="@img/GeminiFlap1.png" />
                            </image>
                         </ImageView>
-                        <ImageView fx:id="logoSubFlap" fitHeight="210.0" fitWidth="212.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="logoSubFlap" fitHeight="210.0" fitWidth="212.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <image>
                               <Image url="@img/GeminiFlap2.png" />
                            </image>
                         </ImageView>
-                        <Circle fx:id="logoCircle" fill="#1c2452" layoutX="106.5" layoutY="105.0" radius="40.5" stroke="TRANSPARENT" strokeType="INSIDE" styleClass="logo-circle" />
+                        <Circle fx:id="logoCircle" fill="#1c2452" layoutX="106.5" layoutY="105.0" radius="40.5" stroke="TRANSPARENT" strokeType="INSIDE" styleClass="logo-circle" AnchorPane.bottomAnchor="64.5" AnchorPane.leftAnchor="66.0" AnchorPane.rightAnchor="63.0" AnchorPane.topAnchor="64.5" />
                         <Text fx:id="logoMainText" layoutX="50.0" layoutY="101.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-main" text="Start" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
                         <Text fx:id="logoSubText" layoutX="50.0" layoutY="118.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="logo-font-sub" text="GeminiFile" textAlignment="CENTER" textOrigin="CENTER" wrappingWidth="113.474609375" />
                         <Button fx:id="logoButton" layoutX="75.0" layoutY="74.0" mnemonicParsing="false" onMouseClicked="#clickCircle" onMouseEntered="#hoverCircle" onMouseExited="#exitCircle" opacity="0.0" prefHeight="63.0" prefWidth="64.0" text="Button" />
                      </children>
                   </AnchorPane>
                </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
             </HBox>
          </children>
       </VBox>

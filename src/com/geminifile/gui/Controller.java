@@ -12,6 +12,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Controller {
 
@@ -66,6 +69,23 @@ public class Controller {
         currentPane = homePane;
         mainCanvas.getChildren().add(homePane);
         updateMainCanvasConstraints();
+
+        // Adds an event that runs every 500 second
+        // Initializes a scheduler to refreshes the all of the need variables every time.
+        ScheduledExecutorService autoLogger = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread trd = new Thread(r, "AutoRefresher");
+            trd.setDaemon(true); // Sets it into daemon, so it automatically quits when the program is closed.
+            return trd;
+        });
+
+        // Add all events here
+        autoLogger.scheduleAtFixedRate(() -> {
+            // Refreshes everything that needs to be refreshed.
+            getLogController().onRefresh();
+            getHomeController().onRefresh();
+            getSettingsController().onRefresh();
+            getBindersController().onRefresh();
+        }, 500, 500, TimeUnit.MILLISECONDS); // Runs this function every 500 milliseconds
     }
 
     //region panel changer

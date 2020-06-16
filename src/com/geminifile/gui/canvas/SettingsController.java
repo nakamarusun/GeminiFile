@@ -4,6 +4,7 @@ import com.geminifile.core.CONSTANTS;
 import com.geminifile.core.GeminiLogger;
 import com.geminifile.core.service.Service;
 import com.geminifile.gui.Controller;
+import com.geminifile.gui.Refresh;
 import javafx.scene.control.*;
 import org.json.JSONObject;
 
@@ -13,7 +14,7 @@ import java.io.IOException;
 import java.util.Scanner;
 import java.util.logging.Level;
 
-public class SettingsController {
+public class SettingsController implements Refresh {
 
     public CheckBox saveLogsCheck;
     public CheckBox autoStartCheck;
@@ -38,6 +39,10 @@ public class SettingsController {
             }
         }
         loadConfigFile();
+    }
+
+    public void onRefresh() {
+
     }
 
     public void writeDefaultFile() throws IOException {

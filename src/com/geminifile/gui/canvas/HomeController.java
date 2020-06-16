@@ -1,8 +1,10 @@
 package com.geminifile.gui.canvas;
 
 import com.geminifile.core.MathUtil;
+import com.geminifile.core.fileparser.binder.BinderManager;
 import com.geminifile.core.service.Service;
 import com.geminifile.gui.Controller;
+import com.geminifile.gui.Refresh;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
@@ -15,11 +17,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
-public class HomeController {
+public class HomeController implements Refresh {
 
     // Texts
     public Text binderCount;
-    public Text lastSyncedDate;
     public Text selfIpAddress;
 
     public ImageView logoMainFlap;
@@ -47,38 +48,48 @@ public class HomeController {
 
         binderCount.setText("-");
         selfIpAddress.setText("-");
-        lastSyncedDate.setText("-");
 
         // Sets the animation for the main flap
         mainFlapRotator = new RotateTransition();
+        mainFlapRotator.setAutoReverse(true);
+        mainFlapRotator.setNode(logoMainFlap);
+        mainFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         mainFlapRotator.setOnFinished(actionEvent -> regenerateMainFlapRotator());
 
         // Sets the animation for sub flap
         subFlapRotator = new RotateTransition();
+        subFlapRotator.setAutoReverse(true);
+        subFlapRotator.setNode(logoSubFlap);
+        subFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         subFlapRotator.setOnFinished(actionEvent -> regenerateSubFlapRotator());
 
         logoCircle.setFill(defaultColor);
     }
 
+    public void onRefresh() {
+        if (serviceStarted) {
+
+            binderCount.setText(String.valueOf(BinderManager.getAllBinders().size()));
+            if (Service.getCurrentIp() != null) {
+                selfIpAddress.setText(Service.getCurrentIp().getHostAddress());
+            }
+
+        }
+    }
+
     public void regenerateMainFlapRotator() {
         mainFlapRotator.stop();
-        mainFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         mainFlapRotator.setDuration(Duration.millis(MathUtil.randomRange(5000, 12000)));
-        mainFlapRotator.setNode(logoMainFlap);
         mainFlapRotator.setByAngle(MathUtil.randomRange(180, 500));
-        mainFlapRotator.setCycleCount(2);
-        mainFlapRotator.setAutoReverse(MathUtil.randomBoolean());
+        mainFlapRotator.setCycleCount(MathUtil.randomRange(1, 3));
         mainFlapRotator.play();
     }
 
     public void regenerateSubFlapRotator() {
         subFlapRotator.stop();
-        mainFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         subFlapRotator.setDuration(Duration.millis(MathUtil.randomRange(3000, 7000)));
-        subFlapRotator.setNode(logoSubFlap);
         subFlapRotator.setByAngle(MathUtil.randomRange(360, 900));
-        subFlapRotator.setCycleCount(2);
-        subFlapRotator.setAutoReverse(MathUtil.randomBoolean());
+        subFlapRotator.setCycleCount(MathUtil.randomRange(1, 3));
         subFlapRotator.play();
     }
 
@@ -109,6 +120,10 @@ public class HomeController {
 
             // Stops service
             stopGeminiFileService();
+
+            // Reset all of the text.
+            binderCount.setText("-");
+            selfIpAddress.setText("-");
 
             // Stop animations
             mainFlapRotator.stop();
