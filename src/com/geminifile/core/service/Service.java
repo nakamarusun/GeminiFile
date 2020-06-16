@@ -42,12 +42,6 @@ public class Service {
             LOGGER.log(Level.SEVERE, "exception", e);
         }
 
-        // Add a shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // Save all of the binders before quitting.
-            BinderManager.saveMyBinders();
-        }, "ShutdownHook"));
-
         stopService = false;
         threadRef = Thread.currentThread();
 
@@ -198,6 +192,7 @@ public class Service {
         // Stops the geminiFileService
         stopService = true;
         threadRef.interrupt();
+        BinderManager.clearBinderList();
         LOGGER.warning("GeminiFile service is stopping...");
     }
 }

@@ -60,3 +60,33 @@
     -fx-background-color: #582a62;
     -fx-min-height: 50px;
 }
+
+.binders-text {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 18px;
+}
+
+.binders-id {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.binders-path {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+}
+
+.binders-last-modified {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 16px;
+}
+
+.binders-delete-button {
+	-fx-fill: #5acee0;
+	-fx-stroke: rgba(0%, 0%, 0%, 0);
+}
+
+.binders-delete-dash {
+	-fx-fill: #9b41ab;
+}

@@ -14,10 +14,10 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="600.0" stylesheets="@GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.HomeController">
    <children>
       <Text layoutX="38.0" layoutY="296.34375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binders:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="30.689453125" AnchorPane.leftAnchor="38.0" />
-      <Text fx:id="binderCount" layoutX="155.0" layoutY="295.96484375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="31.068359375" AnchorPane.leftAnchor="155.0" />
+      <Text fx:id="binderCount" layoutX="155.0" layoutY="295.96484375" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" wrappingWidth="81.0" AnchorPane.bottomAnchor="31.0" AnchorPane.leftAnchor="155.0" />
       <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Home" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
       <Text layoutX="37.349609375" layoutY="314.921875" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="IP Address:" wrappingWidth="86.783203125" AnchorPane.bottomAnchor="12.111328125" AnchorPane.leftAnchor="37.349609375" />
-      <Text fx:id="selfIpAddress" layoutX="155.0" layoutY="314.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" AnchorPane.bottomAnchor="13.033203125" AnchorPane.leftAnchor="155.0" />
+      <Text fx:id="selfIpAddress" layoutX="155.0" layoutY="314.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="0" wrappingWidth="98.7861328125" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="155.0" />
       <Separator layoutX="20.0" layoutY="273.0" prefHeight="0.0" prefWidth="556.0" AnchorPane.bottomAnchor="54.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
       <VBox alignment="CENTER" layoutX="174.0" layoutY="57.0" prefHeight="216.0" prefWidth="252.0" AnchorPane.bottomAnchor="57.0" AnchorPane.leftAnchor="174.0" AnchorPane.rightAnchor="174.0" AnchorPane.topAnchor="57.0">
          <children>

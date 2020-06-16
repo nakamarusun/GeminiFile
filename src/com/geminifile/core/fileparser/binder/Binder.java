@@ -93,7 +93,7 @@ public class Binder {
     }
 
     public void updateDirectoryLastModified() {
-        directoryLastModified = directory.lastModified();
+        directoryLastModified = (new Date()).getTime();
     }
 
     public String getFileToIgnore() {
@@ -250,6 +250,8 @@ public class Binder {
                         if (!valid) {
                             break;
                         }
+                        // Updates the JSON file
+                        BinderManager.saveMyBinders();
 
                     } catch (InterruptedException ex) {
                         // Quit the thread

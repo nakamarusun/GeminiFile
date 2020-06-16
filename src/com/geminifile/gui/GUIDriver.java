@@ -1,5 +1,6 @@
 package com.geminifile.gui;
 
+import com.geminifile.core.CLIDriver;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +28,12 @@ public class GUIDriver extends Application {
 
     public static void main(String[] args) {
         System.out.println("GeminiFile GUI v0.0.1");
-        launch(args);
+
+        // If there is any argument in starting the program then, start the CLI version instead.
+        if (args.length > 0) {
+            CLIDriver.main(args);
+        } else {
+            launch(args);
+        }
     }
 }

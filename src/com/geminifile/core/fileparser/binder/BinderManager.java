@@ -78,10 +78,6 @@ public class BinderManager {
         for (Binder e : binders) {
             e.startWatcher();
         }
-
-        // Saves the binders.
-        saveMyBinders();
-
     }
 
     public static List<Binder> getAllBinders() {
@@ -209,4 +205,7 @@ public class BinderManager {
         BinderManager.start();
     }
 
+    public static void clearBinderList() {
+        binders.clear();
+    }
 }

@@ -10,12 +10,16 @@ import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+import java.io.IOException;
 
 public class HomeController implements Refresh {
 
@@ -42,7 +46,7 @@ public class HomeController implements Refresh {
     private boolean serviceStarted = false;
     Thread geminiService = new Thread("GeminiFileService");
 
-    public void initialize() {
+    public void initialize() throws IOException {
         // Sets the reference for easy access.
         Controller.getMainControllerReference().setHomeController(this);
 
