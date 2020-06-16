@@ -49,11 +49,12 @@ public class BinderManager {
     public static void start() {
         Service.LOGGER.info("[FILE] Binder Manager is Starting...");
         binderDeltaOperations.clear(); // Clears delta operations
-        binders.clear(); // clear binders
 
         for (Binder e : binders) { // Clears the watcher
             e.stopWatcher();
         }
+
+        binders.clear(); // clear binders
 
         // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
@@ -77,7 +78,8 @@ public class BinderManager {
         for (Binder e : binders) {
             e.startWatcher();
         }
-        // Communicates with other peers to sync files
+
+        // Saves the binders.
         saveMyBinders();
 
     }
@@ -138,6 +140,7 @@ public class BinderManager {
             myBinders = new JSONObject(content.toString());
         } catch (JSONException e) {
             Service.LOGGER.severe("[FILE] Error opening " + MYBINDERSPATH + MYBINDERSFILENAME);
+            Service.LOGGER.log(Level.SEVERE, "Exception", e);
             System.exit(5);
         } catch (FileNotFoundException e) {
             Service.LOGGER.severe("[FILE] MyBinders file is not found: " + myBindersFile.getAbsolutePath());

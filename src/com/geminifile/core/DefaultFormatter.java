@@ -11,7 +11,16 @@ public class DefaultFormatter extends Formatter {
 
     @Override
     public String format(LogRecord rec) {
-        return "{" + rec.getLevel() + "} - " + rec.getMessage() + "\n";
+
+        // Puts all of the exceptions into the file.
+        StringBuilder exceptions = new StringBuilder();
+        if (rec.getThrown() != null) {
+            for (StackTraceElement e : rec.getThrown().getStackTrace()) {
+                exceptions.append(e.toString()).append("\n");
+            }
+        }
+
+        return "{" + rec.getLevel() + "} - " + rec.getMessage() + "\n" + exceptions.toString();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.geminifile.gui.canvas;
 
 import com.geminifile.core.MathUtil;
+import com.geminifile.core.service.Service;
 import com.geminifile.gui.Controller;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -38,6 +39,7 @@ public class HomeController {
     public Text logoSubText;
 
     private boolean serviceStarted = false;
+    Thread geminiService = new Thread("GeminiFileService");
 
     public void initialize() {
         // Sets the reference for easy access.
@@ -59,19 +61,23 @@ public class HomeController {
     }
 
     public void regenerateMainFlapRotator() {
+        mainFlapRotator.stop();
+        mainFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         mainFlapRotator.setDuration(Duration.millis(MathUtil.randomRange(5000, 12000)));
         mainFlapRotator.setNode(logoMainFlap);
         mainFlapRotator.setByAngle(MathUtil.randomRange(180, 500));
-        mainFlapRotator.setCycleCount(1);
+        mainFlapRotator.setCycleCount(2);
         mainFlapRotator.setAutoReverse(MathUtil.randomBoolean());
         mainFlapRotator.play();
     }
 
     public void regenerateSubFlapRotator() {
+        subFlapRotator.stop();
+        mainFlapRotator.setInterpolator(Interpolator.EASE_BOTH);
         subFlapRotator.setDuration(Duration.millis(MathUtil.randomRange(3000, 7000)));
         subFlapRotator.setNode(logoSubFlap);
         subFlapRotator.setByAngle(MathUtil.randomRange(360, 900));
-        subFlapRotator.setCycleCount(1);
+        subFlapRotator.setCycleCount(2);
         subFlapRotator.setAutoReverse(MathUtil.randomBoolean());
         subFlapRotator.play();
     }
@@ -86,13 +92,38 @@ public class HomeController {
         if (!serviceStarted) {
             serviceStarted = true;
             // Change texts
-            logoMainText.setText("Starting");
-            logoSubText.setText("Please Wait..");
+            logoMainText.setText("Started");
+            logoSubText.setText("STATUS OK!");
+
+            // Start service.
+            startGeminiFileService();
 
             // Start animations
             regenerateMainFlapRotator();
             regenerateSubFlapRotator();
+        } else {
+            serviceStarted = false;
+            // Change texts
+            logoMainText.setText("Start");
+            logoSubText.setText("GeminiFile");
+
+            // Stops service
+            stopGeminiFileService();
+
+            // Stop animations
+            mainFlapRotator.stop();
+            subFlapRotator.stop();
         }
+    }
+
+    public void startGeminiFileService() {
+        geminiService = new Thread(Service::start, "GeminiFileService");
+        geminiService.setDaemon(true);
+        geminiService.start();
+    }
+
+    public void stopGeminiFileService() {
+        Service.stopService();
     }
 
     public void exitCircle() {

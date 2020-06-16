@@ -27,6 +27,7 @@ This local host can only serve one connection at a time.
 public class LocalServerCommunicator implements Runnable {
 
     private static Thread localServerThread;
+    private static ServerSocket ssock;
 
     public static void startLocalServer() {
 
@@ -73,7 +74,7 @@ public class LocalServerCommunicator implements Runnable {
         By setting up a local host server, it can receive and send messages and commands.
          */
         Service.LOGGER.info("[LSERVER] Opening in localhost:" + LOCALPORT);
-        ServerSocket ssock = null;
+        ssock = null;
         try {
             ssock = new ServerSocket(LOCALPORT);
         } catch (IOException e) {
@@ -113,10 +114,24 @@ public class LocalServerCommunicator implements Runnable {
 
             } catch (SocketException | EOFException ec) {
                 Service.LOGGER.severe("[LSERVER] Client Disconnected.");
+                if (localServerThread.isInterrupted()) break; // breaks from loop when service is stopped.
             } catch (IOException e) {
                 Service.LOGGER.severe("[LSERVER] Socket error.");
                 Service.LOGGER.log(Level.SEVERE, "exception", e);
+            } catch (Exception e) {
+                Service.LOGGER.log(Level.SEVERE, "exception", e);
+                break;
             }
         }
+    }
+
+    public static void stopService() {
+        try {
+            ssock.close(); // Closes the service
+        } catch (IOException e) {
+            Service.LOGGER.severe("[LSERVER] Error closing serversocket.");
+            Service.LOGGER.log(Level.SEVERE, "exception", e);
+        }
+        localServerThread.interrupt(); // And interrupts the thread.
     }
 }

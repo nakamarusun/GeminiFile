@@ -6,6 +6,7 @@ import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
+import com.geminifile.gui.canvas.LogController;
 
 import java.io.IOException;
 import java.net.*;
@@ -29,6 +30,9 @@ public class Service {
 
     public final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME); // Main logger
 
+    public static boolean stopService;
+    public static Thread threadRef;
+
     public static void start() {
 
         // Initializes the logger
@@ -43,6 +47,9 @@ public class Service {
             // Save all of the binders before quitting.
             BinderManager.saveMyBinders();
         }, "ShutdownHook"));
+
+        stopService = false;
+        threadRef = Thread.currentThread();
 
         LOGGER.info("Service is starting...");
         // Starts local server message command processor
@@ -148,6 +155,11 @@ public class Service {
                 PeerCommunicatorManager.stopService();
                 // Stops NerFileManager
                 NetFileManager.stopService();
+                // Stops local server
+                LocalServerCommunicator.stopService();
+            }
+            if (stopService) {
+                break;
             }
         }
     }
@@ -182,4 +194,10 @@ public class Service {
         return InetAddress.getLoopbackAddress();
     }
 
+    public static void stopService() {
+        // Stops the geminiFileService
+        stopService = true;
+        threadRef.interrupt();
+        LOGGER.warning("GeminiFile service is stopping...");
+    }
 }

@@ -37,7 +37,7 @@ public class LogController {
         loggerContent = new ByteArrayOutputStream();
         printStream = new PrintStream(loggerContent);
         logStream = new StreamHandler(printStream, new DefaultFormatter());
-
+        logStream.setFormatter(new DefaultFormatter());
         Service.LOGGER.addHandler(logStream);
 
         // Initializes a scheduler to refreshes the log every time
@@ -50,14 +50,13 @@ public class LogController {
     }
 
     public void logButtonAction() {
-        Service.LOGGER.info((new Date()).toString());
+        refreshLogger();
     }
 
     public void refreshLogger() {
         logStream.flush(); // Flushes the log
         logTextArea.appendText(loggerContent.toString());
-        System.out.println(loggerContent.size());
-        loggerContent.reset();
+        loggerContent.reset(); // Clears the loggerContent buffer
     }
 
 }

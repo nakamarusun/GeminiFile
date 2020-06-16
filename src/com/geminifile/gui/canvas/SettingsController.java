@@ -4,10 +4,7 @@ import com.geminifile.core.CONSTANTS;
 import com.geminifile.core.GeminiLogger;
 import com.geminifile.core.service.Service;
 import com.geminifile.gui.Controller;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -82,6 +79,7 @@ public class SettingsController {
         if (json.optBoolean("autostart")) {
             autoStartCheck.setSelected(true);
             // Starts the geminifile service
+            Controller.getMainControllerReference().getHomeController().clickCircle();
         }
 
         if (json.optBoolean("savelogs")) {
