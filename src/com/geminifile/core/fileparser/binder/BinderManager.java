@@ -111,6 +111,7 @@ public class BinderManager {
     }
 
     public static void saveMyBinders() {
+        Service.LOGGER.info("Saved binders to JSON file at :" + myBindersFile.getAbsolutePath());
         // First, update all of the myBinders JSONObject, and saves it.
         updateMyBinders();
         // Writes into file
@@ -126,6 +127,7 @@ public class BinderManager {
     }
 
     public static void loadMyBinders() {
+        Service.LOGGER.info("Loaded binders JSON from:" + myBindersFile.getAbsolutePath());
         // Read file and put in myBinders
         try {
             Scanner fileReader = new Scanner(myBindersFile);
@@ -207,5 +209,19 @@ public class BinderManager {
 
     public static void clearBinderList() {
         binders.clear();
+    }
+
+    public static void addNewBinder(Binder binder) {
+        binders.add(binder); // Adds into list
+        binder.startWatcher(); // Starts the watcher
+        Service.LOGGER.info("Added new binder to the device !" + binder.toString());
+        BinderManager.saveMyBinders(); // Saves into json
+    }
+
+    public static void removeBinder(Binder binder) {
+        binder.stopWatcher(); // Stops the watcher
+        binders.remove(binder); // Removes from the list
+        Service.LOGGER.info("Removed binder from device !" + binder.toString());
+        BinderManager.saveMyBinders(); // Saves the json
     }
 }

@@ -10,6 +10,6 @@
       <Text layoutX="38.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Settings" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
       <CheckBox fx:id="saveLogsCheck" layoutX="32.0" layoutY="97.0" mnemonicParsing="false" text="Auto Save logs" />
       <CheckBox fx:id="autoStartCheck" layoutX="32.0" layoutY="72.0" mnemonicParsing="false" text="Auto start service" />
-      <Button fx:id="saveSettingsButton" layoutX="454.0" layoutY="266.0" mnemonicParsing="false" onAction="#saveConfigFileButton" text="Save Settings" AnchorPane.bottomAnchor="33.0" AnchorPane.rightAnchor="38.0" />
+      <Button fx:id="saveSettingsButton" layoutX="454.0" layoutY="266.0" mnemonicParsing="false" onAction="#saveConfigFileButton" styleClass="gemini-button" text="Save Settings" AnchorPane.bottomAnchor="33.0" AnchorPane.rightAnchor="38.0" />
    </children>
 </AnchorPane>

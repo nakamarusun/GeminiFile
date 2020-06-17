@@ -9,6 +9,7 @@
    <children>
       <Text layoutX="48.0" layoutY="55.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="header-text" text="Binders" wrappingWidth="134.13671875" AnchorPane.leftAnchor="38.0" AnchorPane.topAnchor="33.0" />
       <ListView fx:id="binderListView" layoutX="16.0" layoutY="76.0" prefHeight="210.0" prefWidth="568.0" AnchorPane.bottomAnchor="44.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="76.0" />
-      <Button layoutX="482.0" layoutY="295.0" mnemonicParsing="false" text="Add new binder" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="17.0" />
+      <Button fx:id="addBinderButton" layoutX="482.0" layoutY="295.0" mnemonicParsing="false" onMouseClicked="#addButton" styleClass="gemini-button" text="Add new binder" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="17.0" />
+      <Button fx:id="refreshButton" layoutX="16.0" layoutY="295.0" mnemonicParsing="false" onMouseClicked="#refreshBindersCellList" styleClass="gemini-button" text="Refresh" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="16.0" />
    </children>
 </AnchorPane>

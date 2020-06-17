@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="211.0" prefWidth="400.0" stylesheets="@../GeminiGUI.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geminifile.gui.canvas.NewBinderController">
+   <children>
+      <Button layoutX="276.0" layoutY="258.0" mnemonicParsing="false" onMouseClicked="#saveButton" styleClass="gemini-button" text="Save binder" AnchorPane.bottomAnchor="16.0" AnchorPane.rightAnchor="24.0" />
+      <Button layoutX="195.0" layoutY="258.0" mnemonicParsing="false" onMouseClicked="#cancelButton" styleClass="gemini-button" text="Cancel" AnchorPane.bottomAnchor="16.0" AnchorPane.rightAnchor="139.0" />
+      <Text layoutX="24.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binder Name:" />
+      <TextField fx:id="newNameField" layoutX="126.0" layoutY="23.0" prefHeight="25.0" prefWidth="244.0" />
+      <Text layoutX="24.0" layoutY="76.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Binder ID*:" />
+      <TextField fx:id="newIdField" layoutX="126.0" layoutY="58.0" prefHeight="25.0" prefWidth="244.0" />
+      <Text layoutX="24.0" layoutY="111.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="common-text" text="Path:" />
+      <TextField fx:id="newPathField" layoutX="126.0" layoutY="93.0" prefHeight="25.0" prefWidth="175.0" />
+      <Text layoutX="24.0" layoutY="141.0" strokeType="OUTSIDE" strokeWidth="0.0" text="*If you don't specify an id, a random id will be generated." />
+      <Button fx:id="browseDirButton" layoutX="296.0" layoutY="93.0" mnemonicParsing="false" onMouseClicked="#browsePathDir" prefHeight="26.0" prefWidth="74.0" styleClass="gemini-button" text="Browse" />
+   </children>
+</AnchorPane>

@@ -190,9 +190,11 @@ public class Service {
 
     public static void stopService() {
         // Stops the geminiFileService
-        stopService = true;
-        threadRef.interrupt();
-        BinderManager.clearBinderList();
-        LOGGER.warning("GeminiFile service is stopping...");
+        if (threadRef != null) {
+            stopService = true;
+            threadRef.interrupt();
+            BinderManager.clearBinderList();
+            LOGGER.warning("GeminiFile service is stopping...");
+        }
     }
 }

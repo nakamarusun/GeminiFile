@@ -12,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Paint;
@@ -132,6 +133,7 @@ public class HomeController implements Refresh {
             // Stop animations
             mainFlapRotator.stop();
             subFlapRotator.stop();
+            Controller.getMainControllerReference().getBindersController().refreshBindersCellList();
         }
     }
 
@@ -147,5 +149,9 @@ public class HomeController implements Refresh {
 
     public void exitCircle() {
         logoCircle.setFill(defaultColor);
+    }
+
+    public boolean isServiceStarted() {
+        return serviceStarted;
     }
 }

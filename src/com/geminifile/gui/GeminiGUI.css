@@ -83,10 +83,27 @@
 }
 
 .binders-delete-button {
-	-fx-fill: #5acee0;
-	-fx-stroke: rgba(0%, 0%, 0%, 0);
+	-fx-fill: rgba(0%, 0%, 0%, 0);
+	-fx-stroke: #5acee0;
+	-fx-stroke-width: 3px;
 }
 
 .binders-delete-dash {
 	-fx-fill: #9b41ab;
+}
+
+.gemini-button {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+	-fx-background-color: #eaeaea;
+	-fx-text-fill: #1fadbf;
+}
+
+.gemini-button:hover {
+	-fx-text-fill: #13809c;
+}
+
+.gemini-button:pressed {
+	-fx-text-fill: #762cde;
 }
