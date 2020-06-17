@@ -12,12 +12,14 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.io.File;
+
 public class GUIDriver extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml")); // Sets the main stage
-        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("img\\icon\\logo64.png"))); // Sets the application logo
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/com/geminifile/gui/img/icon/logo64.png"))); // Sets the application logo
         primaryStage.setTitle("GeminiFile Prototype 1"); // Title
 
         // Minimum sizes
