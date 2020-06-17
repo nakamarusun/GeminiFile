@@ -238,3 +238,5 @@ gemini.conf
 gemini.log
 MyBinders.json
 gemini.log.lck
+
+/releases
