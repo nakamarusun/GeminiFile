@@ -80,7 +80,7 @@ public class CLIArgs {
                 "       #      #       \n" +
                 "   ################   \n" +
                 "###                ###\n" +
-                "GeminiFile v0.1 by Jason Christian\n" +
+                "GeminiFile v0.0.1 by Jason Christian\n" +
                 "" +
                 "");
     }

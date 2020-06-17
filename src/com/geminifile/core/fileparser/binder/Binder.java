@@ -93,7 +93,7 @@ public class Binder {
     }
 
     public void updateDirectoryLastModified() {
-        directoryLastModified = directory.lastModified();
+        directoryLastModified = (new Date()).getTime();
     }
 
     public String getFileToIgnore() {
@@ -250,6 +250,10 @@ public class Binder {
                         if (!valid) {
                             break;
                         }
+                        // Updates the JSON file
+                        if (!Thread.currentThread().isInterrupted()) {
+                            BinderManager.saveMyBinders();
+                        }
 
                     } catch (InterruptedException ex) {
                         // Quit the thread
@@ -268,7 +272,7 @@ public class Binder {
                 Service.LOGGER.log(Level.SEVERE, "exception", e);
             }
         }, "BinderWatcher-" + id);
-
+        directoryWatcher.setDaemon(true);
         directoryWatcher.start();
 
     }
@@ -320,5 +324,14 @@ public class Binder {
         if (directoryWatcher.isAlive()) {
             directoryWatcher.interrupt();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Binder{" +
+                "name='" + name + '\'' +
+                ", id='" + id + '\'' +
+                ", directory=" + directory.getAbsolutePath() +
+                '}';
     }
 }

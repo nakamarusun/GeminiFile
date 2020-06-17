@@ -49,11 +49,12 @@ public class BinderManager {
     public static void start() {
         Service.LOGGER.info("[FILE] Binder Manager is Starting...");
         binderDeltaOperations.clear(); // Clears delta operations
-        binders.clear(); // clear binders
 
         for (Binder e : binders) { // Clears the watcher
             e.stopWatcher();
         }
+
+        binders.clear(); // clear binders
 
         // Checks for a configuration file. If there is no configuration, then create it.
         if (!myBindersFile.exists() && !myBindersFile.isDirectory()) {
@@ -77,9 +78,6 @@ public class BinderManager {
         for (Binder e : binders) {
             e.startWatcher();
         }
-        // Communicates with other peers to sync files
-        saveMyBinders();
-
     }
 
     public static List<Binder> getAllBinders() {
@@ -113,6 +111,7 @@ public class BinderManager {
     }
 
     public static void saveMyBinders() {
+        Service.LOGGER.info("Saved binders to JSON file at :" + myBindersFile.getAbsolutePath());
         // First, update all of the myBinders JSONObject, and saves it.
         updateMyBinders();
         // Writes into file
@@ -128,6 +127,7 @@ public class BinderManager {
     }
 
     public static void loadMyBinders() {
+        Service.LOGGER.info("Loaded binders JSON from:" + myBindersFile.getAbsolutePath());
         // Read file and put in myBinders
         try {
             Scanner fileReader = new Scanner(myBindersFile);
@@ -138,6 +138,7 @@ public class BinderManager {
             myBinders = new JSONObject(content.toString());
         } catch (JSONException e) {
             Service.LOGGER.severe("[FILE] Error opening " + MYBINDERSPATH + MYBINDERSFILENAME);
+            Service.LOGGER.log(Level.SEVERE, "Exception", e);
             System.exit(5);
         } catch (FileNotFoundException e) {
             Service.LOGGER.severe("[FILE] MyBinders file is not found: " + myBindersFile.getAbsolutePath());
@@ -206,4 +207,21 @@ public class BinderManager {
         BinderManager.start();
     }
 
+    public static void clearBinderList() {
+        binders.clear();
+    }
+
+    public static void addNewBinder(Binder binder) {
+        binders.add(binder); // Adds into list
+        binder.startWatcher(); // Starts the watcher
+        Service.LOGGER.info("Added new binder to the device !" + binder.toString());
+        BinderManager.saveMyBinders(); // Saves into json
+    }
+
+    public static void removeBinder(Binder binder) {
+        binder.stopWatcher(); // Stops the watcher
+        binders.remove(binder); // Removes from the list
+        Service.LOGGER.info("Removed binder from device !" + binder.toString());
+        BinderManager.saveMyBinders(); // Saves the json
+    }
 }

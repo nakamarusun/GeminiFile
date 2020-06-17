@@ -1,0 +1,109 @@
+.root {
+
+}
+
+.logo-font-main {
+    -fx-text-alignment: center;
+    -fx-font-family: "sans-serif";
+    -fx-fill: #FFF;
+    -fx-font-size: 18px;
+}
+
+.logo-font-sub {
+    -fx-text-alignment: center;
+    -fx-font-family: "sans-serif";
+    -fx-fill: #FFF;
+    -fx-font-size: 11px;
+}
+
+.logo-circle {
+    -fx-fill: #1c2454;
+}
+
+.bottom-button {
+    -fx-background-color: #582a62;
+    -fx-text-alignment: center;
+    -fx-font-family: "sans-serif";
+    -fx-text-fill: #FFF;
+    -fx-font-size: 16px;
+    -fx-pref-width: 8em;
+}
+
+.bottom-button:hover {
+    -fx-background-color: #7e3587;
+}
+
+.bottom-button:pressed {
+    -fx-background-color: #1B9AAA;
+}
+
+.bottom-button:selected {
+    -fx-background-color: #1B9AAA;
+}
+
+.bottom-button-icon {
+    -fx-blend-mode: src-over;
+}
+
+.common-text {
+    -fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+}
+
+.header-text {
+    -fx-font-family: "sans-serif";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.bottom {
+    -fx-background-color: #582a62;
+    -fx-min-height: 50px;
+}
+
+.binders-text {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 18px;
+}
+
+.binders-id {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.binders-path {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+}
+
+.binders-last-modified {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 16px;
+}
+
+.binders-delete-button {
+	-fx-fill: rgba(0%, 0%, 0%, 0);
+	-fx-stroke: #5acee0;
+	-fx-stroke-width: 3px;
+}
+
+.binders-delete-dash {
+	-fx-fill: #9b41ab;
+}
+
+.gemini-button {
+	-fx-font-family: "sans-serif";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+	-fx-background-color: #eaeaea;
+	-fx-text-fill: #1fadbf;
+}
+
+.gemini-button:hover {
+	-fx-text-fill: #13809c;
+}
+
+.gemini-button:pressed {
+	-fx-text-fill: #762cde;
+}

@@ -66,7 +66,7 @@ public class PeerServerThread implements Runnable, OnConnectOperation {
             }
 
             // At this point, the device has successfully handshake and established connection with the other device
-            Service.LOGGER.severe("[PEER] Successfully established connection with " + sock.getInetAddress().getHostAddress());
+            Service.LOGGER.info("[PEER] Successfully established connection with " + sock.getInetAddress().getHostAddress());
 
             PeerCommunicationLoop commsLoop = new PeerCommunicationLoop(sock, otherNode, localObjectIn, localObjectOut);
             PeerCommunicatorManager.addPeerTable(commsLoop);

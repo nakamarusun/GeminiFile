@@ -233,3 +233,8 @@ Thumbs.db
 # End of https://www.gitignore.io/api/java,intellij,androidstudioi
 
 *.psd
+temp/
+gemini.conf
+gemini.log
+MyBinders.json
+gemini.log.lck
