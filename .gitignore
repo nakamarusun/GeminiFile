@@ -240,3 +240,6 @@ MyBinders.json
 gemini.log.lck
 
 /releases
+
+*.plantuml
+*.puml
