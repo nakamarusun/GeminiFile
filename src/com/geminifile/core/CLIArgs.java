@@ -18,6 +18,9 @@ public class CLIArgs {
 
                 "geminifile stop: stops service\n" +
 
+                "geminifile binder: does nothing on its own. Sets a new status of a binder.\n" +
+                "   [--new registers a new binder to the main service.]\n" +
+
                 "geminifile status: status of the server, folder locations to sync\n" +
                 "   [--threads views all current threads running] [-p returns all active peers] [-n shows current node] [-f in-queue file delta operations]\n" +
                 "   [--binders all of the binders in this device]\n" +

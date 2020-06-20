@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
 
@@ -154,6 +155,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                     String[] receivedJSON = contentWithoutStart.split("-");
                     for (String e : receivedJSON) {
 
+                        Service.LOGGER.severe(e);
                         JSONObject fileDeltaJSON = new JSONObject(e);
                         BinderFileDelta fileDelta = new BinderFileDelta(fileDeltaJSON);
 
@@ -170,6 +172,7 @@ public class PeerMsgProcessor extends MsgProcessor implements ExpectingReply {
                             BinderManager.removeBinderDeltaOperation(fileDelta);
                         }
                     }
+                    Service.LOGGER.severe(finalString.toString());
 
                     msgProc = new MsgWrapper("AskBinderConfirmed-" + finalString.toString(), MsgType.ASK);
 

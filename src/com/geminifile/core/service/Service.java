@@ -6,7 +6,6 @@ import com.geminifile.core.fileparser.netfilemanager.NetFileManager;
 import com.geminifile.core.service.localhostconn.LocalServerCommunicator;
 import com.geminifile.core.service.localnetworkconn.IpChangeChecker;
 import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
-import com.geminifile.gui.canvas.LogController;
 
 import java.io.IOException;
 import java.net.*;

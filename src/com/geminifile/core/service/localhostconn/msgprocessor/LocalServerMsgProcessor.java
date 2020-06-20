@@ -17,6 +17,7 @@ import com.geminifile.core.socketmsg.ExpectingReply;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -138,9 +139,30 @@ public class LocalServerMsgProcessor extends MsgProcessor implements ExpectingRe
                         }
                         break;
                     case "SHUTDOWN":
-                        System.exit(0);
+                        Service.stopService();
+                        break;
+                    case "NewBinder":
+                        // String: "name,binder_id,path"
+                        String[] newBinder = msg.getContent().replace("NewBinder-", "").split(",");
+                        File file = new File(newBinder[2]);
+
+                        if (file.exists() && file.isDirectory()) {
+                            Binder binder;
+
+                            if (newBinder[1].equals("")) {
+                                binder = new Binder(newBinder[0], file);
+                            } else {
+                                binder = new Binder(newBinder[0], newBinder[1], file);
+                            }
+
+                            BinderManager.addNewBinder(binder);
+                            additionalStr.append("Successful created binder.");
+                        } else {
+                            additionalStr.append("Failed created binder.");
+                        }
+
                 }
-                msgProc = new MsgWrapper("Done" + additionalStr, MsgType.ASK);
+                msgProc = new MsgWrapper("Done" + additionalStr, MsgType.INFO);
                 break;
         }
 

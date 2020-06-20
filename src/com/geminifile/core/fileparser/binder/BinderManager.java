@@ -1,6 +1,7 @@
 package com.geminifile.core.fileparser.binder;
 
 import com.geminifile.core.service.Service;
+import com.geminifile.core.service.localnetworkconn.PeerCommunicatorManager;
 import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 import org.json.JSONArray;
@@ -216,6 +217,7 @@ public class BinderManager {
         binder.startWatcher(); // Starts the watcher
         Service.LOGGER.info("Added new binder to the device !" + binder.toString());
         BinderManager.saveMyBinders(); // Saves into json
+        PeerCommunicatorManager.sendToAllPeers(BinderManager.getAskBinderHave());
     }
 
     public static void removeBinder(Binder binder) {

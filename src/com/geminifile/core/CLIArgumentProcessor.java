@@ -5,6 +5,7 @@ import com.geminifile.core.socketmsg.MsgType;
 import com.geminifile.core.socketmsg.msgwrapper.MsgWrapper;
 
 import java.util.Map;
+import java.util.Scanner;
 
 /* Processes arguments based on the function they are calling.
 this might seem can be better coded, but this is actually for
@@ -83,6 +84,41 @@ public class CLIArgumentProcessor {
                     String binderNames = args.get(e.getKey()).replace(" ", "");
                     msg = new MsgWrapper("SyncFolders-" + binderNames, MsgType.COMMAND);
                     break;
+            }
+        }
+
+        LocalClientCommunicator.sendLocalMessage(msg);
+    }
+
+    public static void binder(Map<String, String> args) {
+
+        MsgWrapper msg = new MsgWrapper("", MsgType.NOACTION);
+        Scanner scan = new Scanner(System.in);
+
+        for (Map.Entry<String, String> e : args.entrySet()) {
+
+            StringBuilder binder = new StringBuilder();
+            switch (e.getKey()) {
+                case "new":
+
+                    System.out.println("Enter new binder details:"); // Adds the binder name
+                    System.out.println("\nBinder Name: \n");
+                    String name = scan.nextLine();
+                    if (name.equals("")) System.out.println("Please enter a valid binder name.");
+                    binder.append(name).append(",");
+
+                    System.out.println("\nBinder ID (If empty, will generate random 7 byte alphanumeric): \n"); // Adds the binder id
+                    binder.append(scan.nextLine()).append(",");
+
+                    System.out.println("\nBinder path: \n"); // Adds the path
+                    binder.append(scan.nextLine()).append(",");
+
+                    msg = new MsgWrapper("NewBinder-" + binder.toString(), MsgType.COMMAND);
+                    break;
+//                case "del":
+//                    // Remove whitespaces
+//                    msg = new MsgWrapper("DelBinder-" + e.getKey(), MsgType.COMMAND);
+//                    break;
             }
         }
 
